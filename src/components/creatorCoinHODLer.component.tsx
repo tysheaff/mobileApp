@@ -52,17 +52,11 @@ export function CreatorCoinHODLerComponent({
     function goToProfile() {
         if (userWhoHODL.ProfileEntryResponse &&
             userWhoHODL.ProfileEntryResponse.Username !== 'anonymous') {
-            (navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'UserProfile',
-                    params: {
-                        publicKey: userWhoHODL.ProfileEntryResponse.PublicKeyBase58Check,
-                        username: userWhoHODL.ProfileEntryResponse.Username
-                    },
-                    key: 'Profile_' + userWhoHODL.ProfileEntryResponse.PublicKeyBase58Check
-                }
-            );
+            (navigation as any).push('UserProfile', {
+                publicKey: userWhoHODL.ProfileEntryResponse.PublicKeyBase58Check,
+                username: userWhoHODL.ProfileEntryResponse.Username,
+                key: 'Profile_' + userWhoHODL.ProfileEntryResponse.PublicKeyBase58Check
+            });
         }
     }
 

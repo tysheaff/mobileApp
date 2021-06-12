@@ -42,17 +42,11 @@ export class DiamondSenderComponent extends React.Component<Props, State> {
     private goToProfile() {
         if (this.props.diamondSender.ProfileEntryResponse &&
             this.props.diamondSender.ProfileEntryResponse.Username !== 'anonymous') {
-            (this.props.navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'UserProfile',
-                    params: {
-                        publicKey: this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check,
-                        username: this.props.diamondSender.ProfileEntryResponse.Username
-                    },
-                    key: 'Profile_' + this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check
-                }
-            );
+            (this.props.navigation as any).push('UserProfile', {
+                publicKey: this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check,
+                username: this.props.diamondSender.ProfileEntryResponse.Username,
+                key: 'Profile_' + this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check
+            });
         }
     }
 

@@ -68,9 +68,12 @@ export function ContactMessagesListCardComponent(
         }
 
         navigation.navigate(
-            'Chat',
+            'MessageStack',
             {
-                contactWithMessages: contactWithMessages
+                screen: 'Chat',
+                params: {
+                    contactWithMessages: contactWithMessages
+                }
             }
         );
     }

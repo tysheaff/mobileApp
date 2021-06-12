@@ -114,7 +114,7 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
     }
 
     function goToMessages() {
-        navigation.navigate('Messages');
+        navigation.navigate('MessageStack');
     }
 
     return isSending ?

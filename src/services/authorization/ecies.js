@@ -38,7 +38,86 @@ const kdf = function (secret, outputLength) {
     ctr += 1;
   }
   return result;
-}
+};
+
+const convertUtf8 = (function () {
+  function utf8ByteToUnicodeStr(utf8Bytes) {
+    var unicodeStr = "";
+    for (var pos = 0; pos < utf8Bytes.length; ) {
+      var flag = utf8Bytes[pos];
+      var unicode = 0;
+      if (flag >>> 7 === 0) {
+        unicodeStr += String.fromCharCode(utf8Bytes[pos]);
+        pos += 1;
+      } else if ((flag & 0xfc) === 0xfc) {
+        unicode = (utf8Bytes[pos] & 0x3) << 30;
+        unicode |= (utf8Bytes[pos + 1] & 0x3f) << 24;
+        unicode |= (utf8Bytes[pos + 2] & 0x3f) << 18;
+        unicode |= (utf8Bytes[pos + 3] & 0x3f) << 12;
+        unicode |= (utf8Bytes[pos + 4] & 0x3f) << 6;
+        unicode |= utf8Bytes[pos + 5] & 0x3f;
+        unicodeStr += String.fromCodePoint(unicode);
+        pos += 6;
+      } else if ((flag & 0xf8) === 0xf8) {
+        unicode = (utf8Bytes[pos] & 0x7) << 24;
+        unicode |= (utf8Bytes[pos + 1] & 0x3f) << 18;
+        unicode |= (utf8Bytes[pos + 2] & 0x3f) << 12;
+        unicode |= (utf8Bytes[pos + 3] & 0x3f) << 6;
+        unicode |= utf8Bytes[pos + 4] & 0x3f;
+        unicodeStr += String.fromCodePoint(unicode);
+        pos += 5;
+      } else if ((flag & 0xf0) === 0xf0) {
+        unicode = (utf8Bytes[pos] & 0xf) << 18;
+        unicode |= (utf8Bytes[pos + 1] & 0x3f) << 12;
+        unicode |= (utf8Bytes[pos + 2] & 0x3f) << 6;
+        unicode |= utf8Bytes[pos + 3] & 0x3f;
+        unicodeStr += String.fromCodePoint(unicode);
+        pos += 4;
+      } else if ((flag & 0xe0) === 0xe0) {
+        unicode = (utf8Bytes[pos] & 0x1f) << 12;
+        unicode |= (utf8Bytes[pos + 1] & 0x3f) << 6;
+        unicode |= utf8Bytes[pos + 2] & 0x3f;
+        unicodeStr += String.fromCharCode(unicode);
+        pos += 3;
+      } else if ((flag & 0xc0) === 0xc0) {
+        //110
+        unicode = (utf8Bytes[pos] & 0x3f) << 6;
+        unicode |= utf8Bytes[pos + 1] & 0x3f;
+        unicodeStr += String.fromCharCode(unicode);
+        pos += 2;
+      } else {
+        unicodeStr += String.fromCharCode(utf8Bytes[pos]);
+        pos += 1;
+      }
+    }
+    return unicodeStr;
+  }
+
+  function toBytes(text) {
+    var result = [],
+      i = 0;
+    text = encodeURI(text);
+    while (i < text.length) {
+      var c = text.charCodeAt(i++);
+
+      // if it is a % sign, encode the following 2 bytes as a hex value
+      if (c === 37) {
+        result.push(parseInt(text.substr(i, 2), 16));
+        i += 2;
+
+        // otherwise, just the actual byte
+      } else {
+        result.push(c);
+      }
+    }
+
+    return coerceArray(result);
+  }
+  return {
+    toBytes: toBytes,
+    fromBytes: utf8ByteToUnicodeStr,
+  };
+})();
 
 // AES-128-CTR is used in the Parity implementation
 // Get the AES-128-CTR browser implementation
@@ -52,7 +131,7 @@ export const aesCtrEncrypt = function (counter, key, data) {
 export const aesCtrDecrypt = function (counter, key, data) {
   var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(counter));
   var decryptedBytes = aesCtr.decrypt(data);
-  var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+  var decryptedText = convertUtf8.fromBytes(decryptedBytes);
   return decryptedText;
 }
 
@@ -77,7 +156,6 @@ const derive = function (privateKeyA, publicKeyB) {
   const Px = keyA.derive(keyB.getPublic());  // BN instance
   return new Buffer(Px.toArray());
 };
-
 
 // Encrypt AES-128-CTR and serialise as in Parity
 // Serialization: <ephemPubKey><IV><CipherText><HMAC>

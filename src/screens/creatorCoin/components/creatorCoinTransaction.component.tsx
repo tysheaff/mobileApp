@@ -33,17 +33,11 @@ export class CreatorCoinTransactionComponent extends React.Component<Props, Stat
 
     goToProfile(p_profile: Profile) {
         if (p_profile.Username !== 'anonymous') {
-            (this.props.navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'UserProfile',
-                    params: {
-                        publicKey: p_profile.PublicKeyBase58Check,
-                        username: p_profile.Username
-                    },
-                    key: 'Profile_' + p_profile.PublicKeyBase58Check
-                }
-            );
+            (this.props.navigation as any).push('UserProfile', {
+                publicKey: p_profile.PublicKeyBase58Check,
+                username: p_profile.Username,
+                key: 'Profile_' + p_profile.PublicKeyBase58Check
+            });
         }
     }
 

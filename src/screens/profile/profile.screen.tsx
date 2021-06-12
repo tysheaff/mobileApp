@@ -255,15 +255,18 @@ export function ProfileScreen({ navigation, route }: any) {
         const newProfile: Profile = getProfileCopy(profile);
 
         navigation.navigate(
-            'Chat',
+            'MessageStack',
             {
-                contactWithMessages: {
-                    Messages: [],
-                    ProfileEntryResponse: newProfile,
-                    NumMessagesRead: 0,
-                    PublicKeyBase58Check: newProfile.PublicKeyBase58Check
-                },
-                loadMessages: true
+                screen: 'Chat',
+                params: {
+                    contactWithMessages: {
+                        Messages: [],
+                        ProfileEntryResponse: newProfile,
+                        NumMessagesRead: 0,
+                        PublicKeyBase58Check: newProfile.PublicKeyBase58Check
+                    },
+                    loadMessages: true
+                }
             }
         );
     }

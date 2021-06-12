@@ -2,65 +2,28 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { View, Image, StyleSheet, Text, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/core';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { TabNavigator } from './tabNavigator';
 import { AppearanceScreen } from '@screens/appearance.screen';
-import { ChatScreen } from '@screens/chatScreen';
-import { CreatePostScreen } from '@screens/createPost.screen';
-import { PostScreen } from '@screens/post.screen';
 import { ProfileScreen } from '@screens/profile/profile.screen';
 import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
-import { SearchScreen } from '@screens/search.screen';
 import { SettingsScreen } from '@screens/settings/settings.screen';
-import { MessageTopHoldersOptionsScreen } from '@screens/messageTopHolders/messageTopHoldersOptions';
-import { MessageTopHoldersInputScreen } from '@screens/messageTopHolders/messageTopHoldersInput';
-import { ChatHeaderComponent } from '@components/chatHeader.component';
-import { SearchHeaderComponent } from '@components/searchHeader';
-import { MessagesHeaderComponent } from '@screens/messages/components/messagesHeader';
-import { globals, settingsGlobals, navigatorGlobals } from '@globals';
+import { globals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
-import { MessagesScreen } from '@screens/messages/messages.screen';
 import EditProfileScreen from '@screens/profile/editProfile.screen';
+import { PostScreen } from '@screens/post.screen';
+import { CreatePostScreen } from '@screens/createPost.screen';
+import { ChatHeaderComponent } from '@components/chatHeader.component';
+import { ChatScreen } from '@screens/chatScreen';
 import { IdentityScreen } from '@screens/login/identity.screen';
 
-const Stack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 
-export function AppNavigator({ navigation }: any) {
-    function getHeaderRight(p_route: any) {
-        const focusedScreenName = getFocusedRouteNameFromRoute(p_route);
-        if (focusedScreenName === 'Profile') {
-            return <TouchableOpacity
-                style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
-                onPress={() => navigation.navigate('Settings')}
-            >
-                <Feather name="settings" size={24} color={themeStyles.fontColorMain.color} />
-            </TouchableOpacity>;
-        } else if (focusedScreenName === undefined || focusedScreenName === 'Home') {
-            return <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity
-                    style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
-                    onPress={() => navigation.navigate('Search')}
-                >
-                    <Ionicons name="ios-search" size={26} color={themeStyles.fontColorMain.color} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
-                    onPress={() => navigation.navigate('Messages')}
-                >
-                    <Feather name="send" size={26} color={themeStyles.fontColorMain.color} />
-                </TouchableOpacity>
-            </View>
-        }
-
-        return undefined;
-    }
-
+export default function ProfileStackScreen() {
     return (
-        <Stack.Navigator
-            screenOptions={{
+        <ProfileStack.Navigator
+            screenOptions={({ navigation }: any) => ({
                 headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
                 headerStyle: {
                     backgroundColor: themeStyles.containerColorMain.backgroundColor,
@@ -70,11 +33,11 @@ export function AppNavigator({ navigation }: any) {
                 headerLeft: () => <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
                     <Ionicons name="chevron-back" size={32} color="#007ef5" />
                 </TouchableOpacity>
-            }}
+            })}
         >
-            <Stack.Screen
+            <ProfileStack.Screen
                 options={
-                    ({ route }) => ({
+                    ({ navigation }) => ({
                         headerTitle: ' ',
                         headerLeft: () =>
                             <View style={styles.headerContainer}>
@@ -96,34 +59,37 @@ export function AppNavigator({ navigation }: any) {
                         headerRight: () => (
                             <View style={styles.headerContainer}>
                                 {
-                                    getHeaderRight(route)
+                                    <TouchableOpacity
+                                        style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
+                                        onPress={() => navigation.navigate('Settings')}
+                                    >
+                                        <Feather name="settings" size={24} color={themeStyles.fontColorMain.color} />
+                                    </TouchableOpacity>
                                 }
                             </View>
                         ),
                     })
                 }
-                name="CloutFeed" component={TabNavigator}
-            ></Stack.Screen>
-
-            <Stack.Screen
+                name="Profile"
+                component={ProfileScreen}
+            />
+            <ProfileStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
                 name="UserProfile"
                 component={ProfileScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
+            />
+            <ProfileStack.Screen
                 options={{
                     headerTitle: 'Edit Profile',
                     headerBackTitle: ' '
                 }}
                 name="EditProfile"
                 component={EditProfileScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
+            />
+            <ProfileStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -134,9 +100,8 @@ export function AppNavigator({ navigation }: any) {
                 }
                 name="ProfileFollowers"
                 component={ProfileFollowersScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
+            />
+            <ProfileStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -148,26 +113,42 @@ export function AppNavigator({ navigation }: any) {
                 }
                 name="CreatorCoin"
                 component={CreatorCoinScreen}
-            ></Stack.Screen>
+            />
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Settings',
+                    headerBackTitle: ' ',
+                }}
+                name="Settings"
+                component={SettingsScreen}
+            />
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Appearance',
+                    headerBackTitle: ' ',
+                }}
+                name="Appearance"
+                component={AppearanceScreen}
+            />
 
-            <Stack.Screen
+
+            <ProfileStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
                 name="Post"
                 component={PostScreen}
-            ></Stack.Screen>
+            ></ProfileStack.Screen>
 
-            <Stack.Screen
+            <ProfileStack.Screen
                 options={
                     ({ route }) => (
                         {
                             headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
                                 (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
                             headerBackTitle: 'Cancel',
-                            headerRight: () =>
-                            (
+                            headerRight: () => (
                                 <TouchableOpacity
                                     style={[styles.postButton, themeStyles.buttonBorderColor]}
                                     onPress={() => globals.createPost()}
@@ -179,97 +160,20 @@ export function AppNavigator({ navigation }: any) {
                     )}
                 name="CreatePost"
                 component={CreatePostScreen}
-            ></Stack.Screen>
+            ></ProfileStack.Screen>
 
-            <Stack.Screen
-                options={({ route }) => (
-                    {
-                        title: ' ',
-                        headerBackTitle: ' ',
-                        headerLeft: () => (
-                            route.params ?
-                                <ChatHeaderComponent contactWithMessages={(route.params as any).contactWithMessages}></ChatHeaderComponent> : undefined
-                        )
-                    }
-                )}
-                name="Chat"
-                component={ChatScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
-                options={{
-                    headerTitle: 'Settings',
-                    headerBackTitle: ' ',
-                }}
-                name="Settings"
-                component={SettingsScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
-                options={{
-                    headerTitle: ' ',
-                    headerLeft: () => <SearchHeaderComponent></SearchHeaderComponent>,
-                    headerBackTitle: ' ',
-                }}
-                name="Search"
-                component={SearchScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
-                options={{
-                    headerRight: () => <MessagesHeaderComponent></MessagesHeaderComponent>
-                }}
-                name="Messages"
-                component={MessagesScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
-                options={{
-                    headerTitle: 'Appearance',
-                    headerBackTitle: ' ',
-                }}
-                name="Appearance"
-                component={AppearanceScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
-                options={{
-                    headerTitle: 'Broadcast',
-                    headerBackTitle: ' ',
-                }}
-                name="MessageTopHoldersOptions"
-                component={MessageTopHoldersOptionsScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
-                options={{
-                    headerTitle: 'Broadcast',
-                    headerBackTitle: ' ',
-                    headerRight: () =>
-                    (
-                        <TouchableOpacity
-                            style={[styles.postButton, themeStyles.buttonBorderColor]}
-                            onPress={() => navigatorGlobals.broadcastMessage()}
-                        >
-                            <Text style={styles.postButtonText}>Send</Text>
-                        </TouchableOpacity>
-                    )
-                }}
-                name="MessageTopHoldersInput"
-                component={MessageTopHoldersInputScreen}
-            ></Stack.Screen>
-
-            <Stack.Screen
+            <ProfileStack.Screen
                 options={
                     {
                         headerStyle: { backgroundColor: '#121212', shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
                         headerTitleStyle: { color: 'white', fontSize: 20 }
                     }
                 }
-                name="Identity" component={IdentityScreen} />
-        </Stack.Navigator >
-    );
-}
+                name="Identity" component={IdentityScreen}
+            ></ProfileStack.Screen>
+        </ProfileStack.Navigator>
+    )
+};
 
 const styles = StyleSheet.create(
     {

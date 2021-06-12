@@ -159,16 +159,10 @@ export class NotificationsScreen extends React.Component<Props, State> {
     goToProfile(p_userKey: string, p_username: string) {
         if (p_username !== 'anonymous') {
             try {
-                this.props.navigation.navigate(
-                    'AppNavigator',
-                    {
-                        screen: 'UserProfile',
-                        params: {
-                            publicKey: p_userKey,
-                            username: p_username
-                        }
-                    }
-                );
+                this.props.navigation.navigate('UserProfile', {
+                    publicKey: p_userKey,
+                    username: p_username
+                });
             } catch {
                 alert('Something went wrong! Please try again.')
             }
@@ -177,16 +171,10 @@ export class NotificationsScreen extends React.Component<Props, State> {
 
     goToPost(p_postHashHex: string, p_priorityComment?: string) {
         try {
-            this.props.navigation.navigate(
-                'AppNavigator',
-                {
-                    screen: 'Post',
-                    params: {
-                        postHashHex: p_postHashHex,
-                        priorityComment: p_priorityComment
-                    }
-                }
-            );
+            this.props.navigation.navigate('Post', {
+                postHashHex: p_postHashHex,
+                priorityComment: p_priorityComment
+            });
         } catch {
             alert('Something went wrong! Please try again.')
         }

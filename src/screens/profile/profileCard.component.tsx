@@ -142,7 +142,7 @@ export class ProfileCard extends React.Component<Props, State> {
     }
 
     private goToFollowersScreen(p_selectedTab: string) {
-        this.props.navigation.navigate(
+        (this.props.navigation as any).push(
             'ProfileFollowers',
             {
                 publicKey: this.props.profile.PublicKeyBase58Check,
@@ -153,7 +153,7 @@ export class ProfileCard extends React.Component<Props, State> {
     }
 
     private goToCreatorCoinScreen() {
-        this.props.navigation.navigate(
+        (this.props.navigation as any).push(
             'CreatorCoin',
             {
                 publicKey: this.props.profile.PublicKeyBase58Check,

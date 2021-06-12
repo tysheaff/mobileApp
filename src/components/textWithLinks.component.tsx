@@ -21,16 +21,10 @@ export function TextWithLinks({ text, style, numberOfLines }: { text: string, st
                     const postHashHexStartIndex = p_url.indexOf(postLink) + postLink.length;
                     const postHashHex = p_url.slice(postHashHexStartIndex);
 
-                    (navigation as any).push(
-                        'AppNavigator',
-                        {
-                            screen: 'Post',
-                            params: {
-                                postHashHex: postHashHex
-                            },
-                            key: 'Post_' + postHashHex
-                        }
-                    );
+                    (navigation as any).push('Post', {
+                        postHashHex: postHashHex,
+                        key: 'Post_' + postHashHex
+                    });
                 } else {
                     if (!p_url.startsWith('https://') && !p_url.startsWith('https://')) {
                         p_url = 'https://' + p_url;
@@ -40,17 +34,11 @@ export function TextWithLinks({ text, style, numberOfLines }: { text: string, st
                 break;
             case 'mention':
                 const userName = p_url.slice(1);
-                (navigation as any).push(
-                    'AppNavigator',
-                    {
-                        screen: 'UserProfile',
-                        params: {
-                            username: userName,
-                            navigateByUsername: true
-                        },
-                        key: 'Post_' + userName
-                    }
-                );
+                (navigation as any).push('UserProfile', {
+                    username: userName,
+                    navigateByUsername: true,
+                    key: 'Post_' + userName
+                });
                 break;
         }
     }

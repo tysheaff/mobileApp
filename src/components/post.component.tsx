@@ -27,7 +27,8 @@ interface Props {
     disableProfileNavigation?: boolean,
     actionsDisabled?: boolean,
     hideBottomBorder?: boolean,
-    recloutedPostIndex?: number
+    recloutedPostIndex?: number,
+    isParentPost?: boolean
 }
 
 interface State {
@@ -188,47 +189,29 @@ export class PostComponent extends React.Component<Props, State> {
 
     private goToProfile() {
         if (!this.props.disableProfileNavigation) {
-            (this.props.navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'UserProfile',
-                    params: {
-                        publicKey: this.props.post.ProfileEntryResponse.PublicKeyBase58Check,
-                        username: this.props.post.ProfileEntryResponse.Username
-                    },
-                    key: 'Profile_' + this.props.post.ProfileEntryResponse.PublicKeyBase58Check
-                }
-            );
+            (this.props.navigation as any).push('UserProfile', {
+                publicKey: this.props.post.ProfileEntryResponse.PublicKeyBase58Check,
+                username: this.props.post.ProfileEntryResponse.Username,
+                key: 'Profile_' + this.props.post.ProfileEntryResponse.PublicKeyBase58Check
+            });
         }
     }
 
     private goToPost() {
         if (this.props.disablePostNavigate !== true) {
-            (this.props.navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'Post',
-                    params: {
-                        postHashHex: this.props.post.PostHashHex
-                    },
-                    key: 'Post_' + this.props.post.PostHashHex
-                }
-            );
+            (this.props.navigation as any).push('Post', {
+                postHashHex: this.props.post.PostHashHex,
+                key: 'Post_' + this.props.post.PostHashHex
+            });
         }
     }
 
     private goToRecloutedPost() {
         if (this.props.disablePostNavigate !== true) {
-            (this.props.navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'Post',
-                    params: {
-                        postHashHex: this.props.post.RecloutedPostEntryResponse.PostHashHex
-                    },
-                    key: 'Post_' + this.props.post.RecloutedPostEntryResponse.PostHashHex
-                }
-            );
+            (this.props.navigation as any).push('Post', {
+                postHashHex: this.props.post.RecloutedPostEntryResponse.PostHashHex,
+                key: 'Post_' + this.props.post.RecloutedPostEntryResponse.PostHashHex
+            });
         }
     }
 
@@ -263,6 +246,7 @@ export class PostComponent extends React.Component<Props, State> {
                         cancelButtonIndex: 3
                     },
                     callBack
+
                 );
             } else {
                 actionSheet.showActionSheet(
@@ -367,127 +351,164 @@ export class PostComponent extends React.Component<Props, State> {
     render() {
         const embeddedVideoLink: any = this.props.post.PostExtraData?.EmbedVideoURL ? parseVideoLink(this.props.post.PostExtraData?.EmbedVideoURL) : undefined;
         return (
-            <View
-                style={[
-                    styles.container,
-                    { borderBottomWidth: this.props.hideBottomBorder ? 0 : 1 },
-                    themeStyles.containerColorMain,
-                    themeStyles.borderColor
-                ]}>
-                <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
-                    <View style={styles.headerContainer}>
-                        <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
-                            <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
-                        </TouchableOpacity>
-                        <View>
-                            <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={this.goToProfile}>
-                                <Text style={[styles.username, themeStyles.fontColorMain]} >{this.props.post.ProfileEntryResponse?.Username}</Text>
+            <View style={this.props.isParentPost ? [
+                styles.parentPostContainer,
+                styles.containerVerticalPaddings,
+                themeStyles.containerColorMain,
+                themeStyles.borderColor] : [
+                themeStyles.containerColorMain,
+                themeStyles.borderColor]}>
+                {
+                    this.props.isParentPost ?
+                        <View style={{ flex: 1, paddingLeft: 10 }}>
+                            <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
+                                <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
+                            </TouchableOpacity>
+                            <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
+                        </View> : undefined
+                }
+                <View style={this.props.isParentPost ? { flex: 11 } : {}}>
+                    <View
+                        style={[
+                            styles.contentContainer,
+                            !this.props.isParentPost ? styles.containerVerticalPaddings : {},
+                            { borderBottomWidth: this.props.hideBottomBorder ? 0 : 1 },
+                            themeStyles.borderColor
+                        ]}>
+                        <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
+                            <View style={styles.headerContainer}>
                                 {
-                                    this.props.post.ProfileEntryResponse?.IsVerified ?
-                                        <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
+                                    !this.props.isParentPost ? (
+                                        <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
+                                            <Image style={styles.profilePic} source={{ uri: this.props.post.ProfileEntryResponse?.ProfilePic }}></Image>
+                                        </TouchableOpacity>
+                                    ) : undefined
                                 }
-                            </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.actionButton} activeOpacity={1}>
-                                <Ionicons name="ios-time-outline" size={14} color="#a1a1a1" />
-                                <Text style={styles.actionText}>{this.state.durationUntilNow}</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.headerRightContainer}>
-                            <View style={[styles.coinPriceContainer, themeStyles.chipColor]}>
-                                <Text style={[styles.coinPriceText, themeStyles.fontColorMain]}>
-                                    ${this.state.coinPrice}
-                                </Text>
-                            </View>
-
-                            {
-                                !this.state.actionsDisabled ?
-                                    <TouchableOpacity activeOpacity={1} onPress={this.onPostOptionsClick}>
-                                        <Feather name="more-horizontal" size={20} color="#a1a1a1" />
+                                <View>
+                                    <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={this.goToProfile}>
+                                        <Text style={[styles.username, themeStyles.fontColorMain]} >{this.props.post.ProfileEntryResponse?.Username}</Text>
+                                        {
+                                            this.props.post.ProfileEntryResponse?.IsVerified ?
+                                                <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
+                                        }
                                     </TouchableOpacity>
-                                    :
-                                    undefined
-                            }
-                        </View>
-                    </View>
-                </TouchableOpacity>
 
-                <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
-                    <TextWithLinks style={[styles.bodyText, themeStyles.fontColorMain]} text={this.props.post.Body?.trimEnd()}></TextWithLinks>
-                </TouchableOpacity>
+                                    <TouchableOpacity style={styles.actionButton} activeOpacity={1}>
+                                        <Ionicons name="ios-time-outline" size={14} color="#a1a1a1" />
+                                        <Text style={styles.actionText}>{this.state.durationUntilNow}</Text>
+                                    </TouchableOpacity>
+                                </View>
 
-                {
-                    this.props.post.ImageURLs?.length > 0 ?
-                        <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToPost={this.goToPost}></ImageGalleryComponent> :
-                        undefined
-                }
+                                <View style={styles.headerRightContainer}>
+                                    <View style={[styles.coinPriceContainer, themeStyles.chipColor]}>
+                                        <Text style={[styles.coinPriceText, themeStyles.fontColorMain]}>
+                                            ${this.state.coinPrice}
+                                        </Text>
+                                    </View>
 
-                {
-                    embeddedVideoLink ?
-                        <WebView
-                            style={[styles.videoContainer, themeStyles.containerColorMain]}
-                            source={{ uri: embeddedVideoLink }}
-                            javaScriptEnabled={true}
-                            domStorageEnabled={true}
-                        ></WebView>
-                        :
-                        undefined
-                }
+                                    {
+                                        !this.state.actionsDisabled ?
+                                            <TouchableOpacity activeOpacity={1} onPress={this.onPostOptionsClick}>
+                                                <Feather name="more-horizontal" size={20} color="#a1a1a1" />
+                                            </TouchableOpacity>
+                                            :
+                                            undefined
+                                    }
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                {
-                    this.props.post.RecloutedPostEntryResponse && (this.props.recloutedPostIndex == null || this.props.recloutedPostIndex < 2) ?
-                        <View style={[styles.recloutedPostContainer, themeStyles.recloutBorderColor]}>
-                            <TouchableOpacity onPress={this.goToRecloutedPost} activeOpacity={1}>
-                                <PostComponent
-                                    navigation={this.props.navigation}
-                                    route={this.props.route}
-                                    post={this.props.post.RecloutedPostEntryResponse}
-                                    hideBottomBorder={true}
-                                    recloutedPostIndex={this.props.recloutedPostIndex == null ? 1 : this.props.recloutedPostIndex + 1}
-                                ></PostComponent>
-                            </TouchableOpacity>
-                        </View>
-                        :
-                        undefined
-                }
-                {
-                    this.props.post.Body || this.props.post.ImageURLs?.length > 0 ?
-                        <View style={styles.actionsContainer}>
-                            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onLike.bind(this)}>
-                                <Ionicons name={this.state.likeIcon.name as any} size={24} color={this.state.likeIcon.color} />
-                                <Text style={styles.actionText}>{this.props.post.LikeCount}</Text>
-                            </TouchableOpacity>
+                        <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
+                            <TextWithLinks style={[styles.bodyText, themeStyles.fontColorMain]} text={this.props.post.Body?.trimEnd()}></TextWithLinks>
+                        </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReply}>
-                                <Fontisto name='comment' size={19} color={'#a1a1a1'} />
-                                <Text style={styles.actionText}>{this.props.post.CommentCount}</Text>
-                            </TouchableOpacity>
+                        {
+                            this.props.post.ImageURLs?.length > 0 ?
+                                <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToPost={this.goToPost}></ImageGalleryComponent> :
+                                undefined
+                        }
 
-                            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReclout}>
-                                <MaterialCommunityIcons name="twitter-retweet" size={28} color={this.props.post.PostEntryReaderState?.RecloutedByReader ? '#5ba358' : '#a1a1a1'} />
-                                <Text style={styles.actionText}>{this.props.post.RecloutCount}</Text>
-                            </TouchableOpacity>
+                        {
+                            embeddedVideoLink ?
+                                <WebView
+                                    style={[styles.videoContainer, themeStyles.containerColorMain]}
+                                    source={{ uri: embeddedVideoLink }}
+                                    javaScriptEnabled={true}
+                                    domStorageEnabled={true}
+                                ></WebView>
+                                :
+                                undefined
+                        }
 
-                            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds}>
-                                <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
-                                <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        : undefined
-                }
-            </View >
+                        {
+                            this.props.post.RecloutedPostEntryResponse && (this.props.recloutedPostIndex == null || this.props.recloutedPostIndex < 2) ?
+                                <View style={[styles.recloutedPostContainer, themeStyles.recloutBorderColor]}>
+                                    <TouchableOpacity onPress={this.goToRecloutedPost} activeOpacity={1}>
+                                        <PostComponent
+                                            navigation={this.props.navigation}
+                                            route={this.props.route}
+                                            post={this.props.post.RecloutedPostEntryResponse}
+                                            hideBottomBorder={true}
+                                            recloutedPostIndex={this.props.recloutedPostIndex == null ? 1 : this.props.recloutedPostIndex + 1}
+                                        ></PostComponent>
+                                    </TouchableOpacity>
+                                </View>
+                                :
+                                undefined
+                        }
+                        {
+                            this.props.post.Body || this.props.post.ImageURLs?.length > 0 ?
+                                <View style={styles.actionsContainer}>
+                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onLike.bind(this)}>
+                                        <Ionicons name={this.state.likeIcon.name as any} size={24} color={this.state.likeIcon.color} />
+                                        <Text style={styles.actionText}>{this.props.post.LikeCount}</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReply}>
+                                        <Fontisto name='comment' size={19} color={'#a1a1a1'} />
+                                        <Text style={styles.actionText}>{this.props.post.CommentCount}</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReclout}>
+                                        <MaterialCommunityIcons name="twitter-retweet" size={28} color={this.props.post.PostEntryReaderState?.RecloutedByReader ? '#5ba358' : '#a1a1a1'} />
+                                        <Text style={styles.actionText}>{this.props.post.RecloutCount}</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds}>
+                                        <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
+                                        <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                : undefined
+                        }
+                    </View >
+                </View>
+            </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
+    containerVerticalPaddings: {
+        paddingTop: 24,
+        paddingBottom: 10,
+    },
+    parentPostContainer: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    parentConnector: {
+        borderRightWidth: 2,
+        borderStyle: 'solid',
+        width: '55%',
+        height: '100%'
+    },
+    contentContainer: {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        paddingTop: 24,
-        paddingBottom: 10,
         width: '100%'
     },
     profilePic: {

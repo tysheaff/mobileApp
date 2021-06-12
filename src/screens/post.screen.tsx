@@ -8,6 +8,7 @@ import { PostComponent } from '@components/post.component';
 
 export function PostScreen({ route, navigation }: any) {
     const [isLoading, setLoading] = useState(true);
+    const [parentPosts, setParentPosts] = useState<Post[]>([]);
     const [post, setPost] = useState<Post>({} as any);
     const [isLoadingMore, setLoadingMore] = useState(false);
     const [commentIndex, setCommentIndex] = useState(0);
@@ -31,6 +32,10 @@ export function PostScreen({ route, navigation }: any) {
             setPost(p_previousPost => ({ ...p_previousPost, Comments: newComments }));
             const sections = [
                 {
+                    parentPost: true,
+                    data: parentPosts
+                },
+                {
                     headerPost: true,
                     data: [post]
                 },
@@ -50,7 +55,7 @@ export function PostScreen({ route, navigation }: any) {
             if (route.params?.priorityComment) {
                 Promise.all(
                     [
-                        api.getSinglePost(globals.user.publicKey, postHashHex, false, 0, 20),
+                        api.getSinglePost(globals.user.publicKey, postHashHex, true, 0, 20),
                         api.getSinglePost(globals.user.publicKey, route.params?.priorityComment, false, 0, 0)
                     ]
                 ).then(
@@ -108,9 +113,15 @@ export function PostScreen({ route, navigation }: any) {
             }
 
             if (mount) {
+                let _parentPosts = p_response?.PostFound?.ParentPosts as Post[] || [];
+                setParentPosts(_parentPosts);
                 setPost(backendPost);
                 setCommentIndex(backendPost.Comments ? backendPost.Comments.length : 0);
                 const sections = [
+                    {
+                        parentPost: true,
+                        data: _parentPosts
+                    },
                     {
                         headerPost: true,
                         data: [backendPost]
@@ -138,6 +149,10 @@ export function PostScreen({ route, navigation }: any) {
                         setPost(p_previousPost => ({ ...p_previousPost, Comments: newComments }));
 
                         const sections = [
+                            {
+                                parentPost: true,
+                                data: parentPosts
+                            },
                             {
                                 headerPost: true,
                                 data: [post]
@@ -182,11 +197,12 @@ export function PostScreen({ route, navigation }: any) {
                             navigation={navigation}
                             post={item}
                             disablePostNavigate={section.headerPost}
-                            hideBottomBorder={section.headerPost}></PostComponent>
+                            isParentPost={section.parentPost}
+                            hideBottomBorder={section.headerPost || section.parentPost}></PostComponent>
                 }
                 renderSectionHeader={
-                    ({ section: { headerPost } }) => {
-                        return headerPost ? <View></View> :
+                    ({ section: { headerPost, parentPost } }) => {
+                        return headerPost || parentPost ? <View></View> :
                             <View style={themeStyles.containerColorSub}>
                                 <Text style={[styles.commentsText, themeStyles.fontColorMain]}>Comments</Text>
                             </View>

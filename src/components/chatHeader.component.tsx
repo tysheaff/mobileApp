@@ -15,17 +15,11 @@ export function ChatHeaderComponent(
         if (
             contactWithMessages.ProfileEntryResponse &&
             contactWithMessages.ProfileEntryResponse.Username !== 'anonymous') {
-            (navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'UserProfile',
-                    params: {
-                        publicKey: contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check,
-                        username: contactWithMessages.ProfileEntryResponse.Username
-                    },
-                    key: 'Profile_' + contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check
-                }
-            );
+            (navigation as any).push('UserProfile', {
+                publicKey: contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check,
+                username: contactWithMessages.ProfileEntryResponse.Username,
+                Key: 'Profile_' + contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check
+            })
         }
     }
 

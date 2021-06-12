@@ -73,17 +73,11 @@ export function ProfileListCardComponent({ profile, isFollowing }:
 
     function goToProfile() {
         if (profile.Username !== 'anonymous') {
-            (navigation as any).push(
-                'AppNavigator',
-                {
-                    screen: 'UserProfile',
-                    params: {
-                        publicKey: profile.PublicKeyBase58Check,
-                        username: profile.Username
-                    },
-                    key: 'Profile_' + profile.PublicKeyBase58Check
-                }
-            );
+            (navigation as any).push('UserProfile', {
+                publicKey: profile.PublicKeyBase58Check,
+                username: profile.Username,
+                key: 'Profile_' + profile.PublicKeyBase58Check
+            });
         }
     }
 

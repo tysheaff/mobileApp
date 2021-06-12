@@ -9,7 +9,6 @@ import { settingsGlobals } from './src/globals/settingsGlobals';
 import { themeStyles, updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
 import { constants } from './src/globals/constants';
-import { AppNavigator } from './src/navigation/appNavigator';
 import { SnackbarComponent } from './src/components/snackbarComponent';
 import { cache, initCache } from './src/services/dataCaching/cache';
 import { notificationsService } from './src/services/notificationsService';
@@ -23,6 +22,8 @@ import { authentication } from '@services/authorization/authentication';
 import { ProfileManagerComponent } from '@components/profileManager.component';
 import { eventManager } from '@globals/injector';
 import { StatusBar } from 'expo-status-bar';
+import { TabNavigator } from './src/navigation/tabNavigator';
+import MessageStackScreen from './src/navigation/messageStackNavigator';
 
 enableScreens();
 
@@ -213,7 +214,7 @@ export default function App() {
     </View>
     :
     <NavigationContainer>
-      <StatusBar style={settingsGlobals.darkMode ? 'light' : 'dark'} hidden={false}/>
+      <StatusBar style={settingsGlobals.darkMode ? 'light' : 'dark'} hidden={false} />
       <Stack.Navigator>
         {
           !isLoggedIn ?
@@ -226,13 +227,23 @@ export default function App() {
               :
               <Stack.Screen name="Welcome" component={WelcomeScreen} />
             :
-            <Stack.Screen
-              name="AppNavigator"
-              component={AppNavigator}
-              options={{
-                headerShown: false,
-              }}
-            />
+            <React.Fragment>
+              <Stack.Screen
+                name="TabNavigator"
+                component={TabNavigator}
+                options={{
+                  headerShown: false,
+                }}
+              />
+
+              <Stack.Screen
+                name="MessageStack"
+                component={MessageStackScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </React.Fragment>
         }
       </Stack.Navigator >
       <DiamondAnimationComponent></DiamondAnimationComponent>

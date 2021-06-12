@@ -134,7 +134,18 @@ export function CreatePostScreen({ navigation, route }: any) {
     function handleNewPostSuccess(p_response: any) {
         const newPost = p_response.PostEntryResponse as Post;
         newPost.PostEntryReaderState = { LikedByReader: false, RecloutedByReader: false, DiamondLevelBestowed: 0 };
-        navigation.navigate('Home', { newPost: newPost })
+        navigation.navigate(
+            'TabNavigator',
+            {
+                screen: 'HomeStack',
+                params: {
+                    screen: 'Home',
+                    params: {
+                        newPost: newPost,
+                    }
+                },
+            }
+        );
     }
 
     function handleCommentSuccess(p_response: any) {
@@ -143,17 +154,11 @@ export function CreatePostScreen({ navigation, route }: any) {
 
         const parentPostHashHex = editPost ? editedPost.ParentStakeID : parentPost.PostHashHex;
         navigation.goBack();
-        navigation.navigate(
-            'AppNavigator',
-            {
-                screen: 'Post',
-                params: {
-                    postHashHex: parentPostHashHex,
-                    newComment: newComment
-                },
-                key: 'Post_' + parentPostHashHex
-            }
-        );
+        navigation.navigate('Post', {
+            postHashHex: parentPostHashHex,
+            newComment: newComment,
+            key: 'Post_' + parentPostHashHex
+        });
     }
 
     useEffect(
