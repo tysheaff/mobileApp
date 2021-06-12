@@ -5,7 +5,15 @@ import { User } from "@types";
 
 const loggedInUserCacheableObject = new CacheableObject<User>(
     () => api.getProfile([globals.user.publicKey]),
-    p_response => p_response.UserList[0] as User,
+    p_response => { 
+        const user = p_response.UserList[0] as User;
+
+        if(user.ProfileEntryResponse && !user.ProfileEntryResponse.ProfilePic){
+            user.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(globals.user.publicKey);
+        }
+
+        return user;
+    },
     600
 );
 

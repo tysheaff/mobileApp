@@ -69,6 +69,8 @@ export class LoginUserListComponent extends React.Component<Props, State> {
             for (const user of users) {
                 if (!user.ProfileEntryResponse) {
                     user.ProfileEntryResponse = getAnonymousProfile(user.PublicKeyBase58Check);
+                } else {
+                    user.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(user.PublicKeyBase58Check);
                 }
             }
 

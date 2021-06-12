@@ -140,6 +140,8 @@ export class MessagesScreen extends React.Component<Props, State>{
         for (const contactWithMessages of contactsWithMessages) {
             if (!contactWithMessages.ProfileEntryResponse) {
                 contactWithMessages.ProfileEntryResponse = getAnonymousProfile(contactWithMessages.PublicKeyBase58Check);
+            } else {
+                contactWithMessages.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(contactWithMessages.PublicKeyBase58Check);
             }
 
             contactWithMessages.UnreadMessages = unreadStateByContact[contactWithMessages.PublicKeyBase58Check];

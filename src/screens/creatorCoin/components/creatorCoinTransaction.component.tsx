@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { NavigationProp } from "@react-navigation/native";
 import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
+import { api } from "@services/api";
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -49,6 +50,10 @@ export class CreatorCoinTransactionComponent extends React.Component<Props, Stat
     render() {
         const profile = this.props.profile ?? getAnonymousProfile(this.props.publicKey);
         const formattedCoinPrice = calculateAndFormatBitCloutInUsd(profile.CoinPriceBitCloutNanos);
+
+        if(!profile.ProfilePic){
+            profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
+        }
 
         return <TouchableOpacity onPress={() => this.goToProfile(profile)} activeOpacity={1}>
             <View style={[styles.profileListCard, themeStyles.containerColorMain, themeStyles.borderColor]}>

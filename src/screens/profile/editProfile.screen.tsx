@@ -172,7 +172,7 @@ export class EditProfileScreen extends Component<Props, State> {
             if (this._isMounted) {
                 this.setState(
                     {
-                        profilePic: newProfile.ProfilePic,
+                        profilePic: api.getSingleProfileImage(globals.user.publicKey),
                         username: newProfile.Username,
                         description: newProfile.Description,
                         founderReward: String(newProfile.CoinEntry.CreatorBasisPoints / 100),

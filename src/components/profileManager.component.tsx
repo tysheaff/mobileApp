@@ -63,11 +63,13 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
             const requests = publicKeys?.map(publicKey => api.getSingleProfile('', publicKey).catch(() => ({ Profile: getAnonymousProfile(publicKey) })));
             const response = await Promise.all(requests);
 
-            const profiles = response.map(response => response.Profile);
+            const profiles: Profile[] = response.map(response => response.Profile);
 
             for (let i = 0; i < profiles.length; i++) {
                 if (!profiles[i]) {
                     profiles[i] = getAnonymousProfile(publicKeys[i]);
+                } else {
+                    profiles[i].ProfilePic = api.getSingleProfileImage(profiles[i].PublicKeyBase58Check);
                 }
             }
 

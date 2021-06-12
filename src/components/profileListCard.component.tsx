@@ -24,6 +24,10 @@ export function ProfileListCardComponent({ profile, isFollowing }:
         () => {
             const coinPrice = calculateAndFormatBitCloutInUsd(profile.CoinPriceBitCloutNanos);
 
+            if(profile && !profile.ProfilePic){
+                profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
+            }
+
             if (mount) {
                 setShowFollowButton(profile.PublicKeyBase58Check !== globals.user.publicKey);
                 setFollowing(isFollowing);

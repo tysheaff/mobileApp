@@ -169,10 +169,10 @@ export function ProfileScreen({ navigation, route }: any) {
 
         if (newProfile) {
             const calculatedCoinPrice = calculateBitCloutInUSD(newProfile.CoinPriceBitCloutNanos);
+            newProfile.ProfilePic = api.getSingleProfileImage(newProfile.PublicKeyBase58Check);
 
             if (mount) {
                 setCanCreateProfile(true);
-
                 setCoinPrice(calculatedCoinPrice);
             }
         }
@@ -314,6 +314,12 @@ export function ProfileScreen({ navigation, route }: any) {
             p_response => {
                 const holders = p_response.Hodlers as CreatorCoinHODLer[] ?? [];
 
+                for(const holder of holders){
+                    if(holder.ProfileEntryResponse){
+                        holder.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(holder.HODLerPublicKeyBase58Check);
+                    }
+                }
+
                 profile.UsersThatHODL = holders;
             }
         ).catch(p_error => globals.defaultHandleError(p_error));
@@ -329,6 +335,12 @@ export function ProfileScreen({ navigation, route }: any) {
     async function loadDiamondSenders() {
         const response = await api.getProfileDiamonds(profile.PublicKeyBase58Check);
         const newDiamondSenders: DiamondSender[] = response.DiamondSenderSummaryResponses ?? [];
+        for (const sender of newDiamondSenders) {
+            if(sender.ProfileEntryResponse){
+                sender.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(sender.SenderPublicKeyBase58Check);
+            }
+        }
+
         return newDiamondSenders;
     }
 
@@ -389,6 +401,12 @@ export function ProfileScreen({ navigation, route }: any) {
             const holders = response.Hodlers as CreatorCoinHODLer[] ?? [];
 
             if (holders?.length > 0) {
+                for(const holder of holders){
+                    if(holder.ProfileEntryResponse){
+                        holder.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(holder.HODLerPublicKeyBase58Check);
+                    }
+                }
+
                 profile.UsersThatHODL = profile.UsersThatHODL.concat(holders);
             } else {
                 if (mount) {

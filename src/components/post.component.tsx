@@ -36,6 +36,7 @@ interface State {
     durationUntilNow: string;
     diamondLevel: number;
     actionsDisabled: boolean;
+    profilePic: string;
 }
 
 export class PostComponent extends React.Component<Props, State> {
@@ -52,8 +53,9 @@ export class PostComponent extends React.Component<Props, State> {
             coinPrice,
             durationUntilNow,
             actionsDisabled: this.props.actionsDisabled || globals.readonly,
-            diamondLevel: this.props.post.PostEntryReaderState.DiamondLevelBestowed
-        }
+            diamondLevel: this.props.post.PostEntryReaderState.DiamondLevelBestowed,
+            profilePic: api.getSingleProfileImage(this.props.post.ProfileEntryResponse.PublicKeyBase58Check)
+        };
 
         this.onLike = this.onLike.bind(this);
         this.goToProfile = this.goToProfile.bind(this);
@@ -375,7 +377,7 @@ export class PostComponent extends React.Component<Props, State> {
                 <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
                     <View style={styles.headerContainer}>
                         <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
-                            <Image style={styles.profilePic} source={{ uri: this.props.post.ProfileEntryResponse?.ProfilePic }}></Image>
+                            <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
                         </TouchableOpacity>
                         <View>
                             <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={this.goToProfile}>

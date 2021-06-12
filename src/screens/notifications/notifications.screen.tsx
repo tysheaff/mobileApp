@@ -173,7 +173,10 @@ export class NotificationsScreen extends React.Component<Props, State> {
         let profile = this.state.profiles[p_notification.Metadata.TransactorPublicKeyBase58Check];
         if (!profile) {
             profile = getAnonymousProfile(p_notification.Metadata.TransactorPublicKeyBase58Check);
+        } else {
+            profile.ProfilePic = api.getSingleProfileImage(p_notification.Metadata.TransactorPublicKeyBase58Check);
         }
+
         return profile;
     }
 

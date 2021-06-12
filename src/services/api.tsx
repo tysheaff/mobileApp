@@ -291,6 +291,11 @@ function getSingleProfile(p_username: string, publicKey?: string) {
     );
 }
 
+function getSingleProfileImage(publicKey: string) {
+    const route = 'https://bitclout.com/api/v0/get-single-profile-picture/';
+    return route + publicKey;
+}
+
 function getProfilePostsBatch(p_userPublicKey: string, p_username: string, p_numToFetch: number, p_lastPostHashHex = '') {
     const route = 'get-posts-for-public-key';
 
@@ -649,6 +654,7 @@ export const api = {
     getAppState,
     submitTransaction,
     getSingleProfile,
+    getSingleProfileImage,
     getProfilePostsBatch,
     getProfileHolders,
     sendDiamonds,
