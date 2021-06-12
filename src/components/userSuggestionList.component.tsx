@@ -6,7 +6,6 @@ import { api } from '@services/api';
 import { themeStyles } from '@styles/globalColors';
 import { Profile } from '@types';
 import { MaterialIcons } from '@expo/vector-icons';
-import { checkProfilePicture } from '@services/helpers';
 
 let lastKeyword;
 
@@ -57,7 +56,13 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any) {
             if (profiles?.length > 0) {
                 for (const profile of profiles) {
                     (profile as any).name = profile.Username;
-                    checkProfilePicture(profile);
+                    profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
+
+                    try {
+                        await Image.prefetch(profile.ProfilePic);
+                    } catch {
+                        profile.ProfilePic = 'https://i.imgur.com/vZ2mB1W.png'
+                    }
                 }
             }
 
