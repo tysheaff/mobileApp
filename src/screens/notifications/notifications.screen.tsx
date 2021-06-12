@@ -13,6 +13,8 @@ import { PostReplyNotificationComponent } from './components/postReplyNotificati
 import { PostMentionNotificationComponent } from './components/postMentionNotification.component';
 import { PostRecloutNotificationComponent } from './components/postRecloutNotification.component';
 import { NavigationProp } from '@react-navigation/native';
+import { NotificationsFilter, NotificationsFilterComponent } from './components/notificationsFilter.component';
+import { filterNotifications } from './notificaitonFilterHelper';
 
 interface Props {
     standardPublicKey: string;
@@ -25,16 +27,21 @@ interface Props {
 interface State {
     isLoading: boolean;
     notifications: Notification[];
+    filteredNotifications: Notification[];
     profiles: { [key: string]: Profile };
     posts: { [key: string]: Post };
     refreshing: boolean;
     isLoadingMore: boolean;
     lastNotificationIndex: number;
     init: boolean;
+    filter: NotificationsFilter | undefined;
+    filterSet: boolean;
+    noMoreNotifications: boolean;
 }
 
 export class NotificationsScreen extends React.Component<Props, State> {
 
+    private _lastLoadMoreId: number = -1;
     private _isMounted = true;
 
     constructor(props: Props) {
@@ -43,12 +50,16 @@ export class NotificationsScreen extends React.Component<Props, State> {
         this.state = {
             isLoading: true,
             notifications: [],
+            filteredNotifications: [],
             profiles: {},
             posts: {},
             refreshing: false,
             isLoadingMore: false,
             lastNotificationIndex: -999,
             init: false,
+            filter: undefined,
+            filterSet: false,
+            noMoreNotifications: false
         };
 
         this.loadNotifications = this.loadNotifications.bind(this);
@@ -59,6 +70,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
         this.renderSubmitPostNotification = this.renderSubmitPostNotification.bind(this);
         this.renderPostMentionNotification = this.renderPostMentionNotification.bind(this);
         this.renderNotification = this.renderNotification.bind(this);
+        this.onFilterChanged = this.onFilterChanged.bind(this);
     }
 
     loadNotifications(p_force = false) {
@@ -67,9 +79,10 @@ export class NotificationsScreen extends React.Component<Props, State> {
         }
 
         if (this._isMounted) {
-            this.setState({ isLoading: true, });
+            this.setState({ isLoading: true, noMoreNotifications: false });
         }
 
+        this._lastLoadMoreId = Math.floor(Math.random() * 1000);
         api.getNotifications(globals.user.publicKey, -1, 50)
             .then(
                 p_response => {
@@ -91,35 +104,45 @@ export class NotificationsScreen extends React.Component<Props, State> {
     }
 
     loadMoreNotifications() {
-        if (this.state.notifications?.length > 0) {
+        if (this.state.isLoadingMore) {
+            return;
+        }
+        if (this.state.notifications?.length > 0 && !this.state.noMoreNotifications) {
             const newLastNotificationIndex = this.state.notifications[this.state.notifications.length - 1].Index;
 
             if (newLastNotificationIndex !== 0) {
-                if (this._isMounted) {
-                    this.setState({ isLoadingMore: true });
-                }
 
-                api.getNotifications(globals.user.publicKey, newLastNotificationIndex - 1, 50).then(
-                    p_response => {
-                        if (this._isMounted) {
-                            const allNotifications = this.state.notifications.concat(p_response.Notifications)
-                            this.setState((p_previousValue) => ({
-                                notifications: allNotifications,
-                                lastNotificationIndex: newLastNotificationIndex,
-                                isLoading: false,
-                                refreshing: false,
-                                profiles: Object.assign(p_previousValue.profiles, p_response.ProfilesByPublicKey),
-                                posts: Object.assign(p_previousValue.posts, p_response.PostsByHash)
-                            }));
-                        }
+                if (this.state.filterSet) {
+                    this.loadMoreFilteredNotifications(this.state.filter as NotificationsFilter, newLastNotificationIndex, 50);
+                } else {
+
+                    if (this._isMounted) {
+                        this.setState({ isLoadingMore: true });
                     }
-                ).catch(p_error => globals.defaultHandleError(p_error)).finally(
-                    () => {
-                        if (this._isMounted) {
-                            this.setState({ isLoadingMore: false });
+
+                    api.getNotifications(globals.user.publicKey, newLastNotificationIndex - 1, 50).then(
+                        p_response => {
+                            if (this._isMounted) {
+                                const allNotifications = this.state.notifications.concat(p_response.Notifications);
+                                this.setState((p_previousValue) => ({
+                                    notifications: allNotifications,
+                                    lastNotificationIndex: newLastNotificationIndex,
+                                    isLoading: false,
+                                    refreshing: false,
+                                    profiles: Object.assign(p_previousValue.profiles, p_response.ProfilesByPublicKey),
+                                    posts: Object.assign(p_previousValue.posts, p_response.PostsByHash),
+                                    noMoreNotifications: p_response.Notifications?.length === 0
+                                }));
+                            }
                         }
-                    }
-                );
+                    ).catch(p_error => globals.defaultHandleError(p_error)).finally(
+                        () => {
+                            if (this._isMounted) {
+                                this.setState({ isLoadingMore: false });
+                            }
+                        }
+                    );
+                }
             }
         }
     }
@@ -307,6 +330,64 @@ export class NotificationsScreen extends React.Component<Props, State> {
         }
         return undefined;
     }
+
+    async onFilterChanged(p_filter: NotificationsFilter) {
+        const filteredNotifications = filterNotifications(this.state.notifications, p_filter, this.state.posts);
+        const filterSet = this.getFilterSet(p_filter);
+        const missingNotificationsCount = 50 - filteredNotifications.length;
+        const lastIndex: number = this.state.notifications.length === 0 ? 0 : this.state.notifications[this.state.notifications.length - 1].Index;
+
+        this._lastLoadMoreId = Math.floor(Math.random() * 1000);
+        this.setState({ filteredNotifications: filteredNotifications, lastNotificationIndex: lastIndex, filter: p_filter, filterSet: filterSet });
+
+        if (missingNotificationsCount > 0) {
+            await this.loadMoreFilteredNotifications(p_filter, lastIndex, missingNotificationsCount);
+        }
+    }
+
+    getFilterSet(p_filter: NotificationsFilter) {
+        const filterSet = p_filter != null && Object.keys(p_filter).some(p_filterKey => (p_filter as any)[p_filterKey]);
+        return filterSet;
+    }
+
+    async loadMoreFilteredNotifications(p_filter: NotificationsFilter, p_lastIndex: number, p_count: number) {
+        let loadedCount = 0;
+
+        if (this._isMounted) {
+            this.setState({ isLoadingMore: true });
+        } else {
+            return;
+        }
+        this._lastLoadMoreId = Math.floor(Math.random() * 1000);
+        const loadingId = this._lastLoadMoreId;
+
+        while (loadedCount < p_count && p_lastIndex !== 0) {
+            const response = await api.getNotifications(globals.user.publicKey, p_lastIndex - 1, 100);
+            if (loadingId !== this._lastLoadMoreId) {
+                break;
+            }
+
+            const newFilteredNotifications = filterNotifications(response.Notifications, p_filter, response.PostsByHash);
+            loadedCount += newFilteredNotifications.length;
+
+            p_lastIndex = response.Notifications.length === 0 ? 0 : response.Notifications[response.Notifications.length - 1].Index;
+
+            this.setState(p_previousValue => (
+                {
+                    notifications: this.state.notifications.concat(response.Notifications),
+                    filteredNotifications: this.state.filteredNotifications.concat(newFilteredNotifications),
+                    lastNotificationIndex: response.Notifications,
+                    profiles: Object.assign(p_previousValue.profiles, response.ProfilesByPublicKey),
+                    posts: Object.assign(p_previousValue.posts, response.PostsByHash)
+                }
+            ));
+        }
+
+        if (this._isMounted && loadingId === this._lastLoadMoreId) {
+            this.setState({ isLoadingMore: false });
+        }
+    }
+
     render() {
         navigatorGlobals.refreshNotifications = this.loadNotifications;
 
@@ -321,9 +402,12 @@ export class NotificationsScreen extends React.Component<Props, State> {
                     <Text style={[themeStyles.fontColorMain]}>Notifications are not available in the read-only mode.</Text>
                 </View>
                 :
-                <View style={[styles.listContainer, themeStyles.containerColorSub]}>
+                <View style={[styles.listContainer, themeStyles.containerColorMain]}>
+                    <NotificationsFilterComponent
+                        filter={this.state.filter}
+                        onFilterChange={this.onFilterChanged}></NotificationsFilterComponent>
                     <FlatList
-                        data={this.state.notifications}
+                        data={this.state.filterSet ? this.state.filteredNotifications : this.state.notifications}
                         keyExtractor={keyExtractor}
                         renderItem={({ item }) => this.renderNotification(item)}
                         onEndReached={this.loadMoreNotifications}
