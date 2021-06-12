@@ -23,8 +23,6 @@ interface State {
 }
 
 export class EditProfileScreen extends Component<Props, State> {
-    username = globals.user.username;
-
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -78,7 +76,7 @@ export class EditProfileScreen extends Component<Props, State> {
             return;
         }
 
-        const username = this.username.trim();
+        const username = this.state.username.trim();
         if (!username) {
             Alert.alert('Error', 'Please enter a username.');
             return;
@@ -167,19 +165,23 @@ export class EditProfileScreen extends Component<Props, State> {
     };
 
     loadSingleProfile = async () => {
-        const response = await api.getSingleProfile(this.username);
-        const newProfile = response.Profile as Profile;
+        try {
+            const response = await api.getSingleProfile(globals.user.username);
+            const newProfile = response.Profile as Profile;
 
-        if (this._isMounted) {
-            this.setState(
-                {
-                    profilePic: newProfile.ProfilePic,
-                    username: newProfile.Username,
-                    description: newProfile.Description,
-                    founderReward: String(newProfile.CoinEntry.CreatorBasisPoints / 100),
-                    loading: false
-                }
-            );
+            if (this._isMounted) {
+                this.setState(
+                    {
+                        profilePic: newProfile.ProfilePic,
+                        username: newProfile.Username,
+                        description: newProfile.Description,
+                        founderReward: String(newProfile.CoinEntry.CreatorBasisPoints / 100),
+                        loading: false
+                    }
+                );
+            }
+        } catch {
+            this.props.navigation.goBack();
         }
     }
 
