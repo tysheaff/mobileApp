@@ -56,7 +56,7 @@ export function SettingsScreen({ navigation }: any) {
                 style={[styles.buttonContainer, themeStyles.containerColorMain, themeStyles.borderColor]}
                 activeOpacity={1}>
                 <AntDesign name="copyright" style={{ marginLeft: 6 }} size={18} color={themeStyles.fontColorMain.color} />
-                <Text style={[styles.buttonText, themeStyles.fontColorMain]}>CloutFeed v 1.4.0</Text>
+                <Text style={[styles.buttonText, themeStyles.fontColorMain]}>CloutFeed v 1.4.1</Text>
             </TouchableOpacity>
         </View>
     );
