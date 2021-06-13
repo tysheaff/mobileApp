@@ -46,7 +46,7 @@ export class CreatorCoinHeaderComponent extends React.Component<Props, State> {
         const nowTimeSpanInSeconds = now.getTime() / 1000;
         const last24HoursTimeSpanInSeconds = nowTimeSpanInSeconds - (24 * 60 * 60);
 
-        let coinPriceLast24Hours = 0;
+        let coinPriceLast24Hours = 0.01;
         for (let i = creatorCoinTransactions.length - 1; i >= 0; i--) {
             const transaction = creatorCoinTransactions[i];
             if (transaction.timeStamp < last24HoursTimeSpanInSeconds) {

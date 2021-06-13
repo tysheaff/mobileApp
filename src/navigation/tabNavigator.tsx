@@ -203,19 +203,29 @@ export function TabNavigator({ navigation }: any) {
                             navigation.popToTop();
                         }
 
-                        navigation.navigate(
-                            'TabNavigator',
-                            {
-                                screen: 'HomeStack',
-                                params: {
-                                    screen: p_event.screen,
+                        if (Platform.OS === 'ios') {
+                            navigation.navigate(
+                                'TabNavigator',
+                                {
+                                    screen: 'HomeStack',
                                     params: {
-                                        ...params,
-                                        key
+                                        screen: p_event.screen,
+                                        params: {
+                                            ...params,
+                                            key
+                                        }
                                     }
                                 }
-                            }
-                        );
+                            );
+                        } else {
+                            navigation.push(
+                                p_event.screen,
+                                {
+                                    ...params,
+                                    key
+                                }
+                            );
+                        }
                     }
                 }
             );

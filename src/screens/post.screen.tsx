@@ -143,7 +143,8 @@ export function PostScreen({ route, navigation }: any) {
             p_response => {
                 const backendPost = p_response.PostFound as Post;
                 if (backendPost.Comments?.length > 0) {
-                    const newComments = post.Comments.concat(backendPost.Comments);
+                    const filteredComments = backendPost.Comments.filter(p_comment => !!p_comment.ProfileEntryResponse);
+                    const newComments = post.Comments.concat(filteredComments);
 
                     if (mount) {
                         setPost(p_previousPost => ({ ...p_previousPost, Comments: newComments }));

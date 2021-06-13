@@ -46,6 +46,7 @@ export class PostComponent extends React.Component<Props, State> {
 
     constructor(p_props: Props) {
         super(p_props);
+        
         const coinPrice = calculateAndFormatBitCloutInUsd(this.props.post.ProfileEntryResponse.CoinPriceBitCloutNanos);
         const durationUntilNow = calculateDurationUntilNow(this.props.post.TimestampNanos);
 

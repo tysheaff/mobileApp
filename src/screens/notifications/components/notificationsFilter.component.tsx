@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { FlatList } from "react-native-gesture-handler";
 import { themeStyles } from "@styles/globalColors";
@@ -129,18 +129,20 @@ export class NotificationsFilterComponent extends React.Component<Props, State>{
         const renderChip = (p_chip: FilterChip) => {
             return <TouchableOpacity
                 onPress={() => this.toggleFilter(p_chip)}
-                style={[
+            >
+                <View style={[
                     styles.filterChip,
                     { backgroundColor: this.state.filter[p_chip.id] ? p_chip.active : p_chip.passive }
                 ]}>
-                {renderChipIcon(p_chip.id)}
+                    {renderChipIcon(p_chip.id)}
+                </View>
             </TouchableOpacity>;
         };
 
         const keyExtractorChips = (item: FilterChip) => item.id;
 
         return <FlatList
-            style={[styles.container, themeStyles.containerColorMain]}
+            style={[styles.container]}
             horizontal
             showsVerticalScrollIndicator={false}
             keyExtractor={keyExtractorChips}
@@ -155,7 +157,8 @@ const styles = StyleSheet.create(
     {
         container: {
             paddingBottom: 10,
-            maxHeight: 40
+            height: 45,
+            maxHeight: 45
         },
         filterChip: {
             width: 40,

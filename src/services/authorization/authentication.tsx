@@ -27,7 +27,7 @@ function authenticateUser(
     const keychainNonStandard = crypto.mnemonicToKeychain(mnemonic, extraText, true);
 
     const keychainPublicKey = keychain.publicKey.toString("hex");
-    const keychainNonStandardPublicKey = keychain.publicKey.toString("hex");
+    const keychainNonStandardPublicKey = keychainNonStandard.publicKey.toString("hex");
 
     const user: AuthenticatedUserTypes = {
         standard: generateUserCredentials(keychain),
