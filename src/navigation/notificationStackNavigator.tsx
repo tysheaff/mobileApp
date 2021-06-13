@@ -14,6 +14,7 @@ import { CreatePostScreen } from '@screens/createPost.screen';
 import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
+import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 
 const NotificationStack = createStackNavigator();
 
@@ -37,6 +38,7 @@ export default function NotificationStackScreen() {
                     headerTitle: ' ',
                     headerBackTitle: ' ',
                     headerLeft: () => <LogoHeaderComponent></LogoHeaderComponent>,
+                    headerRight: () => <NotificationsHeaderComponent></NotificationsHeaderComponent>
                 }}
                 name="Notifications"
                 component={NotificationsScreen}

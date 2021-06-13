@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, Text, View, StyleSheet, ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
-import { globals, navigatorGlobals } from '@globals';
-import { Notification, NotificationType, Post, Profile } from '@types';
+import { constants, eventManager, globals, navigatorGlobals } from '@globals';
+import { EventType, Notification, NotificationType, Post, Profile } from '@types';
 import { api, getAnonymousProfile, loadTickersAndExchangeRate } from '@services';
 import { themeStyles } from '@styles';
 import { FollowNotificationComponent } from './components/followNotification.component';
@@ -15,6 +15,7 @@ import { PostRecloutNotificationComponent } from './components/postRecloutNotifi
 import { NavigationProp } from '@react-navigation/native';
 import { NotificationsFilter, NotificationsFilterComponent } from './components/notificationsFilter.component';
 import { filterNotifications } from './notificaitonFilterHelper';
+import * as SecureStore from 'expo-secure-store';
 
 interface Props {
     standardPublicKey: string;
@@ -35,6 +36,7 @@ interface State {
     lastNotificationIndex: number;
     init: boolean;
     filter: NotificationsFilter | undefined;
+    showFilter: boolean;
     filterSet: boolean;
     noMoreNotifications: boolean;
 }
@@ -43,6 +45,8 @@ export class NotificationsScreen extends React.Component<Props, State> {
 
     private _lastLoadMoreId: number = -1;
     private _isMounted = true;
+
+    private _subscriptions: (() => void)[] = [];
 
     constructor(props: Props) {
         super(props);
@@ -58,9 +62,14 @@ export class NotificationsScreen extends React.Component<Props, State> {
             lastNotificationIndex: -999,
             init: false,
             filter: undefined,
+            showFilter: false,
             filterSet: false,
             noMoreNotifications: false
         };
+
+        this._subscriptions.push(
+            eventManager.addEventListener(EventType.ToggleNotificationsFilter, this.toggleNotificationsFilter.bind(this))
+        );
 
         this.loadNotifications = this.loadNotifications.bind(this);
         this.loadMoreNotifications = this.loadMoreNotifications.bind(this);
@@ -73,16 +82,47 @@ export class NotificationsScreen extends React.Component<Props, State> {
         this.onFilterChanged = this.onFilterChanged.bind(this);
     }
 
+    componentDidMount() {
+        this.setState({ init: true });
+        this.initScreen();
+    }
+
+    componentWillUnmount() {
+        for (const unsubscribe of this._subscriptions) {
+            unsubscribe();
+        }
+
+        this._isMounted = false;
+    }
+
+    async initScreen() {
+        const showFilter = await SecureStore.getItemAsync(constants.localStorage_showNotificationsFilter).catch(() => 'false');
+        const filterString = await SecureStore.getItemAsync(constants.localStorage_notificationsFilter).catch(() => undefined);
+
+        let filter;
+        if (filterString) {
+            try {
+                filter = JSON.parse(filterString);
+            } catch { }
+        }
+
+        this.setState({ showFilter: showFilter === 'true', filter });
+        this.loadNotifications(true);
+    }
+
     loadNotifications(p_force = false) {
         if (!this.state.init && !p_force) {
             return;
         }
 
         if (this._isMounted) {
-            this.setState({ isLoading: true, noMoreNotifications: false });
+            this.setState({ isLoading: true, isLoadingMore: false, noMoreNotifications: false, notifications: [], filteredNotifications: [] });
         }
 
         this._lastLoadMoreId = Math.floor(Math.random() * 1000);
+
+        const filterSet = this.state.filter != null && this.getFilterSet(this.state.filter);
+
         api.getNotifications(globals.user.publicKey, -1, 50)
             .then(
                 p_response => {
@@ -97,21 +137,31 @@ export class NotificationsScreen extends React.Component<Props, State> {
                                     posts: p_response.PostsByHash
                                 });
                             }
+
+                            if (filterSet) {
+                                this.onFilterChanged(this.state.filter as NotificationsFilter);
+                            }
                         }
                     );
                 }
             ).catch(p_error => globals.defaultHandleError(p_error));
     }
 
+    toggleNotificationsFilter() {
+        const newState = !this.state.showFilter;
+        this.setState({ showFilter: newState });
+        SecureStore.setItemAsync(constants.localStorage_showNotificationsFilter, String(newState)).catch(() => { });
+    }
+
     loadMoreNotifications() {
         if (this.state.isLoadingMore) {
             return;
         }
+
         if (this.state.notifications?.length > 0 && !this.state.noMoreNotifications) {
             const newLastNotificationIndex = this.state.notifications[this.state.notifications.length - 1].Index;
 
             if (newLastNotificationIndex !== 0) {
-
                 if (this.state.filterSet) {
                     this.loadMoreFilteredNotifications(this.state.filter as NotificationsFilter, newLastNotificationIndex, 50);
                 } else {
@@ -145,15 +195,6 @@ export class NotificationsScreen extends React.Component<Props, State> {
                 }
             }
         }
-    }
-
-    componentDidMount() {
-        this.setState({ init: true });
-        this.loadNotifications(true);
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
     }
 
     goToProfile(p_userKey: string, p_username: string) {
@@ -320,13 +361,22 @@ export class NotificationsScreen extends React.Component<Props, State> {
     }
 
     async onFilterChanged(p_filter: NotificationsFilter) {
+        SecureStore.setItemAsync(constants.localStorage_notificationsFilter, JSON.stringify(p_filter)).catch(() => { });
         const filteredNotifications = filterNotifications(this.state.notifications, p_filter, this.state.posts);
         const filterSet = this.getFilterSet(p_filter);
         const missingNotificationsCount = 50 - filteredNotifications.length;
         const lastIndex: number = this.state.notifications.length === 0 ? 0 : this.state.notifications[this.state.notifications.length - 1].Index;
 
         this._lastLoadMoreId = Math.floor(Math.random() * 1000);
-        this.setState({ filteredNotifications: filteredNotifications, lastNotificationIndex: lastIndex, filter: p_filter, filterSet: filterSet });
+        this.setState(
+            {
+                filteredNotifications: filteredNotifications,
+                lastNotificationIndex: lastIndex,
+                filter: p_filter,
+                filterSet: filterSet,
+                isLoadingMore: false
+            }
+        );
 
         if (missingNotificationsCount > 0) {
             await this.loadMoreFilteredNotifications(p_filter, lastIndex, missingNotificationsCount);
@@ -372,7 +422,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
         }
 
         if (this._isMounted && loadingId === this._lastLoadMoreId) {
-            this.setState({ isLoadingMore: false });
+            this.setState({ isLoadingMore: false, isLoading: false });
         }
     }
 
@@ -391,9 +441,14 @@ export class NotificationsScreen extends React.Component<Props, State> {
                 </View>
                 :
                 <View style={[styles.listContainer, themeStyles.containerColorMain]}>
-                    <NotificationsFilterComponent
-                        filter={this.state.filter}
-                        onFilterChange={this.onFilterChanged}></NotificationsFilterComponent>
+                    {
+                        this.state.showFilter ?
+                            <NotificationsFilterComponent
+                                filter={this.state.filter}
+                                onFilterChange={this.onFilterChanged}></NotificationsFilterComponent>
+                            :
+                            undefined
+                    }
                     <FlatList
                         data={this.state.filterSet ? this.state.filteredNotifications : this.state.notifications}
                         keyExtractor={keyExtractor}

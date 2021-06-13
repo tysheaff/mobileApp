@@ -5,7 +5,8 @@ export enum EventType {
     DecreaseFollowers = 1,
     OpenMessagesSettings = 2,
     ToggleProfileManager = 3,
-    Navigation = 4
+    Navigation = 4,
+    ToggleNotificationsFilter = 5
 }
 
 export interface ChangeFollowersEvent {

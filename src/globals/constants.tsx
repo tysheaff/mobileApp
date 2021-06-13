@@ -9,5 +9,7 @@ export const constants = {
     localStorage_messagesFilter: '_messagesFilter',
     localStorage_messagesSort: '_messagesSort',
     localStorage_cloutFeedIdentity: 'cloutfeedIdentity',
+    localStorage_showNotificationsFilter: 'showNotificationsFilter',
+    localStorage_notificationsFilter: 'notificationsFilter',
     cloutfeed_publicKey: 'BC1YLh5pKXs8NqaUtN8Gzi3rfoAgG2VWio2NER7baDkG8T2x7wRnSwa',
 }

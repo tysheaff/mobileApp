@@ -108,21 +108,21 @@ export class NotificationsFilterComponent extends React.Component<Props, State>{
         const renderChipIcon = (p_chipId: filterId) => {
             switch (p_chipId) {
                 case 'follow':
-                    return <MaterialCommunityIcons name="account" size={15} color={getIConColor(p_chipId)} />;
+                    return <MaterialCommunityIcons name="account" size={19} color={getIConColor(p_chipId)} />;
                 case 'like':
-                    return <Ionicons name={'ios-heart-sharp'} size={13} color={getIConColor(p_chipId)} />;
+                    return <Ionicons name={'ios-heart-sharp'} size={17} color={getIConColor(p_chipId)} />;
                 case 'reply':
-                    return <FontAwesome name="comment" size={12} color={getIConColor(p_chipId)} />;
+                    return <FontAwesome name="comment" size={16} color={getIConColor(p_chipId)} />;
                 case 'mention':
-                    return <FontAwesome style={[{ marginLeft: 1 }]} name="commenting" size={12} color={getIConColor(p_chipId)} />;
+                    return <FontAwesome style={[{ marginLeft: 1 }]} name="commenting" size={16} color={getIConColor(p_chipId)} />;
                 case 'reclout':
-                    return <FontAwesome name="retweet" size={13} color={getIConColor(p_chipId)} />;
+                    return <FontAwesome name="retweet" size={17} color={getIConColor(p_chipId)} />;
                 case 'purchase':
-                    return <FontAwesome name="dollar" size={14} color={getIConColor(p_chipId)} />;
+                    return <FontAwesome name="dollar" size={18} color={getIConColor(p_chipId)} />;
                 case 'diamond':
-                    return <FontAwesome name="diamond" size={12} color={getIConColor(p_chipId)} />;
+                    return <FontAwesome name="diamond" size={16} color={getIConColor(p_chipId)} />;
                 case 'creatorCoinTransfer':
-                    return <FontAwesome name="send" size={12} color={getIConColor(p_chipId)} />;
+                    return <FontAwesome name="send" size={16} color={getIConColor(p_chipId)} />;
             }
         };
 
