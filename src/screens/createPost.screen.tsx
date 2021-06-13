@@ -97,6 +97,7 @@ export function CreatePostScreen({ navigation, route }: any) {
             async p_response => {
                 const transactionHex = p_response.TransactionHex;
                 const signedTransaction = await signing.signTransaction(transactionHex);
+
                 await api.submitTransaction(signedTransaction as string).then(
                     p_response => {
                         if (newPost || reclout) {
@@ -134,18 +135,24 @@ export function CreatePostScreen({ navigation, route }: any) {
     function handleNewPostSuccess(p_response: any) {
         const newPost = p_response.PostEntryResponse as Post;
         newPost.PostEntryReaderState = { LikedByReader: false, RecloutedByReader: false, DiamondLevelBestowed: 0 };
-        navigation.navigate(
-            'TabNavigator',
-            {
-                screen: 'HomeStack',
-                params: {
-                    screen: 'Home',
+
+        const canGoBack = navigation.canGoBack();
+
+        if (canGoBack) {
+            navigation.popToTop();
+            navigation.navigate(
+                'TabNavigator',
+                {
+                    screen: 'HomeStack',
                     params: {
-                        newPost: newPost,
-                    }
-                },
-            }
-        );
+                        screen: 'Home',
+                        params: {
+                            newPost: newPost,
+                        }
+                    },
+                }
+            );
+        }
     }
 
     function handleCommentSuccess(p_response: any) {
@@ -153,12 +160,17 @@ export function CreatePostScreen({ navigation, route }: any) {
         newComment.PostEntryReaderState = { LikedByReader: false, RecloutedByReader: false, DiamondLevelBestowed: 0 };
 
         const parentPostHashHex = editPost ? editedPost.ParentStakeID : parentPost.PostHashHex;
-        navigation.goBack();
-        navigation.navigate('Post', {
-            postHashHex: parentPostHashHex,
-            newComment: newComment,
-            key: 'Post_' + parentPostHashHex
-        });
+
+        const canGoBack = navigation.canGoBack();
+
+        if (canGoBack) {
+            navigation.goBack();
+            navigation.navigate('Post', {
+                postHashHex: parentPostHashHex,
+                newComment: newComment,
+                key: 'Post_' + parentPostHashHex
+            });
+        }
     }
 
     useEffect(

@@ -380,7 +380,7 @@ export class PostComponent extends React.Component<Props, State> {
                                 {
                                     !this.props.isParentPost ? (
                                         <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
-                                            <Image style={styles.profilePic} source={{ uri: this.props.post.ProfileEntryResponse?.ProfilePic }}></Image>
+                                            <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
                                         </TouchableOpacity>
                                     ) : undefined
                                 }

@@ -11,10 +11,9 @@ import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
-import { ChatHeaderComponent } from '@components/chatHeader.component';
-import { ChatScreen } from '@screens/chatScreen';
 import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
+import { LogoHeaderComponent } from '@components/logoHeader.component';
 
 const WalletStack = createStackNavigator();
 
@@ -28,6 +27,8 @@ export default function WalletStackScreen() {
                     shadowOpacity: 0,
                     elevation: 0
                 },
+                headerTitle: ' ',
+                headerBackTitle: ' ',
                 headerLeft: () => <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
                     <Ionicons name="chevron-back" size={32} color="#007ef5" />
                 </TouchableOpacity>
@@ -35,7 +36,7 @@ export default function WalletStackScreen() {
         >
             <WalletStack.Screen
                 options={{
-                    headerLeft: () => <Text>  </Text>
+                    headerLeft: () => <LogoHeaderComponent></LogoHeaderComponent>,
                 }}
                 name="Wallet"
                 component={WalletScreen}

@@ -1,13 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { View, Image, StyleSheet, Text, Platform } from 'react-native';
+import { View, StyleSheet, Text, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { PostScreen } from '@screens/post.screen';
 import { SearchScreen } from '@screens/search.screen';
 import { SearchHeaderComponent } from '@components/searchHeader';
-import { settingsGlobals, globals } from '@globals';
+import { globals } from '@globals';
 import { themeStyles } from '@styles';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { HomeScreen } from '@screens/home.screen';
@@ -16,6 +16,7 @@ import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
+import { LogoHeaderComponent } from '@components/logoHeader.component';
 
 const HomeStack = createStackNavigator();
 
@@ -39,23 +40,7 @@ export default function HomeStackScreen() {
                     ({ navigation }) => ({
                         headerTitle: ' ',
                         headerBackTitle: ' ',
-                        headerLeft: () =>
-                            <View style={styles.headerContainer}>
-                                {
-                                    settingsGlobals.darkMode ?
-                                        <Image
-                                            style={styles.logo}
-                                            source={require('../../assets/icon-black.png')}
-                                        ></Image>
-                                        :
-                                        <Image
-                                            style={styles.logo}
-                                            source={require('../../assets/icon-white.png')}
-                                        ></Image>
-                                }
-                                <Text style={{ marginLeft: -10, fontWeight: '700', fontSize: 20, color: themeStyles.fontColorMain.color }}>CloutFeed</Text>
-                            </View>
-                        ,
+                        headerLeft: () =><LogoHeaderComponent></LogoHeaderComponent>,
                         headerRight: () => (
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
@@ -179,11 +164,6 @@ export default function HomeStackScreen() {
 
 const styles = StyleSheet.create(
     {
-        headerContainer: {
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-        },
         postButton: {
             backgroundColor: 'black',
             display: 'flex',
@@ -200,10 +180,6 @@ const styles = StyleSheet.create(
         },
         postButtonText: {
             color: 'white'
-        },
-        logo: {
-            width: 50,
-            height: 40
         }
     }
 )

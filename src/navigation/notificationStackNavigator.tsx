@@ -12,9 +12,8 @@ import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { globals } from '@globals/globals';
-import { ChatHeaderComponent } from '@components/chatHeader.component';
-import { ChatScreen } from '@screens/chatScreen';
 import { IdentityScreen } from '@screens/login/identity.screen';
+import { LogoHeaderComponent } from '@components/logoHeader.component';
 
 const NotificationStack = createStackNavigator();
 
@@ -35,7 +34,9 @@ export default function NotificationStackScreen() {
         >
             <NotificationStack.Screen
                 options={{
-                    headerLeft: () => <Text>  </Text>
+                    headerTitle: ' ',
+                    headerBackTitle: ' ',
+                    headerLeft: () => <LogoHeaderComponent></LogoHeaderComponent>,
                 }}
                 name="Notifications"
                 component={NotificationsScreen}

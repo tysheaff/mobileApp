@@ -197,11 +197,23 @@ export function TabNavigator({ navigation }: any) {
                     }
 
                     if (params && key) {
-                        (navigation as any).push(
-                            p_event.screen === 'Post' ? 'HomeStack' : 'ProfileStack',
+                        const canGoBack = navigation.canGoBack();
+
+                        if (canGoBack) {
+                            navigation.popToTop();
+                        }
+
+                        navigation.navigate(
+                            'TabNavigator',
                             {
-                                ...params,
-                                screen: p_event.screen
+                                screen: 'HomeStack',
+                                params: {
+                                    screen: p_event.screen,
+                                    params: {
+                                        ...params,
+                                        key
+                                    }
+                                }
                             }
                         );
                     }
