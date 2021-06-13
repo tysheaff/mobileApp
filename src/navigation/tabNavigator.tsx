@@ -197,35 +197,10 @@ export function TabNavigator({ navigation }: any) {
                     }
 
                     if (params && key) {
-                        const canGoBack = navigation.canGoBack();
-
-                        if (canGoBack) {
-                            navigation.popToTop();
-                        }
-
-                        if (Platform.OS === 'ios') {
-                            navigation.navigate(
-                                'TabNavigator',
-                                {
-                                    screen: 'HomeStack',
-                                    params: {
-                                        screen: p_event.screen,
-                                        params: {
-                                            ...params,
-                                            key
-                                        }
-                                    }
-                                }
-                            );
-                        } else {
-                            navigation.push(
-                                p_event.screen,
-                                {
-                                    ...params,
-                                    key
-                                }
-                            );
-                        }
+                        navigation.push(
+                            p_event.screen,
+                            params
+                        );
                     }
                 }
             );
