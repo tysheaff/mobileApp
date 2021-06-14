@@ -171,48 +171,6 @@ const TabBar = ({ state, navigation }: any) => {
 
 export function TabNavigator({ navigation }: any) {
 
-    useEffect(
-        () => {
-            const unsubscribe = eventManager.addEventListener(
-                EventType.Navigation,
-                (p_event: NavigationEvent) => {
-                    let params;
-                    let key;
-
-                    switch (p_event.screen) {
-                        case 'UserProfile':
-                            params = {
-                                publicKey: p_event.publicKey,
-                                username: p_event.username
-                            };
-                            key = 'Profile_' + p_event.publicKey;
-                            break;
-                        case 'Post':
-                            params = {
-                                postHashHex: p_event.postHashHex,
-                                priorityComment: p_event.priorityCommentHashHex
-                            };
-                            key = 'Post_' + p_event.postHashHex;
-                            break;
-                    }
-
-                    if (params && key) {
-                        navigation.push(
-                            p_event.screen,
-                            params
-                        );
-                    }
-                }
-            );
-
-            notificationsService.registerNotificationHandler();
-            return () => {
-                unsubscribe();
-                notificationsService.unregisterNotificationHandler();
-            };
-        },
-        []
-    );
 
     return (
         <Tab.Navigator
