@@ -93,13 +93,15 @@ export class EditProfileScreen extends Component<Props, State> {
             return;
         }
 
+        const profilePic = this.state.profilePic === api.getSingleProfileImage(globals.user.publicKey) ? '' : this.state.profilePic;
+
         this.setState({ loading: true });
 
         const founderRewardText = this.state.founderReward.split(',').join('.');
         const founderReward = Number(founderRewardText) * 100;
 
         api.updateProfile(
-            globals.user.publicKey, username, description, this.state.profilePic, founderReward
+            globals.user.publicKey, username, description, profilePic, founderReward
         ).then(
             async p_response => {
                 const transactionHex = p_response.TransactionHex;
