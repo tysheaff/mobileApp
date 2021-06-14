@@ -399,11 +399,15 @@ export class NotificationsScreen extends React.Component<Props, State> {
         this._lastLoadMoreId = Math.floor(Math.random() * 1000);
         const loadingId = this._lastLoadMoreId;
 
-        while (loadedCount < p_count && p_lastIndex !== 0) {
+        let noMoreNotifications = false;
+
+        while (loadedCount < p_count && p_lastIndex !== 0 && !noMoreNotifications) {
             const response = await api.getNotifications(globals.user.publicKey, p_lastIndex - 1, 100);
             if (loadingId !== this._lastLoadMoreId) {
                 break;
             }
+
+            noMoreNotifications = response.Notifications?.length === 0;
 
             const newFilteredNotifications = filterNotifications(response.Notifications, p_filter, response.PostsByHash);
             loadedCount += newFilteredNotifications.length;
@@ -422,7 +426,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
         }
 
         if (this._isMounted && loadingId === this._lastLoadMoreId) {
-            this.setState({ isLoadingMore: false, isLoading: false });
+            this.setState({ isLoadingMore: false, isLoading: false, noMoreNotifications });
         }
     }
 
