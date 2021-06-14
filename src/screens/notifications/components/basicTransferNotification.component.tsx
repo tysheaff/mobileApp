@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Profile, Notification } from '@types';
 import { globalStyles } from "@styles/globalStyles";
+import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
+import { globals } from "@globals/globals";
 
 interface Props {
     profile: Profile;
@@ -22,6 +24,18 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
     }
 
     render() {
+        const output = this.props.notification.TxnOutputResponses?.find(
+            p_output => p_output.PublicKeyBase58Check === globals.user.publicKey
+        );
+
+        let bitCloutAmount = '';
+        let usdAmount = '';
+
+        if (output) {
+            bitCloutAmount = (output.AmountNanos / 1000000000).toFixed(2);
+            usdAmount = calculateAndFormatBitCloutInUsd(output.AmountNanos as number);
+        }
+
         return (
             <TouchableOpacity
                 style={[this.props.styles.notificationContainer, this.props.styles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
@@ -46,7 +60,10 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
                         <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
                     </TouchableOpacity>
 
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>sent you BitClout</Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>sent you</Text>
+                    <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} </Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>BitClout!</Text>
+                    <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount})</Text>
                 </View>
             </TouchableOpacity>
         )

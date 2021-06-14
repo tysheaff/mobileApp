@@ -109,6 +109,11 @@ export interface NotificationCreatorCoinTransferMetaData {
     PostHashHex: string;
 }
 
+export interface NotificationTransactionOutputResponse {
+    AmountNanos: number;
+    PublicKeyBase58Check: string;
+}
+
 export interface NotificationMetaData {
     TxnType: NotificationType;
     TransactorPublicKeyBase58Check: string;
@@ -122,6 +127,7 @@ export interface NotificationMetaData {
 export interface Notification {
     Index: number;
     Metadata: NotificationMetaData;
+    TxnOutputResponses: NotificationTransactionOutputResponse[];
 }
 
 export interface CreatorCoinHODLer {
