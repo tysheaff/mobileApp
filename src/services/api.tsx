@@ -331,13 +331,13 @@ function getProfilePosts(p_userPublicKey: string, p_username: string, p_fetchUse
     );
 }
 
-function getProfileHolders(p_username: string, p_numToFetch: number, p_lastPublicKey = '') {
+function getProfileHolders(p_username: string, p_numToFetch: number, p_lastPublicKey = '', p_fetchAll = false) {
     const route = 'get-hodlers-for-public-key';
 
     return post(
         route,
         {
-            FetchAll: false,
+            FetchAll: p_fetchAll,
             FetchHodlings: false,
             LastPublicKeyBase58Check: p_lastPublicKey,
             NumToFetch: p_numToFetch,

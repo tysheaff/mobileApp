@@ -23,14 +23,17 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
 
     useEffect(
         () => {
-            cache.user.getData(true).then(
-                p_user => {
-                    let user = p_user;
-                    const profile = user.ProfileEntryResponse;
-                    let usersWhoHODLYou: CreatorCoinHODLer[] = [];
 
-                    usersWhoHODLYou = user.UsersWhoHODLYou?.filter(
-                        p_user => p_user.CreatorPublicKeyBase58Check !== p_user.HODLerPublicKeyBase58Check && p_user.HasPurchased
+            Promise.all([
+                cache.user.getData(),
+                api.getProfileHolders(globals.user.username, 0, '', true)
+            ]).then(
+                p_responses => {
+                    const user = p_responses[0];
+                    const profile = user.ProfileEntryResponse;
+
+                    let usersWhoHODLYou: CreatorCoinHODLer[] = p_responses[1].Hodlers?.filter(
+                        (p_user: CreatorCoinHODLer) => p_user.CreatorPublicKeyBase58Check !== p_user.HODLerPublicKeyBase58Check && p_user.HasPurchased
                     );
 
                     if (usersWhoHODLYou?.length > 0) {
@@ -98,7 +101,7 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
                         );
                     },
                     5000,
-                    10
+                    3
                 ).then(
                     () => {
                         setAlreadyReceivedCount(p_previous => p_previous + 1);
@@ -114,7 +117,7 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
     }
 
     function goToMessages() {
-        navigation.navigate('MessageStack');
+        navigation.navigate('MessageStack', { screen: 'Messages' });
     }
 
     return isSending ?
