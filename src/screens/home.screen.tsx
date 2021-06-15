@@ -5,7 +5,7 @@ import { themeStyles } from '@styles';
 import { navigatorGlobals, globals, eventManager } from '@globals';
 import { EventType, NavigationEvent, Post } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
-import { PostComponent } from '@components/post.component';
+import { PostComponent } from '@components/post/post.component';
 
 const postsCountPerLoad = 10;
 

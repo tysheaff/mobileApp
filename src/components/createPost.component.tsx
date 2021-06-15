@@ -10,7 +10,7 @@ import { ImageGalleryComponent } from './imageGallery.component';
 import { themeStyles } from '@styles';
 import { settingsGlobals } from '../globals/settingsGlobals';
 import { Post, Profile } from '@types';
-import { PostComponent } from './post.component';
+import { PostComponent } from './post/post.component';
 import { useNavigation, useRoute } from '@react-navigation/core';
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types';
 import { MentionInput, replaceMentionValues } from 'react-native-controlled-mentions';

@@ -11,7 +11,7 @@ import { ProfileStats } from './profileStats.component';
 import { themeStyles } from '@styles/globalColors';
 import { ProfileCard } from './profileCard.component';
 import { DiamondSenderComponent } from './diamondSender.component';
-import { PostComponent } from '@components/post.component';
+import { PostComponent } from '@components/post/post.component';
 import OwnProfileOptionsComponent from './ownProfileOptions.component';
 import { useFocusEffect } from '@react-navigation/core';
 

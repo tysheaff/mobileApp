@@ -4,7 +4,7 @@ import { themeStyles } from '@styles';
 import { globals } from '@globals';
 import { api } from '@services';
 import { Post } from '@types';
-import { PostComponent } from '@components/post.component';
+import { PostComponent } from '@components/post/post.component';
 
 export function PostScreen({ route, navigation }: any) {
     const [isLoading, setLoading] = useState(true);
