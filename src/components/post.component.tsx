@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, ActionSheetIOS, Alert, TouchableOpacity, Platform, Linking } from 'react-native';
+import { View, StyleSheet, Text, Image, Alert, TouchableOpacity, Linking } from 'react-native';
 import { EventType, Post } from '../types';
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -239,23 +239,13 @@ export class PostComponent extends React.Component<Props, State> {
 
             };
 
-            if (Platform.OS === 'ios') {
-                ActionSheetIOS.showActionSheetWithOptions(
-                    {
-                        options: options,
-                        destructiveButtonIndex: 2,
-                        cancelButtonIndex: 3
-                    },
-                    callback
-
-                );
-            } else {
-                eventManager.dispatchEvent(EventType.ToggleActionSheet,
-                    {
-                        visible: true,
-                        config: { options, callback, destructiveButtonIndex: [1, 2] }
-                    })
-            }
+            eventManager.dispatchEvent(
+                EventType.ToggleActionSheet,
+                {
+                    visible: true,
+                    config: { options, callback, destructiveButtonIndex: [1, 2] }
+                }
+            );
         } else {
             const options = ['Copy Link', 'Edit', 'Delete Post', 'Cancel',];
             const callback = (p_optionIndex: number) => {
@@ -306,22 +296,13 @@ export class PostComponent extends React.Component<Props, State> {
                 }
             }
 
-            if (Platform.OS === 'ios') {
-                ActionSheetIOS.showActionSheetWithOptions(
-                    {
-                        options: options,
-                        destructiveButtonIndex: 2,
-                        cancelButtonIndex: 3,
-                    },
-                    callback
-                );
-            } else {
-                eventManager.dispatchEvent(EventType.ToggleActionSheet,
-                    {
-                        visible: true,
-                        config: { options, callback, destructiveButtonIndex: [2] }
-                    })
-            }
+            eventManager.dispatchEvent(
+                EventType.ToggleActionSheet,
+                {
+                    visible: true,
+                    config: { options, callback, destructiveButtonIndex: [2] }
+                }
+            );
         }
     }
 

@@ -186,8 +186,15 @@ export class MessagesScreen extends React.Component<Props, State>{
     async onMessageSettingChange(p_filter: MessageFilter[], p_sort: MessageSort) {
 
         try {
+            const filterJson = JSON.stringify(p_filter);
+
+            if (filterJson === JSON.stringify(this.state.messagesFilter) && p_sort === this.state.messagesSort) {
+                this.setState({ isFilterShown: false });
+                return;
+            }
+
             const messageFilterKey = globals.user.publicKey + constants.localStorage_messagesFilter;
-            await SecureStore.setItemAsync(messageFilterKey, JSON.stringify(p_filter));
+            await SecureStore.setItemAsync(messageFilterKey, filterJson);
 
             const messageSortKey = globals.user.publicKey + constants.localStorage_messagesSort;
             await SecureStore.setItemAsync(messageSortKey, p_sort);

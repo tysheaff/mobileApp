@@ -1,7 +1,7 @@
 import { SelectListControl } from "@controls/selectList.control";
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
-import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView } from "react-native";
+import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView, Platform } from "react-native";
 import Modal from 'react-native-modal'
 
 export enum MessageFilter {
@@ -62,15 +62,15 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
     render() {
         return <Modal
             animationIn={'slideInUp'}
-            animationOut={'slideOutDown'}
             animationOutTiming={500}
-            animationInTiming={500}
+            swipeDirection={'down'}
             onSwipeComplete={this.onDone}
             onBackdropPress={this.onDone}
             onBackButtonPress={this.onDone}
             isVisible={this.props.isFilterShown}
-            style={[styles.container, themeStyles.containerColorSub]}>
-            <ScrollView bounces={false}>
+            propagateSwipe={true}
+            style={[styles.modal]}>
+            <ScrollView style={[styles.container, themeStyles.modalBackgroundColor]} bounces={false}>
                 <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
                     <Text style={[styles.showText, themeStyles.fontColorMain]}>Filter By</Text>
                 </View>
@@ -133,16 +133,18 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
 
 const styles = StyleSheet.create(
     {
+        modal: {
+            width: '100%',
+            marginLeft: 0,
+            marginBottom: 0
+        },
         container: {
-            position: 'absolute',
-            left: 0,
-            margin: 0,
-            right: 0,
-            bottom: 0,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            maxHeight: Dimensions.get('window').height * 0.7,
-            padding: 10,
+            height: '75%',
+            maxHeight: 525,
+            marginTop: 'auto',
+            borderTopRightRadius: 20,
+            borderTopLeftRadius: 20,
+            paddingTop: 30
         },
         headerContainer: {
             borderBottomWidth: 1,
@@ -156,18 +158,6 @@ const styles = StyleSheet.create(
         },
         selectList: {
             width: '100%'
-        },
-        doneButtonContainer: {
-            alignItems: 'center',
-            paddingVertical: 12,
-            backgroundColor: '#007ef5',
-            borderRadius: 8,
-            marginTop: 10,
-        },
-        doneButtonText: {
-            color: 'white',
-            fontWeight: '600',
-            fontSize: 16
         }
     }
 );

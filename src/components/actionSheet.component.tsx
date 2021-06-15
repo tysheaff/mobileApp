@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
 import { ActionSheetConfig } from '@services';
 import { themeStyles } from '@styles';
 import Modal from 'react-native-modal'
 import { eventManager } from '@globals/injector';
 import { EventType } from "@types";
+import { settingsGlobals } from '@globals/settingsGlobals';
 
 export function ActionSheet(props: { config: ActionSheetConfig }) {
 
@@ -30,34 +31,38 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
         animationOut={'slideOutDown'}
         swipeDirection='down'
         animationOutTiming={500}
-        animationInTiming={500}
         onSwipeComplete={close}
         onBackdropPress={close}
         onBackButtonPress={close}
         isVisible={true}
         style={styles.container}>
-        <View style={[styles.optionsContainer, themeStyles.actionSheetContainer]}>
+        <View style={[styles.optionsContainer, themeStyles.modalBackgroundColor]}>
             {
-                props.config.options.map(
+                props.config.options.slice(0, -1).map(
                     (p_option: string, p_index: number) =>
-                        p_index !== props.config.options.length - 1 &&
                         <TouchableOpacity
-                            style={[styles.optionButton, themeStyles.recloutBorderColor]}
+                            style={[
+                                styles.optionButton,
+                                p_index !== props.config.options.length - 2 && { borderBottomWidth: 1, borderColor: settingsGlobals.darkMode ? '#2b2b2b' : '#e0e0e0' },
+                            ]}
                             key={p_index.toString()}
                             onPress={() => onOptionClick(p_index)}
                         >
-                            <Text style={[themeStyles.fontColorMain, props.config.destructiveButtonIndex.includes(p_index) && { color: '#ff0000' }]}>{p_option}</Text>
+                            <Text style={[
+                                styles.optionText,
+                                themeStyles.fontColorMain, props.config.destructiveButtonIndex.includes(p_index) && { color: '#f53636' }
+                            ]}>{p_option}</Text>
                         </TouchableOpacity>
                 )
             }
         </View>
-        <View style={[styles.cancelContainer, themeStyles.actionSheetContainer, styles.cancel]}>
+        <View style={[styles.cancelContainer, themeStyles.modalBackgroundColor]}>
 
             <TouchableOpacity
-                style={[styles.optionButton, themeStyles.recloutBorderColor]}
+                style={[styles.optionButton]}
                 onPress={close}
             >
-                <Text style={[themeStyles.fontColorMain]}>Cancel</Text>
+                <Text style={[styles.optionText, themeStyles.fontColorMain]}>Cancel</Text>
             </TouchableOpacity>
 
         </View>
@@ -66,34 +71,26 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
 const styles = StyleSheet.create(
     {
         container: {
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            margin: 0,
+            marginLeft: 15,
+            marginRight: 15
         },
         optionsContainer: {
-            position: 'absolute',
-            bottom: 60,
-            left: 0,
-            right: 0,
-            margin: 15,
+            marginTop: 'auto',
             borderRadius: 15,
         },
         optionButton: {
-            height: 50,
+            height: 54,
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'center'
         },
         cancelContainer: {
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            margin: 15,
+            marginTop: 10,
             borderRadius: 15,
+            marginBottom: Platform.OS === 'ios' ? 10 : 0
         },
-        cancel: {
+        optionText: {
+            fontSize: 16,
+            fontWeight: '500'
         }
     }
 );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActionSheetIOS, Alert, Platform, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/core';
 import { Feather } from '@expo/vector-icons';
@@ -125,22 +125,13 @@ export function ProfileScreenOptionsComponent(
                 ).catch(p_error => globals.defaultHandleError(p_error));
             }
         }
-        if (Platform.OS === 'ios') {
-            ActionSheetIOS.showActionSheetWithOptions(
-                {
-                    options: options,
-                    destructiveButtonIndex: 1,
-                    cancelButtonIndex: 2,
-                },
-                callback
-            );
-        } else {
-            eventManager.dispatchEvent(EventType.ToggleActionSheet,
-                {
-                    visible: true,
-                    config: { options, callback, destructiveButtonIndex: [1] }
-                })
-        }
+        eventManager.dispatchEvent(
+            EventType.ToggleActionSheet,
+            {
+                visible: true,
+                config: { options, callback, destructiveButtonIndex: [1] }
+            }
+        );
     }
 
     return <View style={styles.container}>

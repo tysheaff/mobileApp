@@ -100,8 +100,8 @@ const styles = StyleSheet.create(
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingLeft: 10,
-            paddingRight: 10,
+            paddingLeft: 15,
+            paddingRight: 15,
             width: '100%',
             height: 50
         },

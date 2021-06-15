@@ -37,7 +37,7 @@ export default function App() {
   const [theme, setGlobalTheme] = useState('light');
   const [showProfileManager, setShowProfileManager] = useState(false);
   const [showActionSheet, setShowActionSheet] = useState(false);
-  const [config, setConfig] = useState<ActionSheetConfig>()
+  const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>()
   const [navigation, setNavigation] = useState<NavigationProp<any>>();
 
   let mount = true;
@@ -58,7 +58,7 @@ export default function App() {
         EventType.ToggleActionSheet,
         (event: ToggleActionSheetEvent) => {
           if (mount) {
-            setConfig(event.config)
+            setActionSheetConfig(event.config)
             setShowActionSheet(event.visible);
           }
         }
@@ -261,7 +261,7 @@ export default function App() {
         }
       </Stack.Navigator >
       <DiamondAnimationComponent />
-      {showActionSheet && config && <ActionSheet config={config} />}
+      {showActionSheet && actionSheetConfig && <ActionSheet config={actionSheetConfig} />}
       <SnackbarComponent />
       {
         showProfileManager ?
