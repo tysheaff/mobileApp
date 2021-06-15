@@ -15,7 +15,7 @@ interface Props { }
 
 interface State {
     isLoading: boolean;
-    openSettings: boolean;
+    isFilterShown: boolean;
     messagesFilter: MessageFilter[];
     messagesSort: MessageSort;
     contacts: ContactWithMessages[];
@@ -34,7 +34,7 @@ export class MessagesScreen extends React.Component<Props, State>{
 
         this.state = {
             isLoading: true,
-            openSettings: false,
+            isFilterShown: false,
             messagesFilter: [],
             messagesSort: MessageSort.MostRecent,
             contacts: [],
@@ -54,12 +54,13 @@ export class MessagesScreen extends React.Component<Props, State>{
         );
 
         this._subscriptions.push(
-            eventManager.addEventListener(EventType.OpenMessagesSettings, this.openMessagesSettings.bind(this))
+            eventManager.addEventListener(EventType.OpenMessagesSettings, this.toggleMessagesFilter.bind(this))
         );
 
         this.loadMessages = this.loadMessages.bind(this);
         this.loadMoreMessages = this.loadMoreMessages.bind(this);
         this.onMessageSettingChange = this.onMessageSettingChange.bind(this);
+        this.toggleMessagesFilter = this.toggleMessagesFilter.bind(this)
     }
 
     componentDidMount() {
@@ -75,7 +76,7 @@ export class MessagesScreen extends React.Component<Props, State>{
     }
 
     shouldComponentUpdate(_nextProps: Props, p_nextState: State) {
-        return p_nextState.openSettings !== this.state.openSettings ||
+        return p_nextState.isFilterShown !== this.state.isFilterShown ||
             p_nextState.isLoading !== this.state.isLoading ||
             p_nextState.isLoadingMore !== this.state.isLoadingMore;
     }
@@ -176,9 +177,9 @@ export class MessagesScreen extends React.Component<Props, State>{
         return { messagesFilter, messagesSort };
     }
 
-    openMessagesSettings() {
+    toggleMessagesFilter() {
         if (this._isMounted) {
-            this.setState({ openSettings: true });
+            this.setState({ isFilterShown: true });
         }
     }
 
@@ -192,7 +193,7 @@ export class MessagesScreen extends React.Component<Props, State>{
             await SecureStore.setItemAsync(messageSortKey, p_sort);
 
             if (this._isMounted) {
-                this.setState({ messagesFilter: p_filter, messagesSort: p_sort, openSettings: false });
+                this.setState({ messagesFilter: p_filter, messagesSort: p_sort, isFilterShown: false });
                 this.loadMessages(p_filter, p_sort);
             }
         }
@@ -240,13 +241,15 @@ export class MessagesScreen extends React.Component<Props, State>{
             }
 
             {
-                this.state.openSettings ?
-                    <MessageSettingsComponent
-                        filter={this.state.messagesFilter}
-                        sort={this.state.messagesSort}
-                        onSettingsChange={this.onMessageSettingChange}
-                    ></MessageSettingsComponent>
-                    : undefined
+                this.state.isFilterShown &&
+                <MessageSettingsComponent
+                    filter={this.state.messagesFilter}
+                    sort={this.state.messagesSort}
+                    toggleMessagesFilter={this.toggleMessagesFilter}
+                    isFilterShown={this.state.isFilterShown}
+                    onSettingsChange={this.onMessageSettingChange}
+                />
+
             }
         </View>
     }

@@ -1,8 +1,8 @@
 import { SelectListControl } from "@controls/selectList.control";
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
-import { View, StyleSheet, Text, Dimensions } from "react-native";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView } from "react-native";
+import Modal from 'react-native-modal'
 
 export enum MessageFilter {
     Holders = 'Holders',
@@ -21,7 +21,9 @@ export enum MessageSort {
 interface Props {
     filter: MessageFilter[];
     sort: MessageSort;
-    onSettingsChange: (p_filter: MessageFilter[], p_sort: MessageSort) => void
+    onSettingsChange: (p_filter: MessageFilter[], p_sort: MessageSort) => void;
+    isFilterShown: boolean;
+    toggleMessagesFilter: () => void
 }
 
 interface State {
@@ -36,7 +38,7 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
 
         this.state = {
             filter: this.props.filter.slice(0),
-            sort: this.props.sort
+            sort: this.props.sort,
         }
 
         this.onFilterValueChange = this.onFilterValueChange.bind(this);
@@ -53,109 +55,94 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
     }
 
     onDone() {
+        this.props.toggleMessagesFilter
         this.props.onSettingsChange(this.state.filter, this.state.sort);
     }
 
     render() {
-        return <View style={styles.fullScreen}>
-            <View style={styles.overlay}>
-            </View>
-
-            <View style={[styles.container, themeStyles.containerColorSub]}>
-                <ScrollView bounces={false}>
-                    <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
-                        <Text style={[styles.showText, themeStyles.fontColorMain]}>Filter By</Text>
-                    </View>
-                    <SelectListControl
-                        style={[styles.selectList]}
-                        options={[
-                            {
-                                name: 'Holders',
-                                value: MessageFilter.Holders
-                            },
-                            {
-                                name: 'Holding',
-                                value: MessageFilter.Holding
-                            },
-                            {
-                                name: 'Followers',
-                                value: MessageFilter.Followers
-                            },
-                            {
-                                name: 'Following',
-                                value: MessageFilter.Following
-                            }
-                        ]}
-                        value={this.state.filter}
-                        onValueChange={this.onFilterValueChange}
-                        multiple={true}
-                    >
-                    </SelectListControl>
-                    <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
-                        <Text style={[styles.showText, themeStyles.fontColorMain]}>Sort By</Text>
-                    </View>
-                    <SelectListControl
-                        style={[styles.selectList]}
-                        options={[
-                            {
-                                name: 'Most Recent',
-                                value: MessageSort.MostRecent
-                            },
-                            {
-                                name: 'Largest Holder',
-                                value: MessageSort.LargestHolder
-                            },
-                            {
-                                name: 'Most Clout',
-                                value: MessageSort.MostClout
-                            }, {
-                                name: 'Most Followed',
-                                value: MessageSort.MostFollowed
-                            },
-                        ]}
-                        value={this.state.sort}
-                        onValueChange={this.onSortValueChange}
-                    >
-                    </SelectListControl>
-                </ScrollView>
-
-                <TouchableOpacity style={styles.doneButtonContainer} activeOpacity={0.7} onPress={this.onDone}>
-                    <Text style={styles.doneButtonText}>Done</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+        return <Modal
+            animationIn={'slideInUp'}
+            animationOut={'slideOutDown'}
+            animationOutTiming={500}
+            animationInTiming={500}
+            onSwipeComplete={this.onDone}
+            onBackdropPress={this.onDone}
+            onBackButtonPress={this.onDone}
+            isVisible={this.props.isFilterShown}
+            style={[styles.container, themeStyles.containerColorSub]}>
+            <ScrollView bounces={false}>
+                <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
+                    <Text style={[styles.showText, themeStyles.fontColorMain]}>Filter By</Text>
+                </View>
+                <SelectListControl
+                    style={[styles.selectList]}
+                    options={[
+                        {
+                            name: 'Holders',
+                            value: MessageFilter.Holders
+                        },
+                        {
+                            name: 'Holding',
+                            value: MessageFilter.Holding
+                        },
+                        {
+                            name: 'Followers',
+                            value: MessageFilter.Followers
+                        },
+                        {
+                            name: 'Following',
+                            value: MessageFilter.Following
+                        }
+                    ]}
+                    value={this.state.filter}
+                    onValueChange={this.onFilterValueChange}
+                    multiple={true}
+                >
+                </SelectListControl>
+                <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
+                    <Text style={[styles.showText, themeStyles.fontColorMain]}>Sort By</Text>
+                </View>
+                <SelectListControl
+                    style={[styles.selectList]}
+                    options={[
+                        {
+                            name: 'Most Recent',
+                            value: MessageSort.MostRecent
+                        },
+                        {
+                            name: 'Largest Holder',
+                            value: MessageSort.LargestHolder
+                        },
+                        {
+                            name: 'Most Clout',
+                            value: MessageSort.MostClout
+                        }, {
+                            name: 'Most Followed',
+                            value: MessageSort.MostFollowed
+                        },
+                    ]}
+                    value={this.state.sort}
+                    onValueChange={this.onSortValueChange}
+                >
+                </SelectListControl>
+            </ScrollView>
+        </Modal>
 
     }
 }
 
 const styles = StyleSheet.create(
     {
-        fullScreen: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
-        },
-        overlay: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'black',
-            opacity: 0.6
-        },
         container: {
             position: 'absolute',
-            top: 0,
             left: 0,
+            margin: 0,
             right: 0,
+            bottom: 0,
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            maxHeight: Dimensions.get('window').height * 0.7,
             padding: 10,
-            borderBottomLeftRadius: 16,
-            borderBottomRightRadius: 16,
-            borderRadius: 16,
-            maxHeight: Dimensions.get('window').height * 0.7
         },
         headerContainer: {
             borderBottomWidth: 1,
@@ -171,14 +158,11 @@ const styles = StyleSheet.create(
             width: '100%'
         },
         doneButtonContainer: {
-            display: 'flex',
             alignItems: 'center',
-            paddingTop: 12,
-            paddingBottom: 12,
+            paddingVertical: 12,
             backgroundColor: '#007ef5',
             borderRadius: 8,
             marginTop: 10,
-            marginBottom: 6
         },
         doneButtonText: {
             color: 'white',
