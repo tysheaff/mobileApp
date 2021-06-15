@@ -17,6 +17,7 @@ import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
+import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 
 const HomeStack = createStackNavigator();
 
@@ -40,7 +41,7 @@ export default function HomeStackScreen() {
                     ({ navigation }) => ({
                         headerTitle: ' ',
                         headerBackTitle: ' ',
-                        headerLeft: () =><LogoHeaderComponent></LogoHeaderComponent>,
+                        headerLeft: () => <LogoHeaderComponent></LogoHeaderComponent>,
                         headerRight: () => (
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
@@ -136,6 +137,15 @@ export default function HomeStackScreen() {
                 }}
                 name="Post"
                 component={PostScreen}
+            ></HomeStack.Screen>
+
+            <HomeStack.Screen
+                options={{
+                    headerTitle: 'CloutFeed',
+                    headerBackTitle: ' '
+                }}
+                name="PostStats"
+                component={PostStatsScreen}
             ></HomeStack.Screen>
 
             <HomeStack.Screen

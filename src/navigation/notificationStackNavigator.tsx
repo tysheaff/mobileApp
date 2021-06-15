@@ -15,6 +15,7 @@ import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
+import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 
 const NotificationStack = createStackNavigator();
 
@@ -95,6 +96,15 @@ export default function NotificationStackScreen() {
                 }}
                 name="Post"
                 component={PostScreen}
+            ></NotificationStack.Screen>
+
+            <NotificationStack.Screen
+                options={{
+                    headerTitle: 'CloutFeed',
+                    headerBackTitle: ' '
+                }}
+                name="PostStats"
+                component={PostStatsScreen}
             ></NotificationStack.Screen>
 
             <NotificationStack.Screen

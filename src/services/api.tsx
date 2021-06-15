@@ -481,6 +481,58 @@ function getSinglePost(p_userKey: string, p_postHash: string, p_fetchParents: bo
     );
 }
 
+function getLikesForPost(p_userKey: string, p_postHash: string, limit: number, offset: number) {
+    const route = 'get-likes-for-post';
+    return post(
+        route,
+        {
+            PostHashHex: p_postHash,
+            ReaderPublicKeyBase58Check: p_userKey,
+            Limit: limit,
+            Offset: offset
+        }
+    );
+}
+
+function getRecloutersForPost(p_userKey: string, p_postHash: string, limit: number, offset: number) {
+    const route = 'get-reclouts-for-post';
+    return post(
+        route,
+        {
+            PostHashHex: p_postHash,
+            ReaderPublicKeyBase58Check: p_userKey,
+            Limit: limit,
+            Offset: offset
+        }
+    );
+}
+
+function getQuotesForPost(p_userKey: string, p_postHash: string, limit: number, offset: number) {
+    const route = 'get-quote-reclouts-for-post';
+    return post(
+        route,
+        {
+            PostHashHex: p_postHash,
+            ReaderPublicKeyBase58Check: p_userKey,
+            Limit: limit,
+            Offset: offset
+        }
+    );
+}
+
+function getDiamondSendersForPost(p_userKey: string, p_postHash: string, limit: number, offset: number) {
+    const route = 'get-diamonds-for-post';
+    return post(
+        route,
+        {
+            PostHashHex: p_postHash,
+            ReaderPublicKeyBase58Check: p_userKey,
+            Limit: limit,
+            Offset: offset
+        }
+    );
+}
+
 function createFollow(p_userKey: string, p_followedUserKey: string, p_isUnFollow: boolean) {
     const route = 'create-follow-txn-stateless';
     return post(
@@ -504,22 +556,6 @@ function blockUser(p_userKey: string, p_blockedUserKey: string, p_jwt: string, p
             PublicKeyBase58Check: p_userKey,
             JWT: p_jwt,
             Unblock: p_unblock
-        }
-    );
-}
-
-function updateUserGlobalMetaData(p_userKey: string, p_contactPublicKey: string, p_messagesReadCount: number, p_jwt: string) {
-    const route = 'update-user-global-metadata';
-
-    return post(
-        route,
-        {
-            Email: '',
-            JWT: p_jwt,
-            MessageReadStateUpdatesByContact: { [p_contactPublicKey]: p_messagesReadCount },
-            PhoneNumber: '',
-            PhoneNumberCountryCode: '',
-            UserPublicKeyBase58Check: p_userKey
         }
     );
 }
@@ -628,6 +664,8 @@ function updateProfile(
     )
 }
 
+
+
 export const api = {
     login,
     logout,
@@ -650,7 +688,6 @@ export const api = {
     getSinglePost,
     createFollow,
     blockUser,
-    updateUserGlobalMetaData,
     getAppState,
     submitTransaction,
     getSingleProfile,
@@ -664,5 +701,9 @@ export const api = {
     uploadImageAndroid,
     getTikTokFullVideoId,
     updateProfile,
-    markContactMessagesRead
+    markContactMessagesRead,
+    getLikesForPost,
+    getRecloutersForPost,
+    getDiamondSendersForPost,
+    getQuotesForPost
 }

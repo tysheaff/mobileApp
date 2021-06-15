@@ -31,6 +31,7 @@ export interface Profile {
     CoinEntry: CoinEntry;
     IsVerified: boolean;
     CoinPriceUSD?: number;
+    FormattedCoinPriceUSD?: string;
     Posts: Post[];
     UsersThatHODL?: CreatorCoinHODLer[];
 }

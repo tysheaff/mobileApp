@@ -14,9 +14,8 @@ import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
-import { ChatHeaderComponent } from '@components/chatHeader.component';
-import { ChatScreen } from '@screens/chatScreen';
 import { IdentityScreen } from '@screens/login/identity.screen';
+import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 
 const ProfileStack = createStackNavigator();
 
@@ -139,6 +138,15 @@ export default function ProfileStackScreen() {
                 }}
                 name="Post"
                 component={PostScreen}
+            ></ProfileStack.Screen>
+
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'CloutFeed',
+                    headerBackTitle: ' '
+                }}
+                name="PostStats"
+                component={PostStatsScreen}
             ></ProfileStack.Screen>
 
             <ProfileStack.Screen

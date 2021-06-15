@@ -36,6 +36,7 @@ export class PostActionsRow extends React.Component<Props, State> {
         this.onSendDiamonds = this.onSendDiamonds.bind(this);
         this.goToReply = this.goToReply.bind(this);
         this.goToReclout = this.goToReclout.bind(this);
+        this.goToStats = this.goToStats.bind(this);
     }
 
     componentDidMount() {
@@ -161,9 +162,19 @@ export class PostActionsRow extends React.Component<Props, State> {
         );
     }
 
+    private goToStats(p_selectedTab: string) {
+        (this.props.navigation as any).push(
+            'PostStats',
+            {
+                postHashHex: this.props.post.PostHashHex,
+                selectedTab: p_selectedTab
+            }
+        );
+    }
+
     render() {
         return <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onLike}>
+            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onLike} onLongPress={() => this.goToStats('Likes')}>
                 <Ionicons name={this.state.likeIcon.name as any} size={24} color={this.state.likeIcon.color} />
                 <Text style={styles.actionText}>{this.props.post.LikeCount}</Text>
             </TouchableOpacity>
@@ -173,12 +184,12 @@ export class PostActionsRow extends React.Component<Props, State> {
                 <Text style={styles.actionText}>{this.props.post.CommentCount}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReclout}>
+            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReclout} onLongPress={() => this.goToStats('Reclouts')}>
                 <MaterialCommunityIcons name="twitter-retweet" size={28} color={this.props.post.PostEntryReaderState?.RecloutedByReader ? '#5ba358' : '#a1a1a1'} />
                 <Text style={styles.actionText}>{this.props.post.RecloutCount}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds}>
+            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds} onLongPress={() => this.goToStats('Diamonds')}>
                 <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
                 <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
             </TouchableOpacity>

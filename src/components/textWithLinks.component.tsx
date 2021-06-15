@@ -63,13 +63,11 @@ export function TextWithLinks({ text, style, numberOfLines }: { text: string, st
                 style={[styles.link, themeStyles.linkColor]}
                 key={index}
                 onPress={() => onLinkPressed(text, match)}
-                selectable={true}
             >
                 {renderLink(text)}
             </Text>
         )}
         numberOfLines={numberOfLines}
-        selectable={true}
     />
 }
 

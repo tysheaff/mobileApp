@@ -5,7 +5,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import ImageModal from './imageModal.component';
 
-export function ImageGalleryComponent({ imageUrls, goToPost, removable, onRemove, selectedImageIndex }: any) {
+export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemove, selectedImageIndex }: any) {
     let mount = true;
     const scrollRef = useRef(null);
     const [internalIndex, setInternalIndex] = useState(0);
@@ -61,6 +61,7 @@ export function ImageGalleryComponent({ imageUrls, goToPost, removable, onRemove
                                 <TouchableOpacity
                                     style={styles.image}
                                     onPress={() => setModalVisible(true)}
+                                    onLongPress={goToStats}
                                     activeOpacity={1}
                                     key={index}>
                                     <Image style={[styles.image, { width: imageWidth }]} source={{ uri: p_imageUrl }} key={index}></Image>

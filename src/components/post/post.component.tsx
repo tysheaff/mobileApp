@@ -52,6 +52,7 @@ export class PostComponent extends React.Component<Props, State> {
         };
 
         this.goToProfile = this.goToProfile.bind(this);
+        this.goToStats = this.goToStats.bind(this);
         this.goToPost = this.goToPost.bind(this);
         this.goToRecloutedPost = this.goToRecloutedPost.bind(this);
         this.getEmbeddedVideoLink = this.getEmbeddedVideoLink.bind(this);
@@ -63,6 +64,15 @@ export class PostComponent extends React.Component<Props, State> {
 
     shouldComponentUpdate(p_nextProps: Props) {
         return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex;
+    }
+
+    private goToStats() {
+        (this.props.navigation as any).push(
+            'PostStats',
+            {
+                postHashHex: this.props.post.PostHashHex
+            }
+        );
     }
 
     private goToProfile() {
@@ -141,7 +151,7 @@ export class PostComponent extends React.Component<Props, State> {
                             { borderBottomWidth: this.props.hideBottomBorder ? 0 : 1 },
                             themeStyles.borderColor
                         ]}>
-                        <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
+                        <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
                             <View style={styles.headerContainer}>
                                 {
                                     !this.props.isParentPost ? (
@@ -182,13 +192,13 @@ export class PostComponent extends React.Component<Props, State> {
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={this.goToPost} activeOpacity={1}>
+                        <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
                             <TextWithLinks style={[styles.bodyText, themeStyles.fontColorMain]} text={this.props.post.Body?.trimEnd()}></TextWithLinks>
                         </TouchableOpacity>
 
                         {
                             this.props.post.ImageURLs?.length > 0 ?
-                                <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToPost={this.goToPost}></ImageGalleryComponent> :
+                                <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToStats={this.goToStats}></ImageGalleryComponent> :
                                 undefined
                         }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { themeStyles } from '@styles';
 
@@ -7,7 +7,10 @@ export interface TabConfig {
     name: string;
 }
 
-export function TabsComponent({ tabs, selectedTab, onTabClick }: { tabs: TabConfig[], selectedTab: string, onTabClick: (p_tabName: string) => void }) {
+export function TabsComponent(
+    { tabs, selectedTab, onTabClick, centerText }:
+        { tabs: TabConfig[], selectedTab: string, onTabClick: (p_tabName: string) => void, centerText?: boolean }
+) {
 
     return <View style={[styles.container, themeStyles.containerColorMain]}>
         {
@@ -16,7 +19,8 @@ export function TabsComponent({ tabs, selectedTab, onTabClick }: { tabs: TabConf
                     key={p_tab.name}
                     style={[
                         styles.tab,
-                        selectedTab === p_tab.name ? { borderBottomWidth: 2, borderBottomColor: themeStyles.fontColorMain.color } : {}
+                        selectedTab === p_tab.name ? { borderBottomWidth: 2, borderBottomColor: themeStyles.fontColorMain.color } : {},
+                        centerText === true ? { alignItems: 'center', width: Dimensions.get('window').width / tabs.length } : {}
                     ]}
                     activeOpacity={1}
                     onPress={() => onTabClick(p_tab.name)}>
@@ -34,10 +38,10 @@ export function TabsComponent({ tabs, selectedTab, onTabClick }: { tabs: TabConf
 const styles = StyleSheet.create(
     {
         container: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            height: 40
+            height: 40,
+            width: '100%'
         },
         tab: {
             height: 40,
