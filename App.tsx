@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { ActivityIndicator, View } from 'react-native';
 import { WelcomeScreen } from './src/screens/welcome.screen';
-import { CreatorCoinHODLer, EventType, ToggleProfileManagerEvent, User } from './src/types';
+import { CreatorCoinHODLer, EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
 import { themeStyles, updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
@@ -24,6 +24,7 @@ import { eventManager } from '@globals/injector';
 import { StatusBar } from 'expo-status-bar';
 import { TabNavigator } from './src/navigation/tabNavigator';
 import MessageStackScreen from './src/navigation/messageStackNavigator';
+import { ActionSheetConfig } from '@services/actionSheet';
 
 enableScreens();
 
@@ -35,6 +36,8 @@ export default function App() {
   const [areTermsAccepted, setTermsAccepted] = useState(false);
   const [theme, setGlobalTheme] = useState('light');
   const [showProfileManager, setShowProfileManager] = useState(false);
+  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [config, setConfig] = useState<ActionSheetConfig>()
   const [navigation, setNavigation] = useState<NavigationProp<any>>();
 
   let mount = true;
@@ -42,7 +45,7 @@ export default function App() {
   useEffect(
     () => {
       checkAuthenticatedUser();
-      const unsubscribe = eventManager.addEventListener(
+      const unsubscribeProfileManager = eventManager.addEventListener(
         EventType.ToggleProfileManager,
         (event: ToggleProfileManagerEvent) => {
           if (mount) {
@@ -51,9 +54,20 @@ export default function App() {
           }
         }
       );
+      const unsubscribeActionSheet = eventManager.addEventListener(
+        EventType.ToggleActionSheet,
+        (event: ToggleActionSheetEvent) => {
+          if (mount) {
+            setConfig(event.config)
+            setShowActionSheet(event.visible);
+          }
+        }
+      );
 
       return () => {
-        unsubscribe();
+        unsubscribeProfileManager();
+        unsubscribeActionSheet();
+
       };
     },
     []
@@ -246,9 +260,9 @@ export default function App() {
             </React.Fragment>
         }
       </Stack.Navigator >
-      <DiamondAnimationComponent></DiamondAnimationComponent>
-      <ActionSheet></ActionSheet>
-      <SnackbarComponent></SnackbarComponent>
+      <DiamondAnimationComponent />
+      {showActionSheet && config && <ActionSheet config={config} />}
+      <SnackbarComponent />
       {
         showProfileManager ?
           <ProfileManagerComponent navigation={navigation as NavigationProp<any>}></ProfileManagerComponent> : undefined

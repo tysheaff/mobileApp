@@ -3,7 +3,7 @@ import { ActionSheetIOS, Alert, Platform, StyleSheet, Text, View } from 'react-n
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/core';
 import { Feather } from '@expo/vector-icons';
-import { actionSheet, api, cache, snackbar } from '@services';
+import { api, cache, snackbar } from '@services';
 import { ChangeFollowersEvent, EventType, User } from '@types';
 import { eventManager, globals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
@@ -135,12 +135,11 @@ export function ProfileScreenOptionsComponent(
                 callback
             );
         } else {
-            actionSheet.showActionSheet(
+            eventManager.dispatchEvent(EventType.ToggleActionSheet,
                 {
-                    options: options,
-                    callback: callback
-                }
-            );
+                    visible: true,
+                    config: { options, callback, destructiveButtonIndex: [1] }
+                })
         }
     }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, Image, ActionSheetIOS, Alert, TouchableOpacity, Platform, Linking } from 'react-native';
-import { Post } from '../types';
+import { EventType, Post } from '../types';
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
@@ -13,8 +13,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ImageGalleryComponent } from './imageGallery.component';
 import { TextWithLinks } from './textWithLinks.component';
-import { globals } from '@globals';
-import { actionSheet, api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow, diamondAnimation, snackbar } from '@services';
+import { eventManager, globals } from '@globals';
+import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow, diamondAnimation, snackbar } from '@services';
 import { themeStyles } from '@styles';
 import { parseVideoLink } from '@services/videoLinkParser';
 import { signing } from '@services/authorization/signing';
@@ -46,7 +46,7 @@ export class PostComponent extends React.Component<Props, State> {
 
     constructor(p_props: Props) {
         super(p_props);
-        
+
         const coinPrice = calculateAndFormatBitCloutInUsd(this.props.post.ProfileEntryResponse.CoinPriceBitCloutNanos);
         const durationUntilNow = calculateDurationUntilNow(this.props.post.TimestampNanos);
 
@@ -219,7 +219,7 @@ export class PostComponent extends React.Component<Props, State> {
     private onPostOptionsClick() {
         if (globals.user.publicKey !== this.props.post.ProfileEntryResponse.PublicKeyBase58Check) {
             const options = ['Copy Link', 'Report', 'Block User', 'Cancel'];
-            const callBack = async (p_optionIndex: number) => {
+            const callback = async (p_optionIndex: number) => {
                 if (p_optionIndex === 0) {
                     this.copyToClipBoard();
                 } else if (p_optionIndex === 1) {
@@ -246,16 +246,15 @@ export class PostComponent extends React.Component<Props, State> {
                         destructiveButtonIndex: 2,
                         cancelButtonIndex: 3
                     },
-                    callBack
+                    callback
 
                 );
             } else {
-                actionSheet.showActionSheet(
+                eventManager.dispatchEvent(EventType.ToggleActionSheet,
                     {
-                        options: options,
-                        callback: callBack
-                    }
-                );
+                        visible: true,
+                        config: { options, callback, destructiveButtonIndex: [1, 2] }
+                    })
             }
         } else {
             const options = ['Copy Link', 'Edit', 'Delete Post', 'Cancel',];
@@ -317,12 +316,11 @@ export class PostComponent extends React.Component<Props, State> {
                     callback
                 );
             } else {
-                actionSheet.showActionSheet(
+                eventManager.dispatchEvent(EventType.ToggleActionSheet,
                     {
-                        options,
-                        callback
-                    }
-                );
+                        visible: true,
+                        config: { options, callback, destructiveButtonIndex: [2] }
+                    })
             }
         }
     }

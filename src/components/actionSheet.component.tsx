@@ -1,48 +1,68 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { actionSheet, ActionSheetConfig } from '@services';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { ActionSheetConfig } from '@services';
 import { themeStyles } from '@styles';
+import Modal from 'react-native-modal'
+import { eventManager } from '@globals/injector';
+import { EventType } from "@types";
 
-export function ActionSheet() {
-    const [showActionSheet, setShowActionSheet] = useState(false);
-    const [options, setOptions] = useState<string[]>([]);
-    const [config, setConfig] = useState<ActionSheetConfig>();
+export function ActionSheet(props: { config: ActionSheetConfig }) {
 
-    actionSheet.showActionSheet = (p_config: ActionSheetConfig) => {
-        setOptions(p_config.options);
-        setConfig(p_config);
+    let _isMounted = true;
 
-        setShowActionSheet(true);
-    }
+    useEffect(() => {
+        return () => { _isMounted = false };
+    }, [])
 
     function onOptionClick(p_optionIndex: number) {
-        config?.callback(p_optionIndex);
-        setShowActionSheet(false);
+        props.config?.callback(p_optionIndex);
+        close();
     }
 
-    return showActionSheet ?
-        <View style={styles.container}>
-            <View style={styles.overlay}></View>
-            <View style={[styles.optionsContainer, themeStyles.containerColorMain]}>
-                {
-                    options.map(
-                        (p_option, p_index) =>
-                            <TouchableOpacity
-                                style={[styles.optionButton, themeStyles.recloutBorderColor]}
-                                key={p_index.toString()}
-                                onPress={() => onOptionClick(p_index)}
-                            >
-                                <Text style={[themeStyles.fontColorMain]}>{p_option}</Text>
-                            </TouchableOpacity>
-                    )
-                }
-            </View>
-        </View>
-        :
-        <View></View>
-}
+    function close() {
+        if (_isMounted) {
+            eventManager.dispatchEvent(EventType.ToggleActionSheet, { visible: false });
+        }
+    }
 
+    return <Modal
+        animationIn={'slideInUp'}
+        animationOut={'slideOutDown'}
+        swipeDirection='down'
+        animationOutTiming={500}
+        animationInTiming={500}
+        onSwipeComplete={close}
+        onBackdropPress={close}
+        onBackButtonPress={close}
+        isVisible={true}
+        style={styles.container}>
+        <View style={[styles.optionsContainer, themeStyles.actionSheetContainer]}>
+            {
+                props.config.options.map(
+                    (p_option: string, p_index: number) =>
+                        p_index !== props.config.options.length - 1 &&
+                        <TouchableOpacity
+                            style={[styles.optionButton, themeStyles.recloutBorderColor]}
+                            key={p_index.toString()}
+                            onPress={() => onOptionClick(p_index)}
+                        >
+                            <Text style={[themeStyles.fontColorMain, props.config.destructiveButtonIndex.includes(p_index) && { color: '#ff0000' }]}>{p_option}</Text>
+                        </TouchableOpacity>
+                )
+            }
+        </View>
+        <View style={[styles.cancelContainer, themeStyles.actionSheetContainer, styles.cancel]}>
+
+            <TouchableOpacity
+                style={[styles.optionButton, themeStyles.recloutBorderColor]}
+                onPress={close}
+            >
+                <Text style={[themeStyles.fontColorMain]}>Cancel</Text>
+            </TouchableOpacity>
+
+        </View>
+    </Modal>
+}
 const styles = StyleSheet.create(
     {
         container: {
@@ -50,29 +70,30 @@ const styles = StyleSheet.create(
             bottom: 0,
             left: 0,
             right: 0,
-            top: 0,
+            margin: 0,
         },
-        overlay: {
+        optionsContainer: {
+            position: 'absolute',
+            bottom: 60,
+            left: 0,
+            right: 0,
+            margin: 15,
+            borderRadius: 15,
+        },
+        optionButton: {
+            height: 50,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        cancelContainer: {
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
-            top: 0,
-            backgroundColor: 'black',
-            opacity: 0.5
+            margin: 15,
+            borderRadius: 15,
         },
-        optionsContainer: {
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0
-        },
-        optionButton: {
-            height: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderTopWidth: 1
+        cancel: {
         }
     }
 );
