@@ -1,13 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { Post } from '../../types';
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Fontisto } from '@expo/vector-icons';
 import WebView from 'react-native-webview';
-import { FontAwesome } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
@@ -15,8 +12,8 @@ import { globals } from '@globals';
 import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow, diamondAnimation } from '@services';
 import { themeStyles } from '@styles';
 import { parseVideoLink } from '@services/videoLinkParser';
-import { signing } from '@services/authorization/signing';
 import { PostOptionsComponent } from './postOptions.components';
+import { PostActionsRow } from './postActionsRow.component';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -31,10 +28,8 @@ interface Props {
 }
 
 interface State {
-    likeIcon: any;
     coinPrice: string;
     durationUntilNow: string;
-    diamondLevel: number;
     actionsDisabled: boolean;
     profilePic: string;
 }
@@ -50,19 +45,13 @@ export class PostComponent extends React.Component<Props, State> {
         const durationUntilNow = calculateDurationUntilNow(this.props.post.TimestampNanos);
 
         this.state = {
-            likeIcon: this.getLikeIcon(),
             coinPrice,
             durationUntilNow,
             actionsDisabled: this.props.actionsDisabled || globals.readonly,
-            diamondLevel: this.props.post.PostEntryReaderState.DiamondLevelBestowed,
             profilePic: api.getSingleProfileImage(this.props.post.ProfileEntryResponse.PublicKeyBase58Check)
         };
 
-        this.onLike = this.onLike.bind(this);
         this.goToProfile = this.goToProfile.bind(this);
-        this.onSendDiamonds = this.onSendDiamonds.bind(this);
-        this.goToReply = this.goToReply.bind(this);
-        this.goToReclout = this.goToReclout.bind(this);
         this.goToPost = this.goToPost.bind(this);
         this.goToRecloutedPost = this.goToRecloutedPost.bind(this);
         this.getEmbeddedVideoLink = this.getEmbeddedVideoLink.bind(this);
@@ -72,145 +61,44 @@ export class PostComponent extends React.Component<Props, State> {
         this._mount = false;
     }
 
-    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
-        return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex ||
-            this.state.likeIcon.name !== p_nextState.likeIcon.name ||
-            this.state.diamondLevel !== p_nextState.diamondLevel;
-    }
-
-    private getLikeIcon = () => {
-        const icon = this.props.post.PostEntryReaderState?.LikedByReader ? { name: 'ios-heart-sharp', color: '#eb1b0c' } : { name: 'ios-heart-outline', color: '#a1a1a1' };
-        return icon;
-    }
-
-    private async onLike() {
-        const post = this.props.post;
-        if (this.state.actionsDisabled) {
-            return;
-        }
-
-        if (!post.PostEntryReaderState) {
-            return;
-        }
-
-        let originalLikedByReader = post.PostEntryReaderState.LikedByReader;
-        post.PostEntryReaderState.LikedByReader = !originalLikedByReader;
-        if (post.PostEntryReaderState.LikedByReader) {
-            post.LikeCount++
-        } else {
-            post.LikeCount--;
-        }
-
-        if (this._mount) {
-            this.setState({ likeIcon: this.getLikeIcon() });
-        }
-
-        try {
-            const response = await api.likePost(globals.user.publicKey, post.PostHashHex, originalLikedByReader);
-            const transactionHex = response.TransactionHex;
-
-            const signedTransactionHex = await signing.signTransaction(transactionHex);
-            await api.submitTransaction(signedTransactionHex as string);
-
-        } catch {
-            post.PostEntryReaderState.LikedByReader = originalLikedByReader;
-            if (post.PostEntryReaderState.LikedByReader) {
-                post.LikeCount++
-            } else {
-                post.LikeCount--;
-            }
-
-            if (this._mount) {
-                this.setState({ likeIcon: this.getLikeIcon() });
-            }
-        }
-    }
-
-    private async onSendDiamonds() {
-        const post = this.props.post;
-
-        if (this.state.actionsDisabled || !post.PostEntryReaderState || post.PostEntryReaderState.DiamondLevelBestowed > 0) {
-            return;
-        }
-
-        if (globals.user.publicKey === post.ProfileEntryResponse?.PublicKeyBase58Check) {
-            Alert.alert('Error', 'You cannot diamond your own posts.');
-            return;
-        }
-        diamondAnimation.show();
-
-        post.PostEntryReaderState.DiamondLevelBestowed = 1;
-        post.DiamondCount++;
-
-        this.setState({ diamondLevel: 1 });
-
-        try {
-            const response = await api.sendDiamonds(globals.user.publicKey, post.ProfileEntryResponse.PublicKeyBase58Check, post.PostHashHex);
-            const transactionHex = response.TransactionHex;
-
-            const signedTransactionHex = await signing.signTransaction(transactionHex);
-            await api.submitTransaction(signedTransactionHex as string);
-
-        } catch {
-            post.PostEntryReaderState.DiamondLevelBestowed = 0;
-            post.DiamondCount--;
-            this.setState({ diamondLevel: 0 });
-        }
-    }
-
-    private goToReply() {
-        if (this.state.actionsDisabled) {
-            return;
-        }
-
-        this.props.navigation.navigate(
-            'CreatePost',
-            {
-                parentPost: this.props.post,
-                comment: true
-            }
-        );
-    }
-
-    private goToReclout() {
-        if (this.state.actionsDisabled) {
-            return;
-        }
-
-        this.props.navigation.navigate(
-            'CreatePost',
-            {
-                recloutedPost: this.props.post,
-                reclout: true
-            }
-        );
+    shouldComponentUpdate(p_nextProps: Props) {
+        return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex;
     }
 
     private goToProfile() {
         if (!this.props.disableProfileNavigation) {
-            (this.props.navigation as any).push('UserProfile', {
-                publicKey: this.props.post.ProfileEntryResponse.PublicKeyBase58Check,
-                username: this.props.post.ProfileEntryResponse.Username,
-                key: 'Profile_' + this.props.post.ProfileEntryResponse.PublicKeyBase58Check
-            });
+            (this.props.navigation as any).push(
+                'UserProfile',
+                {
+                    publicKey: this.props.post.ProfileEntryResponse.PublicKeyBase58Check,
+                    username: this.props.post.ProfileEntryResponse.Username,
+                    key: 'Profile_' + this.props.post.ProfileEntryResponse.PublicKeyBase58Check
+                }
+            );
         }
     }
 
     private goToPost() {
         if (this.props.disablePostNavigate !== true) {
-            (this.props.navigation as any).push('Post', {
-                postHashHex: this.props.post.PostHashHex,
-                key: 'Post_' + this.props.post.PostHashHex
-            });
+            (this.props.navigation as any).push(
+                'Post',
+                {
+                    postHashHex: this.props.post.PostHashHex,
+                    key: 'Post_' + this.props.post.PostHashHex
+                }
+            );
         }
     }
 
     private goToRecloutedPost() {
         if (this.props.disablePostNavigate !== true) {
-            (this.props.navigation as any).push('Post', {
-                postHashHex: this.props.post.RecloutedPostEntryResponse.PostHashHex,
-                key: 'Post_' + this.props.post.RecloutedPostEntryResponse.PostHashHex
-            });
+            (this.props.navigation as any).push(
+                'Post',
+                {
+                    postHashHex: this.props.post.RecloutedPostEntryResponse.PostHashHex,
+                    key: 'Post_' + this.props.post.RecloutedPostEntryResponse.PostHashHex
+                }
+            );
         }
     }
 
@@ -334,27 +222,10 @@ export class PostComponent extends React.Component<Props, State> {
                         }
                         {
                             this.props.post.Body || this.props.post.ImageURLs?.length > 0 ?
-                                <View style={styles.actionsContainer}>
-                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onLike.bind(this)}>
-                                        <Ionicons name={this.state.likeIcon.name as any} size={24} color={this.state.likeIcon.color} />
-                                        <Text style={styles.actionText}>{this.props.post.LikeCount}</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReply}>
-                                        <Fontisto name='comment' size={19} color={'#a1a1a1'} />
-                                        <Text style={styles.actionText}>{this.props.post.CommentCount}</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReclout}>
-                                        <MaterialCommunityIcons name="twitter-retweet" size={28} color={this.props.post.PostEntryReaderState?.RecloutedByReader ? '#5ba358' : '#a1a1a1'} />
-                                        <Text style={styles.actionText}>{this.props.post.RecloutCount}</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds}>
-                                        <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
-                                        <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                <PostActionsRow
+                                    navigation={this.props.navigation}
+                                    post={this.props.post}
+                                    actionsDisabled={this.props.actionsDisabled} />
                                 : undefined
                         }
                     </View >
@@ -364,111 +235,106 @@ export class PostComponent extends React.Component<Props, State> {
     }
 }
 
-const styles = StyleSheet.create({
-    containerVerticalPaddings: {
-        paddingTop: 24,
-        paddingBottom: 10,
-    },
-    parentPostContainer: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-    parentConnector: {
-        borderRightWidth: 2,
-        borderStyle: 'solid',
-        width: '55%',
-        height: '100%'
-    },
-    contentContainer: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%'
-    },
-    profilePic: {
-        width: 35,
-        height: 35,
-        borderRadius: 8,
-        marginRight: 10
-    },
-    headerContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-        paddingLeft: 10,
-        paddingRight: 10
-    },
-    headerRightContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        marginLeft: 'auto'
-    },
-    bodyText: {
-        fontSize: 15,
-        paddingLeft: 10,
-        paddingRight: 10
-    },
-    usernameContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    username: {
-        fontWeight: 'bold',
-        maxWidth: Dimensions.get('window').width / 2 + 20,
-        marginBottom: 2,
-        marginRight: 6
-    },
-    actionsContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 14,
-        marginLeft: 10
-    },
-    actionButton: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginRight: 10,
-        flex: 1
-    },
-    actionText: {
-        marginLeft: 4,
-        color: '#a1a1a1',
-        fontSize: 12
-    },
-    coinPriceContainer: {
-        borderRadius: 12,
-        paddingRight: 10,
-        paddingLeft: 10,
-        marginBottom: 6,
-        justifyContent: 'center',
-        height: 20,
-        marginRight: 12
-    },
-    coinPriceText: {
-        fontSize: 10,
-        fontWeight: '600'
-    },
-    recloutedPostContainer: {
-        marginLeft: 10,
-        marginRight: 10,
-        borderWidth: 1,
-        padding: 10,
-        paddingBottom: 4,
-        borderRadius: 8,
-        marginTop: 10
-    },
-    link: {
-        fontWeight: '500'
-    },
-    videoContainer: {
-        opacity: 0.99,
-        height: 400,
-        width: '100%'
+const styles = StyleSheet.create(
+    {
+        containerVerticalPaddings: {
+            paddingTop: 24,
+            paddingBottom: 10,
+        },
+        parentPostContainer: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center'
+        },
+        parentConnector: {
+            borderRightWidth: 2,
+            borderStyle: 'solid',
+            width: '55%',
+            height: '100%'
+        },
+        contentContainer: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%'
+        },
+        profilePic: {
+            width: 35,
+            height: 35,
+            borderRadius: 8,
+            marginRight: 10
+        },
+        headerContainer: {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+            paddingLeft: 10,
+            paddingRight: 10
+        },
+        headerRightContainer: {
+            display: 'flex',
+            flexDirection: 'row',
+            marginLeft: 'auto'
+        },
+        bodyText: {
+            fontSize: 15,
+            paddingLeft: 10,
+            paddingRight: 10
+        },
+        usernameContainer: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        },
+        username: {
+            fontWeight: 'bold',
+            maxWidth: Dimensions.get('window').width / 2 + 20,
+            marginBottom: 2,
+            marginRight: 6
+        },
+        actionButton: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginRight: 10,
+            flex: 1
+        },
+        actionText: {
+            marginLeft: 4,
+            color: '#a1a1a1',
+            fontSize: 12
+        },
+        coinPriceContainer: {
+            borderRadius: 12,
+            paddingRight: 10,
+            paddingLeft: 10,
+            marginBottom: 6,
+            justifyContent: 'center',
+            height: 20,
+            marginRight: 12
+        },
+        coinPriceText: {
+            fontSize: 10,
+            fontWeight: '600'
+        },
+        recloutedPostContainer: {
+            marginLeft: 10,
+            marginRight: 10,
+            borderWidth: 1,
+            padding: 10,
+            paddingBottom: 4,
+            borderRadius: 8,
+            marginTop: 10
+        },
+        link: {
+            fontWeight: '500'
+        },
+        videoContainer: {
+            opacity: 0.99,
+            height: 400,
+            width: '100%'
+        }
     }
-});
+);

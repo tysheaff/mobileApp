@@ -31,9 +31,7 @@ export class PostOptionsComponent extends React.Component<Props> {
     private onPostOptionsClick() {
         if (globals.user.publicKey !== this.props.post.ProfileEntryResponse.PublicKeyBase58Check) {
             this.showNotOwnPostOptions();
-            console.log('1');
         } else {
-            console.log('2');
             this.showOwnPostOptions();
         }
     }
