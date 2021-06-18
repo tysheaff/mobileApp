@@ -12,6 +12,7 @@ import { globals } from '@globals';
 interface Settings {
     title: string;
     icon: any;
+    action: () => void;
 }
 
 export function SettingsScreen({ navigation }: any) {
@@ -19,51 +20,42 @@ export function SettingsScreen({ navigation }: any) {
     const settings: Settings[] = [
         {
             title: 'Feed',
-            icon: <MaterialCommunityIcons name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />
+            icon: <MaterialCommunityIcons name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />,
+            action: () => navigation.navigate('FeedSettings')
         },
         {
             title: 'Privacy Policy',
-            icon: <Feather name="lock" size={24} color={themeStyles.fontColorMain.color} />
+            icon: <Feather name="lock" size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => Linking.openURL('https://clouttechnologies.com/privacy-policy')
         },
         {
             title: 'Terms & Conditions',
-            icon: <MaterialCommunityIcons name="text-box-check-outline" size={24} color={themeStyles.fontColorMain.color} />
+            icon: <MaterialCommunityIcons name="text-box-check-outline" size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => Linking.openURL('https://clouttechnologies.com/terms-%26-conditions')
         },
         {
             title: 'Contact Us',
-            icon: <Ionicons name="mail-unread-outline" size={24} color={themeStyles.fontColorMain.color} />
+            icon: <Ionicons name="mail-unread-outline" size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => Linking.openURL('https://clouttechnologies.com/home')
         },
         {
             title: 'Logout',
-            icon: <SimpleLineIcons name="logout" size={24} color={themeStyles.fontColorMain.color} />
+            icon: <SimpleLineIcons name="logout" size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => globals.onLogout()
         },
         {
             title: 'CloutFeed v 1.4.1',
-            icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={18} color={themeStyles.fontColorMain.color} />
+            icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={18} color={themeStyles.fontColorMain.color} />,
+            action: () => { }
         },
     ];
-
-    const onSettingsClick = (p_option: string) => {
-        switch (p_option) {
-            case 'Feed':
-                return navigation.navigate('FeedSettings')
-            case 'Privacy Policy':
-                return Linking.openURL('https://clouttechnologies.com/privacy-policy');
-            case 'Terms & Conditions':
-                return Linking.openURL('https://clouttechnologies.com/terms-%26-conditions');
-            case 'Contact Us':
-                return Linking.openURL('https://clouttechnologies.com/home');
-            case 'Logout':
-                return globals.onLogout();
-        }
-    };
 
     const keyExtractor = (item: any, index: number) => item.toString() + index.toString();
 
     const renderItem = (p_item: Settings) => {
         return <TouchableOpacity
             style={[styles.buttonContainer, themeStyles.containerColorMain, themeStyles.borderColor]}
-            onPress={() => onSettingsClick(p_item.title)}
+            onPress={p_item.action}
             activeOpacity={1}>
             {p_item.icon}
             <Text style={[styles.buttonText, themeStyles.fontColorMain]}>{p_item.title}</Text>

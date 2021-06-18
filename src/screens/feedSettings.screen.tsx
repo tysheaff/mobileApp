@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, Text, TouchableOpacity, Switch } from 'react-native'
+import { View, StyleSheet, Text, Switch } from 'react-native'
 import { themeStyles } from '@styles';
 import { SelectListControl } from "@controls/selectList.control";
 import * as SecureStore from 'expo-secure-store'
@@ -22,11 +22,12 @@ interface State {
 export class FeedSettingsScreen extends React.Component<Props, State>{
 
     private _isMounted = false;
+
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            isCloutCastEnabled: false,
+            isCloutCastEnabled: true,
             feed: FeedType.Global
         };
 
@@ -45,29 +46,40 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
 
     toggleSwitch() {
         this.setState({ isCloutCastEnabled: !this.state.isCloutCastEnabled });
-        SecureStore.setItemAsync(`${globals.user.publicKey}_${constants.localStorage_cloutCastFeedEnabled}`, String(!this.state.isCloutCastEnabled)).catch(() => { });
+
+        const key = `${globals.user.publicKey}_${constants.localStorage_cloutCastFeedEnabled}`;
+        SecureStore.setItemAsync(key, String(!this.state.isCloutCastEnabled)).catch(() => { });
     }
 
     onFeedTypeChange(p_type: FeedType) {
         this.setState({ feed: p_type });
-        SecureStore.setItemAsync(`${globals.user.publicKey}_${constants.localStorage_defaultFeed}`, String(p_type)).catch(() => { });
+
+        const key = `${globals.user.publicKey}_${constants.localStorage_defaultFeed}`;
+        SecureStore.setItemAsync(key, String(p_type)).catch(() => { });
     }
 
     async initScreen() {
-        const feed = await SecureStore.getItemAsync(`${globals.user.publicKey}_${constants.localStorage_defaultFeed}`).catch(() => undefined) as FeedType;
+        const feedKey = `${globals.user.publicKey}_${constants.localStorage_defaultFeed}`;
+        const feed = await SecureStore.getItemAsync(feedKey).catch(() => undefined) as FeedType;
 
-        const isCloutCastEnabledString = await SecureStore.getItemAsync(`${globals.user.publicKey}_${constants.localStorage_cloutCastFeedEnabled}`).catch(() => undefined);
+        const key = `${globals.user.publicKey}_${constants.localStorage_cloutCastFeedEnabled}`;
+        const isCloutCastEnabledString = await SecureStore.getItemAsync(key).catch(() => undefined);
 
         if (this._isMounted) {
-            this.setState({ isCloutCastEnabled: isCloutCastEnabledString === 'true', feed });
+            this.setState(
+                {
+                    isCloutCastEnabled: !isCloutCastEnabledString || isCloutCastEnabledString === 'true',
+                    feed: feed ? feed : FeedType.Global
+                }
+            );
         }
     }
 
     render() {
-        return <View style={[styles.container, themeStyles.containerColorSub]} >
+        return <View style={[styles.container, themeStyles.containerColorMain]} >
             <View style={themeStyles.containerColorMain}>
-                <View style={[styles.buttonContainer, themeStyles.borderColor]}>
-                    <Text style={[styles.buttonText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
+                <View style={[styles.cloutCastFeedSettingsContainer, themeStyles.borderColor]}>
+                    <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
                     <Switch
                         trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
                         thumbColor={this.state.isCloutCastEnabled ? "white" : "white"}
@@ -77,10 +89,10 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
                     />
                 </View>
                 <View style={styles.selectList}>
-                    <Text style={[styles.themeTitle, themeStyles.fontColorMain]}>Default Feed</Text>
+                    <Text style={[styles.defaultFeedTitle, themeStyles.fontColorMain]}>Default Feed</Text>
                 </View>
                 <SelectListControl
-                    style={[styles.selectList]}
+                    style={[styles.selectList, themeStyles.borderColor]}
                     options={[
                         {
                             name: 'Global',
@@ -100,31 +112,35 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
                 >
                 </SelectListControl>
             </View>
-        </View>
+        </View>;
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 16,
-        borderBottomWidth: 1
-    },
-    buttonText: {
-        fontWeight: '600',
-        fontSize: 16
-    },
-    selectList: {
-        padding: 6,
-    },
-    themeTitle: {
-        fontSize: 18,
-        textAlign: 'center',
-        fontWeight: '700'
+const styles = StyleSheet.create(
+    {
+        container: {
+            flex: 1,
+        },
+        cloutCastFeedSettingsContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: 15,
+            borderBottomWidth: 1
+        },
+        cloutCastFeedSettingsText: {
+            fontWeight: '600',
+            fontSize: 16
+        },
+        selectList: {
+            borderBottomWidth: 1
+        },
+        defaultFeedTitle: {
+            marginTop: 15,
+            marginBottom: 5,
+            fontSize: 18,
+            paddingLeft: 15,
+            fontWeight: '700'
+        }
     }
-})
+);
