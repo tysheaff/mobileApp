@@ -10,7 +10,7 @@ import { SearchHeaderComponent } from '@components/searchHeader';
 import { globals } from '@globals';
 import { themeStyles } from '@styles';
 import { IdentityScreen } from '@screens/login/identity.screen';
-import { HomeScreen } from '@screens/home.screen';
+import { HomeScreen } from '@screens/home/home.screen';
 import { ProfileScreen } from '@screens/profile/profile.screen';
 import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
