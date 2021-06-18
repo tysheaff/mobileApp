@@ -35,7 +35,6 @@ interface State {
 
 export class HomeScreen extends React.Component<Props, State> {
 
-    private _isMounted = false;
     private _postListComponent = React.createRef<PostListComponent>();
     private _unsubscribeNavigationEvent: any;
 
@@ -48,41 +47,33 @@ export class HomeScreen extends React.Component<Props, State> {
             api: api.getGlobalPosts,
         };
 
+        notificationsService.registerNotificationHandler();
+        this.subscribeNavigationEvent();
+
         this.onTabClick = this.onTabClick.bind(this);
         this.configureTabs = this.configureTabs.bind(this);
-        this.subscribeNavigationEvent();
     };
 
     componentDidMount() {
-        this._isMounted = true;
         this.configureTabs();
-        notificationsService.registerNotificationHandler();
     };
 
     componentWillUnmount() {
-        this._isMounted = false;
         notificationsService.unregisterNotificationHandler();
-        this._unsubscribeNavigationEvent()
-    };
-
-    init() {
-        if (!this._postListComponent.current) {
-            return;
-        }
-        this._postListComponent.current.init();
+        this._unsubscribeNavigationEvent();
     };
 
     onTabClick(p_tabName: string) {
-        let tab: any;
+        let apiCallback: any;
         if (p_tabName === HomeScreenTab.Global) {
-            tab = api.getGlobalPosts
+            apiCallback = api.getGlobalPosts
         } else if (p_tabName === HomeScreenTab.Following) {
-            tab = api.getFollowingPosts
+            apiCallback = api.getFollowingPosts
         } else {
-            tab = api.getRecentPosts
+            apiCallback = api.getRecentPosts
         }
-        this.setState({ api: tab, selectedTab: p_tabName as HomeScreenTab });
-        this.init()
+        this.setState({ api: apiCallback, selectedTab: p_tabName as HomeScreenTab });
+        this._postListComponent?.current?.refresh();
     };
 
     subscribeNavigationEvent() {
@@ -118,7 +109,7 @@ export class HomeScreen extends React.Component<Props, State> {
                 }
             }
         );
-    };
+    }
 
     configureTabs() {
         const newTabs: TabConfig[] = [
@@ -132,8 +123,8 @@ export class HomeScreen extends React.Component<Props, State> {
                 name: HomeScreenTab.Recent
             }
         ];
-        this.setState({ tabs: newTabs })
-    };
+        this.setState({ tabs: newTabs });
+    }
 
     render() {
         const renderTab = () => {
@@ -144,7 +135,7 @@ export class HomeScreen extends React.Component<Props, State> {
                         ref={this._postListComponent}
                         selectedTab={this.state.selectedTab}
                         navigation={this.props.navigation}
-                        api={api.getGlobalPosts} />
+                        api={api.getGlobalPosts} />;
 
                 case HomeScreenTab.Following:
                     return <PostListComponent
@@ -152,7 +143,7 @@ export class HomeScreen extends React.Component<Props, State> {
                         ref={this._postListComponent}
                         selectedTab={this.state.selectedTab}
                         navigation={this.props.navigation}
-                        api={api.getFollowingPosts} />
+                        api={api.getFollowingPosts} />;
 
                 case HomeScreenTab.Recent:
                     return <PostListComponent
@@ -160,7 +151,7 @@ export class HomeScreen extends React.Component<Props, State> {
                         ref={this._postListComponent}
                         selectedTab={this.state.selectedTab}
                         navigation={this.props.navigation}
-                        api={api.getRecentPosts} />
+                        api={api.getRecentPosts} />;
             }
         };
 
