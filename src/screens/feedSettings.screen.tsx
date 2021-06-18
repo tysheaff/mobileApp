@@ -47,22 +47,22 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
     toggleSwitch() {
         this.setState({ isCloutCastEnabled: !this.state.isCloutCastEnabled });
 
-        const key = `${globals.user.publicKey}_${constants.localStorage_cloutCastFeedEnabled}`;
+        const key = globals.user.publicKey + constants.localStorage_cloutCastFeedEnabled;
         SecureStore.setItemAsync(key, String(!this.state.isCloutCastEnabled)).catch(() => { });
     }
 
     onFeedTypeChange(p_type: FeedType) {
         this.setState({ feed: p_type });
 
-        const key = `${globals.user.publicKey}_${constants.localStorage_defaultFeed}`;
+        const key = globals.user.publicKey + constants.localStorage_defaultFeed;
         SecureStore.setItemAsync(key, String(p_type)).catch(() => { });
     }
 
     async initScreen() {
-        const feedKey = `${globals.user.publicKey}_${constants.localStorage_defaultFeed}`;
+        const feedKey = globals.user.publicKey + constants.localStorage_defaultFeed;
         const feed = await SecureStore.getItemAsync(feedKey).catch(() => undefined) as FeedType;
 
-        const key = `${globals.user.publicKey}_${constants.localStorage_cloutCastFeedEnabled}`;
+        const key = globals.user.publicKey + constants.localStorage_cloutCastFeedEnabled;
         const isCloutCastEnabledString = await SecureStore.getItemAsync(key).catch(() => undefined);
 
         if (this._isMounted) {
@@ -78,16 +78,19 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
     render() {
         return <View style={[styles.container, themeStyles.containerColorMain]} >
             <View style={themeStyles.containerColorMain}>
-                <View style={[styles.cloutCastFeedSettingsContainer, themeStyles.borderColor]}>
-                    <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
-                    <Switch
-                        trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
-                        thumbColor={this.state.isCloutCastEnabled ? "white" : "white"}
-                        ios_backgroundColor={themeStyles.switchColor.color}
-                        onValueChange={this.toggleSwitch}
-                        value={this.state.isCloutCastEnabled}
-                    />
-                </View>
+                {
+                    globals.readonly ? undefined :
+                        <View style={[styles.cloutCastFeedSettingsContainer, themeStyles.borderColor]}>
+                            <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
+                            <Switch
+                                trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
+                                thumbColor={this.state.isCloutCastEnabled ? "white" : "white"}
+                                ios_backgroundColor={themeStyles.switchColor.color}
+                                onValueChange={this.toggleSwitch}
+                                value={this.state.isCloutCastEnabled}
+                            />
+                        </View>
+                }
                 <View style={styles.selectList}>
                     <Text style={[styles.defaultFeedTitle, themeStyles.fontColorMain]}>Default Feed</Text>
                 </View>

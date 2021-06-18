@@ -2,11 +2,12 @@ import React from 'react';
 import { View } from 'react-native';
 import { api, notificationsService } from '@services';
 import { themeStyles } from '@styles';
-import { eventManager } from '@globals';
+import { constants, eventManager, globals } from '@globals';
 import { EventType, NavigationEvent, Post } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { PostListComponent } from './components/postList.component';
+import * as SecureStore from 'expo-secure-store'
 
 enum HomeScreenTab {
     Global = 'Global',
@@ -47,21 +48,26 @@ export class HomeScreen extends React.Component<Props, State> {
             api: api.getGlobalPosts,
         };
 
+        this.init();
         notificationsService.registerNotificationHandler();
         this.subscribeNavigationEvent();
 
         this.onTabClick = this.onTabClick.bind(this);
-        this.configureTabs = this.configureTabs.bind(this);
-    };
-
-    componentDidMount() {
-        this.configureTabs();
     };
 
     componentWillUnmount() {
         notificationsService.unregisterNotificationHandler();
         this._unsubscribeNavigationEvent();
     };
+
+    async init() {
+        const key = globals.user.publicKey + constants.localStorage_defaultFeed;
+        const defaultFeed = await SecureStore.getItemAsync(key).catch(() => undefined);
+
+        const selectedTab = defaultFeed ? defaultFeed as HomeScreenTab : HomeScreenTab.Global;
+        this.setState({ selectedTab });
+        this.configureTabs();
+    }
 
     onTabClick(p_tabName: string) {
         let apiCallback: any;
