@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from "./api/api";
 
 export async function parseVideoLinkAsync(p_videoLink: string) {
     if (!p_videoLink) {

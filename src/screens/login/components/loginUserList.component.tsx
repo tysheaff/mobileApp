@@ -1,7 +1,7 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Image, Text, Dimensions } from "react-native";
 import { User } from "@types";
-import { api } from "@services/api";
+import { api } from "@services";
 import { MaterialIcons } from '@expo/vector-icons';
 import { calculateAndFormatBitCloutInUsd, loadTickersAndExchangeRate } from "@services/bitCloutCalculator";
 import { getAnonymousProfile } from "@services/helpers";

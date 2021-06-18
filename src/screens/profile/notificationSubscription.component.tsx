@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { themeStyles } from '@styles/globalColors';
 import { signing } from '@services/authorization/signing';
-import { cloutFeedApi } from '@services/cloutfeedApi';
+import { cloutFeedApi } from '@services';
 import { globals } from '@globals/globals';
 import Modal from 'react-native-modal';
 import { SelectListControl } from '@controls/selectList.control';

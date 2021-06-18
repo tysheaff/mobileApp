@@ -1,7 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { eventManager, globals } from '@globals';
 import { Platform } from 'react-native';
-import { cloutFeedApi } from './cloutfeedApi';
+import { cloutFeedApi } from './api/cloutfeedApi';
 import { signing } from './authorization/signing';
 import { EventType } from '@types';
 

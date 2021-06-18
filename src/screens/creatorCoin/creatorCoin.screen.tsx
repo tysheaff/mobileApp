@@ -1,12 +1,11 @@
 import React from "react";
 import { View, StyleSheet, Text, ActivityIndicator, FlatList } from 'react-native';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { cloutFeedApi } from "@services/cloutfeedApi";
 import { CreatorCoinChartComponent } from "./components/creatorCoinChart.component";
 import { themeStyles } from "@styles";
 import { CreatorCoinTransaction, Profile } from "@types";
 import { CreatorCoinHeaderComponent } from "./components/creatorCoinHeader.component";
-import { api } from "@services/api";
+import { api, cloutFeedApi } from "@services";
 import { CreatorCoinTransactionComponent } from "./components/creatorCoinTransaction.component";
 
 type RouteParams = {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, Image, StyleSheet, View, Dimensions, ActivityIndicator } from 'react-native';
 import { globals } from '@globals/globals';
-import { api } from '@services/api';
+import { api } from '@services';
 import { themeStyles } from '@styles/globalColors';
 import { Profile } from '@types';
 import { MaterialIcons } from '@expo/vector-icons';

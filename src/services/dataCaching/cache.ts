@@ -1,4 +1,4 @@
-import { api } from "../api";
+import { api } from "../api/api";
 import { CacheableObject } from "./cacheableObject";
 import { globals } from "@globals";
 import { User } from "@types";

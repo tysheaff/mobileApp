@@ -1,5 +1,5 @@
 import { globals } from "../globals/globals";
-import { api } from "./api";
+import { api } from "./api/api";
 import { formatNumber } from "./helpers";
 
 export async function loadTickersAndExchangeRate() {

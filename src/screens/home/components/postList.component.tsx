@@ -5,11 +5,8 @@ import { Post, User } from '@types';
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { themeStyles } from "@styles/globalColors";
 import { globals } from "@globals/globals";
-import { cache } from "@services/dataCaching";
-import { loadTickersAndExchangeRate } from "@services/bitCloutCalculator";
-import { api } from "@services/api";
+import { api, cloutFeedApi, loadTickersAndExchangeRate, cache } from "@services";
 import { navigatorGlobals } from "@globals/navigatorGlobals";
-import { cloutFeedApi } from "@services/cloutfeedApi";
 
 enum HomeScreenTab {
     Global = 'Global',

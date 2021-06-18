@@ -5,7 +5,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { Post } from '@types';
 import { globals } from "@globals/globals";
 import { diamondAnimation } from "@services/diamondAnimation";
-import { api } from "@services/api";
+import { api } from "@services";
 import { signing } from "@services/authorization/signing";
 import { themeStyles } from "@styles/globalColors";
 

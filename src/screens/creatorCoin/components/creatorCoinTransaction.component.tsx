@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { NavigationProp } from "@react-navigation/native";
 import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
-import { api } from "@services/api";
+import { api } from "@services";
 
 interface Props {
     navigation: NavigationProp<any>;

@@ -9,7 +9,7 @@ import { TabConfig, TabsComponent } from "@components/tabs.component";
 import { CreatorCoinHODLerComponent } from "@components/creatorCoinHODLer.component";
 import { formatNumber } from "@services/helpers";
 import { navigatorGlobals } from "@globals/navigatorGlobals";
-import { api } from "@services/api";
+import { api } from "@services";
 
 enum WalletTab {
     Purchased = 'Purchased',

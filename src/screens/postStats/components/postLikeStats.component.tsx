@@ -1,7 +1,7 @@
 import { View, ActivityIndicator, FlatList } from 'react-native';
 import React from "react";
 import { Profile, User } from "@types";
-import { api } from "@services/api";
+import { api } from "@services";
 import { globals } from "@globals/globals";
 import { cache } from '@services/dataCaching';
 import { ProfileListCardComponent } from '@components/profileListCard.component';

@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { EventType, Post } from '@types';
 import { globals } from "@globals/globals";
 import { signing } from "@services/authorization/signing";
-import { api } from "@services/api";
+import { api } from "@services";
 import { eventManager } from "@globals/injector";
 import Clipboard from 'expo-clipboard';
 import { snackbar } from "@services/snackbar";

@@ -1,4 +1,4 @@
-import { api } from "@services/api";
+import { api } from "@services";
 import { authentication } from "@services/authorization/authentication";
 import { getAnonymousProfile } from "@services/helpers";
 import { themeStyles } from "@styles/globalColors";

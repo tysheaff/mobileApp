@@ -1,5 +1,5 @@
 import { globals } from '@globals/globals';
-import { api } from '@services/api';
+import { api } from '@services';
 import React, { Component } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { ActivityIndicator, Image, Platform, StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';

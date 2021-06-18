@@ -7,7 +7,7 @@ import { MessageFilter, MessageSettingsComponent, MessageSort } from "./componen
 import * as SecureStore from 'expo-secure-store';
 import { constants } from "@globals/constants";
 import { globals } from "@globals/globals";
-import { api } from "@services/api";
+import { api } from "@services";
 import { getAnonymousProfile } from "@services";
 import { ContactMessagesListCardComponent } from "@screens/messages/components/contactMessagesListCard.component";
 

@@ -2,7 +2,7 @@ import { View, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Image,
 import { FontAwesome } from '@expo/vector-icons';
 import React from "react";
 import { Profile, User } from "@types";
-import { api } from "@services/api";
+import { api } from "@services";
 import { globals } from "@globals/globals";
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';

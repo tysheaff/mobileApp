@@ -15,7 +15,7 @@ import { notificationsService } from './src/services/notificationsService';
 import { LoginNavigator } from './src/navigation/loginNavigator';
 import { ActionSheet } from './src/components/actionSheet.component';
 import { DiamondAnimationComponent } from '@components/diamondAnimation.component';
-import { cloutFeedApi } from '@services/cloutfeedApi';
+import { cloutFeedApi } from '@services';
 import { enableScreens } from 'react-native-screens';
 import { signing } from '@services/authorization/signing';
 import { authentication } from '@services/authorization/authentication';
