@@ -71,18 +71,18 @@ export class SelectListControl extends React.Component<Props, State> {
         let showIcon = false;
 
         if (this.props.multiple) {
-            showIcon = !!this.state.value && this.state.value.indexOf(p_value) !== -1;
+            showIcon = !!this.props.value && this.props.value.indexOf(p_value) !== -1;
         } else {
-            showIcon = this.state.value === p_value;
+            showIcon = this.props.value === p_value;
         }
-        return showIcon ? <MaterialIcons style={styles.checkIcon} name="check-circle" size={22} color="#007ef5" /> : undefined;
+        return showIcon && <MaterialIcons style={styles.checkIcon} name="check-circle" size={22} color="#007ef5" />;
     }
 
     render() {
         return <View style={this.props.style}>
             {
                 this.props.options.map(
-                    p_option => <TouchableOpacity activeOpacity={1} style={[styles.optionContainer]} key={p_option.value} onPress={() => this.onOptionPress(p_option.value)}>
+                    p_option => <TouchableOpacity activeOpacity={1} style={styles.optionContainer} key={p_option.value} onPress={() => this.onOptionPress(p_option.value)}>
                         <Text style={[themeStyles.fontColorMain, styles.optionText]}>{p_option.name}</Text>
                         {
                             this.getCheckIcon(p_option.value)
@@ -97,7 +97,6 @@ export class SelectListControl extends React.Component<Props, State> {
 const styles = StyleSheet.create(
     {
         optionContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             paddingLeft: 15,

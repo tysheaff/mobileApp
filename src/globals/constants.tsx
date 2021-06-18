@@ -8,6 +8,8 @@ export const constants = {
     localStorage_readonly: 'readonly',
     localStorage_messagesFilter: '_messagesFilter',
     localStorage_messagesSort: '_messagesSort',
+    localStorage_defaultFeed: '_defaultFeed',
+    localStorage_cloutCastFeedEnabled: '_cloutCastFeedEnabled',
     localStorage_cloutFeedIdentity: 'cloutfeedIdentity',
     localStorage_showNotificationsFilter: 'showNotificationsFilter',
     localStorage_notificationsFilter: 'notificationsFilter',

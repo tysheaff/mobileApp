@@ -15,6 +15,7 @@ import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { IdentityScreen } from '@screens/login/identity.screen';
+import { FeedSettingsScreen } from '@screens/feedSettings.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 
 const ProfileStack = createStackNavigator();
@@ -129,8 +130,14 @@ export default function ProfileStackScreen() {
                 name="Appearance"
                 component={AppearanceScreen}
             />
-
-
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Feed Settings',
+                    headerBackTitle: ' ',
+                }}
+                name="FeedSettings"
+                component={FeedSettingsScreen}
+            />
             <ProfileStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',
