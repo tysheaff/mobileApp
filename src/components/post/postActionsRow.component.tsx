@@ -13,6 +13,7 @@ interface Props {
     navigation: NavigationProp<any>;
     post: Post;
     actionsDisabled?: boolean;
+    toggleHeartIcon: () => void
 }
 
 interface State {
@@ -60,7 +61,6 @@ export class PostActionsRow extends React.Component<Props, State> {
 
     private async onLike() {
         const post = this.props.post;
-
         if (this.props.actionsDisabled) {
             return;
         }
@@ -73,6 +73,7 @@ export class PostActionsRow extends React.Component<Props, State> {
         post.PostEntryReaderState.LikedByReader = !originalLikedByReader;
         if (post.PostEntryReaderState.LikedByReader) {
             post.LikeCount++
+            this.props.toggleHeartIcon();
         } else {
             post.LikeCount--;
         }
@@ -200,18 +201,16 @@ export class PostActionsRow extends React.Component<Props, State> {
 const styles = StyleSheet.create(
     {
         actionsContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             marginTop: 14,
             marginLeft: 10
         },
         actionButton: {
-            display: 'flex',
+            flex: 1,
             flexDirection: 'row',
             alignItems: 'center',
             marginRight: 10,
-            flex: 1
         },
         actionText: {
             marginLeft: 4,

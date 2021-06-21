@@ -17,7 +17,8 @@ export let themeStyles = StyleSheet.create(
         diamondColor: { color: settingsGlobals.darkMode ? '#b9f2ff' : '#3599d4' },
         linkColor: { color: settingsGlobals.darkMode ? '#d1eeff' : '#3f729b' },
         modalBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? '#242424' : '#f7f7f7' },
-        disabledButton: { backgroundColor: '#2b2b2b' }
+        disabledButton: { backgroundColor: '#2b2b2b' },
+        likeHeartBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? 'white' : 'black' }
     }
 )
 
@@ -38,7 +39,9 @@ export function updateThemeStyles() {
             diamondColor: { color: settingsGlobals.darkMode ? '#b9f2ff' : '#3599d4' },
             linkColor: { color: settingsGlobals.darkMode ? '#d1eeff' : '#3f729b' },
             modalBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? '#242424' : '#f7f7f7' },
-            disabledButton: { backgroundColor: '#2b2b2b' }
+            disabledButton: { backgroundColor: '#2b2b2b' },
+            likeHeartBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? 'white' : 'black' }
+
         }
     )
 }

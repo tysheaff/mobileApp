@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { Post } from '../../types';
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,11 +32,19 @@ interface State {
     durationUntilNow: string;
     actionsDisabled: boolean;
     profilePic: string;
+    isHeartShowed: boolean;
 }
 
 export class PostComponent extends React.Component<Props, State> {
 
-    private _mount = true;
+    private _isMounted = true;
+    private _animation = new Animated.Value(0);
+    private _inputRange = [0, 1.3];
+    private _outputRange = [0, 1.3];
+    private scale = this._animation.interpolate({
+        inputRange: this._inputRange,
+        outputRange: this._outputRange
+    });
 
     constructor(p_props: Props) {
         super(p_props);
@@ -48,7 +56,8 @@ export class PostComponent extends React.Component<Props, State> {
             coinPrice,
             durationUntilNow,
             actionsDisabled: this.props.actionsDisabled || globals.readonly,
-            profilePic: api.getSingleProfileImage(this.props.post.ProfileEntryResponse.PublicKeyBase58Check)
+            profilePic: api.getSingleProfileImage(this.props.post.ProfileEntryResponse.PublicKeyBase58Check),
+            isHeartShowed: false
         };
 
         this.goToProfile = this.goToProfile.bind(this);
@@ -56,14 +65,16 @@ export class PostComponent extends React.Component<Props, State> {
         this.goToPost = this.goToPost.bind(this);
         this.goToRecloutedPost = this.goToRecloutedPost.bind(this);
         this.getEmbeddedVideoLink = this.getEmbeddedVideoLink.bind(this);
+        this.toggleHeartIcon = this.toggleHeartIcon.bind(this);
     }
 
     componentWillUnmount() {
-        this._mount = false;
+        this._isMounted = false;
     }
 
-    shouldComponentUpdate(p_nextProps: Props) {
-        return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex;
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+        return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex
+            || this.state.isHeartShowed !== p_nextState.isHeartShowed;
     }
 
     private goToStats() {
@@ -124,8 +135,30 @@ export class PostComponent extends React.Component<Props, State> {
         return p_videoLink;
     }
 
+    scaleIn() {
+        this.setState({ isHeartShowed: true });
+        Animated.spring(this._animation, {
+            toValue: 1,
+            useNativeDriver: true,
+        }).start();
+    }
+
+    scaleOut() {
+        Animated.spring(this._animation, {
+            toValue: 0,
+            useNativeDriver: true,
+        }).start(() => this.setState({ isHeartShowed: false }));
+    }
+
+    toggleHeartIcon() {
+        this.scaleIn()
+        setTimeout(() => {
+            this.scaleOut()
+        }, 1500);
+    }
+
     render() {
-        const embeddedVideoLink: any = this.props.post.PostExtraData?.EmbedVideoURL ? parseVideoLink(this.props.post.PostExtraData?.EmbedVideoURL) : undefined;
+        const embeddedVideoLink: any = this.props.post.PostExtraData?.EmbedVideoURL && parseVideoLink(this.props.post.PostExtraData?.EmbedVideoURL);
         return (
             <View style={this.props.isParentPost ? [
                 styles.parentPostContainer,
@@ -135,13 +168,13 @@ export class PostComponent extends React.Component<Props, State> {
                 themeStyles.containerColorMain,
                 themeStyles.borderColor]}>
                 {
-                    this.props.isParentPost ?
-                        <View style={{ flex: 1, paddingLeft: 10 }}>
-                            <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
-                                <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
-                            </TouchableOpacity>
-                            <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
-                        </View> : undefined
+                    this.props.isParentPost &&
+                    <View style={{ flex: 1, paddingLeft: 10 }}>
+                        <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
+                            <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
+                        </TouchableOpacity>
+                        <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
+                    </View>
                 }
                 <View style={this.props.isParentPost ? { flex: 11 } : {}}>
                     <View
@@ -154,18 +187,18 @@ export class PostComponent extends React.Component<Props, State> {
                         <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
                             <View style={styles.headerContainer}>
                                 {
-                                    !this.props.isParentPost ? (
+                                    !this.props.isParentPost && (
                                         <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
                                             <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
                                         </TouchableOpacity>
-                                    ) : undefined
+                                    )
                                 }
                                 <View>
                                     <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={this.goToProfile}>
                                         <Text style={[styles.username, themeStyles.fontColorMain]} >{this.props.post.ProfileEntryResponse?.Username}</Text>
                                         {
-                                            this.props.post.ProfileEntryResponse?.IsVerified ?
-                                                <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
+                                            this.props.post.ProfileEntryResponse?.IsVerified &&
+                                            <MaterialIcons name="verified" size={16} color="#007ef5" />
                                         }
                                     </TouchableOpacity>
 
@@ -183,56 +216,52 @@ export class PostComponent extends React.Component<Props, State> {
                                     </View>
 
                                     {
-                                        !this.state.actionsDisabled ?
-                                            <PostOptionsComponent navigation={this.props.navigation} route={this.props.route} post={this.props.post} />
-                                            :
-                                            undefined
+                                        !this.state.actionsDisabled &&
+                                        <PostOptionsComponent navigation={this.props.navigation} route={this.props.route} post={this.props.post} />
+
                                     }
                                 </View>
                             </View>
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
-                            <TextWithLinks style={[styles.bodyText, themeStyles.fontColorMain]} text={this.props.post.Body?.trimEnd()}></TextWithLinks>
+                            <TextWithLinks style={[styles.bodyText, themeStyles.fontColorMain]} text={this.props.post.Body?.trimEnd()} />
                         </TouchableOpacity>
 
                         {
-                            this.props.post.ImageURLs?.length > 0 ?
-                                <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToStats={this.goToStats}></ImageGalleryComponent> :
-                                undefined
+                            this.props.post.ImageURLs?.length > 0 &&
+                            <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToStats={this.goToStats} />
                         }
 
                         {
-                            embeddedVideoLink ?
-                                <WebView
-                                    style={[styles.videoContainer, themeStyles.containerColorMain]}
-                                    source={{ uri: embeddedVideoLink }}
-                                    javaScriptEnabled={true}
-                                    domStorageEnabled={true}
-                                ></WebView>
-                                :
-                                undefined
+                            embeddedVideoLink &&
+                            <WebView
+                                style={[styles.videoContainer, themeStyles.containerColorMain]}
+                                source={{ uri: embeddedVideoLink }}
+                                javaScriptEnabled={true}
+                                domStorageEnabled={true}
+                            />
                         }
 
                         {
-                            this.props.post.RecloutedPostEntryResponse && (this.props.recloutedPostIndex == null || this.props.recloutedPostIndex < 2) ?
-                                <View style={[styles.recloutedPostContainer, themeStyles.recloutBorderColor]}>
-                                    <TouchableOpacity onPress={this.goToRecloutedPost} activeOpacity={1}>
-                                        <PostComponent
-                                            navigation={this.props.navigation}
-                                            route={this.props.route}
-                                            post={this.props.post.RecloutedPostEntryResponse}
-                                            hideBottomBorder={true}
-                                            recloutedPostIndex={this.props.recloutedPostIndex == null ? 1 : this.props.recloutedPostIndex + 1}
-                                        ></PostComponent>
-                                    </TouchableOpacity>
-                                </View>
-                                :
-                                undefined
+                            this.props.post.RecloutedPostEntryResponse && (this.props.recloutedPostIndex == null || this.props.recloutedPostIndex < 2) &&
+                            <View style={[styles.recloutedPostContainer, themeStyles.recloutBorderColor]}>
+                                <TouchableOpacity onPress={this.goToRecloutedPost} activeOpacity={1}>
+                                    <PostComponent
+                                        navigation={this.props.navigation}
+                                        route={this.props.route}
+                                        post={this.props.post.RecloutedPostEntryResponse}
+                                        hideBottomBorder={true}
+                                        recloutedPostIndex={this.props.recloutedPostIndex == null ? 1 : this.props.recloutedPostIndex + 1}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
                         }
                         {
                             this.props.post.Body || this.props.post.ImageURLs?.length > 0 ?
                                 <PostActionsRow
+                                    toggleHeartIcon={this.toggleHeartIcon}
                                     navigation={this.props.navigation}
                                     post={this.props.post}
                                     actionsDisabled={this.props.actionsDisabled} />
@@ -240,6 +269,15 @@ export class PostComponent extends React.Component<Props, State> {
                         }
                     </View >
                 </View>
+
+                {this.state.isHeartShowed
+                    && <Animated.View style={[styles.floatingHeart, { transform: [{ scale: this.scale }] }]} >
+                        <Ionicons
+                            name={'ios-heart-sharp'}
+                            size={110}
+                            color={themeStyles.likeHeartBackgroundColor.backgroundColor}
+                        />
+                    </Animated.View>}
             </View>
         );
     }
@@ -345,6 +383,15 @@ const styles = StyleSheet.create(
             opacity: 0.99,
             height: 400,
             width: '100%'
+        },
+        floatingHeart: {
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            left: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
         }
     }
 );

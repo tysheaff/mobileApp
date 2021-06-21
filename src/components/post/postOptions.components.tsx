@@ -70,7 +70,6 @@ export class PostOptionsComponent extends React.Component<Props> {
         );
     }
 
-
     private showOwnPostOptions() {
         const options = ['Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
 
@@ -85,7 +84,6 @@ export class PostOptionsComponent extends React.Component<Props> {
                         this.props.navigation.navigate(
                             'CreatePost',
                             {
-
                                 editPost: true,
                                 editedPost: this.props.post
                             }
