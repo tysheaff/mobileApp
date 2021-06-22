@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/core';
 import { Feather } from '@expo/vector-icons';
 import { api, cache, snackbar } from '@services';
 import { ChangeFollowersEvent, EventType, User } from '@types';
-import { eventManager, globals, settingsGlobals } from '@globals';
+import { eventManager, globals } from '@globals';
 import { themeStyles } from '@styles';
 import Clipboard from 'expo-clipboard';
 import { signing } from '@services/authorization/signing';
 import NotificationSubscriptionComponent from '@screens/profile/notificationSubscription.component';
+import CloudFeedButton from '@components/cloutfeedButton.component'
 
 export function ProfileScreenOptionsComponent(
     { publicKey, goToChat }: { publicKey: string, goToChat: () => void }
@@ -19,7 +20,7 @@ export function ProfileScreenOptionsComponent(
     const [isFollowed, setIsFollowed] = useState<boolean | undefined>(undefined);
     const [followButtonColor, setFollowButtonColor] = useState<string>('black');
 
-    let mount = true;
+    let isMounted = true;
 
     useEffect(
         () => {
@@ -28,7 +29,7 @@ export function ProfileScreenOptionsComponent(
             ).catch();
 
             return () => {
-                mount = false;
+                isMounted = false;
             };
         },
         []
@@ -38,7 +39,7 @@ export function ProfileScreenOptionsComponent(
         const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser as string[];
 
         const followed = followedByUserPublicKeys?.indexOf(publicKey);
-        if (mount) {
+        if (isMounted) {
             setIsFollowed(followed !== -1);
         }
     }
@@ -57,7 +58,7 @@ export function ProfileScreenOptionsComponent(
                 const signedTransactionHex = await signing.signTransaction(transactionHex);
                 await api.submitTransaction(signedTransactionHex as string);
 
-                if (mount) {
+                if (isMounted) {
                     const event: ChangeFollowersEvent = {
                         publicKey: publicKey
                     };
@@ -90,39 +91,41 @@ export function ProfileScreenOptionsComponent(
         const options = ['Copy Public Key', blockOptionText, 'Cancel'];
 
         const callback = async (p_optionIndex: number) => {
-            if (p_optionIndex === 0) {
-                Clipboard.setString(publicKey);
-                snackbar.showSnackBar(
-                    {
-                        text: 'Public key copied to clipboard.'
-                    }
-                );
-            } else if (p_optionIndex === 1) {
-                const jwt = await signing.signJWT();
-
-                api.blockUser(globals.user.publicKey, publicKey, jwt as string, isUserBlocked).then(
-                    async () => {
-                        try {
-                            const blockedText = isUserBlocked ? 'unblocked' : 'blocked';
-                            await cache.user.getData(true);
-                            snackbar.showSnackBar(
-                                {
-                                    text: 'User has been ' + blockedText
-                                }
-                            );
-                            if (!isUserBlocked) {
-                                navigation.navigate(
-                                    'Home',
+            switch (p_optionIndex) {
+                case 0:
+                    Clipboard.setString(publicKey);
+                    snackbar.showSnackBar(
+                        {
+                            text: 'Public key copied to clipboard.'
+                        }
+                    );
+                    return;
+                case 1:
+                    const jwt = await signing.signJWT();
+                    api.blockUser(globals.user.publicKey, publicKey, jwt as string, isUserBlocked).then(
+                        async () => {
+                            try {
+                                const blockedText = isUserBlocked ? 'unblocked' : 'blocked';
+                                await cache.user.getData(true);
+                                snackbar.showSnackBar(
                                     {
-                                        blockedUser: publicKey
+                                        text: 'User has been ' + blockedText
                                     }
                                 );
+                                if (!isUserBlocked) {
+                                    navigation.navigate(
+                                        'Home',
+                                        {
+                                            blockedUser: publicKey
+                                        }
+                                    );
+                                }
+                            } catch {
+                                Alert.alert('Error', 'Something went wrong! Please try again.');
                             }
-                        } catch {
-                            Alert.alert('Error', 'Something went wrong! Please try again.');
                         }
-                    }
-                ).catch(p_error => globals.defaultHandleError(p_error));
+                    ).catch(p_error => globals.defaultHandleError(p_error));
+                    return;
             }
         }
         eventManager.dispatchEvent(
@@ -136,31 +139,18 @@ export function ProfileScreenOptionsComponent(
 
     return <View style={styles.container}>
         <NotificationSubscriptionComponent publicKey={publicKey} />
-        <TouchableOpacity
+        <CloudFeedButton
             disabled={followButtonColor !== 'black'}
-            style={[
-                styles.followButton,
-                themeStyles.buttonBorderColor,
-                { backgroundColor: followButtonColor, borderWidth: settingsGlobals.darkMode ? 1 : 0 }
-            ]}
-            activeOpacity={1}
+            title={isFollowed ? 'Unfollow' : 'Follow'}
             onPress={onFollowButtonClick}
-        >
-            <Text
-                style={styles.followButtonText}
-            >{isFollowed ? 'Unfollow' : 'Follow'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-            style={[
-                styles.followButton,
-                themeStyles.buttonBorderColor,
-                { borderWidth: settingsGlobals.darkMode ? 1 : 0 }
-            ]}
-            activeOpacity={1}
+            styles={styles.followButton}
+        />
+        <CloudFeedButton
+            disabled={false}
+            title={'Message'}
             onPress={goToChat}
-        >
-            <Text style={styles.followButtonText}>Message</Text>
-        </TouchableOpacity>
+            styles={styles.followButton}
+        />
         <TouchableOpacity
             activeOpacity={1}
             onPress={onProfileOptionsClick}
@@ -169,30 +159,15 @@ export function ProfileScreenOptionsComponent(
         </TouchableOpacity>
     </View>
 }
-
 const styles = StyleSheet.create(
     {
         container: {
-            display: 'flex',
             flexDirection: 'row',
             justifyContent: 'flex-end'
         },
         followButton: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
             marginRight: 10,
-            paddingRight: 12,
-            paddingLeft: 12,
-            paddingTop: 6,
-            paddingBottom: 6,
-            borderRadius: 4,
             marginBottom: 8,
-            backgroundColor: 'black'
         },
-        followButtonText: {
-            color: 'white'
-        }
     }
 );
