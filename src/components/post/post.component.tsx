@@ -154,7 +154,7 @@ export class PostComponent extends React.Component<Props, State> {
         this.scaleIn()
         setTimeout(() => {
             this.scaleOut()
-        }, 1500);
+        }, 750);
     }
 
     render() {
@@ -274,8 +274,8 @@ export class PostComponent extends React.Component<Props, State> {
                     && <Animated.View style={[styles.floatingHeart, { transform: [{ scale: this.scale }] }]} >
                         <Ionicons
                             name={'ios-heart-sharp'}
-                            size={110}
-                            color={themeStyles.likeHeartBackgroundColor.backgroundColor}
+                            size={90}
+                            color={'#eb1b0c'}
                         />
                     </Animated.View>}
             </View>

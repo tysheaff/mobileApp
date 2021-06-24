@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons, Fontisto, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationProp } from "@react-navigation/native";
 import { Post } from '@types';
@@ -190,10 +190,14 @@ export class PostActionsRow extends React.Component<Props, State> {
                 <Text style={styles.actionText}>{this.props.post.RecloutCount}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds} onLongPress={() => this.goToStats('Diamonds')}>
-                <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
-                <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
-            </TouchableOpacity>
+            {
+                Platform.OS !== 'ios' ?
+                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds} onLongPress={() => this.goToStats('Diamonds')}>
+                        <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
+                        <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
+                    </TouchableOpacity> :
+                    <View style={styles.actionButton} />
+            }
         </View>
     }
 }

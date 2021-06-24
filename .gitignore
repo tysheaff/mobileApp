@@ -14,3 +14,4 @@ web-build/
 app.json
 google-services.json
 package-lock.json
+.env

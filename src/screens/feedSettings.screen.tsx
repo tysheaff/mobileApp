@@ -79,7 +79,7 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
         return <View style={[styles.container, themeStyles.containerColorMain]} >
             <View style={themeStyles.containerColorMain}>
                 {
-                    globals.readonly ? undefined :
+                    globals.readonly || true ? undefined :
                         <View style={[styles.cloutCastFeedSettingsContainer, themeStyles.borderColor]}>
                             <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
                             <Switch
