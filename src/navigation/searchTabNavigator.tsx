@@ -1,6 +1,6 @@
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { CreatorsSearchScreen } from '@screens/search/creatorsSearch.screen';
+import { CreatorsSearchScreen } from '@screens/search/creatorSearch.screen';
 import CloutTagSearchScreen from '@screens/search/cloutTagSearch.screen';
 import { NavigationProp } from '@react-navigation/native';
 import TopTabBarComponent from '@components/TopTabBar.component';

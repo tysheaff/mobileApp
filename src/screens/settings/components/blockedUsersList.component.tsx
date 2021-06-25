@@ -24,8 +24,6 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
 
     private _isMounted: boolean = false;
     private _noMoreUsers: boolean = false;
-    private _firstProfileIndex: number = 0;
-    private _lastProfileIndex: number = 10;
 
     constructor(props: Props) {
         super(props);
@@ -37,10 +35,10 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
             isLoadingMore: false,
         };
 
-        this.init = this.init.bind(this);
+        this.loadData = this.loadData.bind(this);
         this.unblockUser = this.unblockUser.bind(this);
 
-        this.init(false);
+        this.loadData(false);
     }
 
     componentDidMount() {
@@ -56,7 +54,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
         cache.user.getData(true);
     }
 
-    async init(p_loadMore: boolean) {
+    async loadData(p_loadMore: boolean) {
 
         if (this.state.isLoadingMore || this._noMoreUsers) {
             return;
@@ -66,18 +64,21 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
             this.setState({ isLoading: !p_loadMore, isLoadingMore: p_loadMore });
         }
 
+        const batchSize = 10;
         const user = await cache.user.getData();
         const blockedPublicKeys = user?.BlockedPubKeys ? Object.keys(user.BlockedPubKeys) : [];
-        const slicedBlockedPublicKeys = blockedPublicKeys.slice(this._firstProfileIndex, this._lastProfileIndex);
+        const profileLength = this.state.blockedProfiles.length;
+        const slicedBlockedPublicKeys = blockedPublicKeys.slice(profileLength, profileLength + batchSize);
+
         let profiles: Profile[] = [];
         const promises: Promise<Profile>[] = [];
+
         for (const profile of slicedBlockedPublicKeys) {
             const promise = new Promise<Profile | any>(
                 async (p_resolve, _reject) => {
                     try {
                         const response = await api.getSingleProfile('', profile);
                         response.Profile.ProfilePic = api.getSingleProfileImage(profile);
-                        profiles.push(response.Profile);
                         p_resolve(response.Profile);
 
                     } catch {
@@ -88,16 +89,13 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
             promises.push(promise);
         }
 
-        if (promises.length < 10) {
+        if (slicedBlockedPublicKeys.length < batchSize) {
             this._noMoreUsers = true;
         }
 
-        this._firstProfileIndex = this._lastProfileIndex;
-        this._lastProfileIndex = this._firstProfileIndex + 10;
+        profiles = await Promise.all(promises);
         if (p_loadMore) {
-            profiles = this.state.blockedProfiles.concat(await Promise.all(promises));
-        } else {
-            profiles = await Promise.all(promises);
+            profiles = this.state.blockedProfiles.concat(profiles);
         }
 
         if (this._isMounted) {
@@ -113,8 +111,9 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
         catch {
             Alert.alert('Error', 'Something went wrong! Please try again.');
         } finally {
-            const filteredUsers: Profile[] = this.state.blockedProfiles.filter((p_item: Profile) =>
-                p_item.PublicKeyBase58Check !== publicKey);
+            const filteredUsers: Profile[] = this.state.blockedProfiles.filter(
+                p_profile => p_profile.PublicKeyBase58Check !== publicKey
+            );
             if (this._isMounted) {
                 this.setState({ blockedProfiles: filteredUsers });
                 snackbar.showSnackBar({ text: 'User unblocked successfully.' });
@@ -124,7 +123,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
 
     render() {
 
-        const keyExtractor = (p_item: Profile, p_index: number) => `${p_item}_${p_index}`;
+        const keyExtractor = (p_item: Profile, p_index: number) => `${p_item.PublicKeyBase58Check}_${p_index}`;
 
         const renderItem = (p_item: Profile) =>
             <BlockedUserComponent
@@ -141,14 +140,14 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
                 ? <ActivityIndicator style={{ height: 200, alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
                 : this.state.blockedProfiles.length === 0
                     ? <View style={[styles.emptyTextContainer, themeStyles.containerColorMain]}>
-                        <Text style={[themeStyles.fontColorMain, styles.emptyText]}>Your block list is empty!</Text>
+                        <Text style={[themeStyles.fontColorMain, styles.emptyText]}>Your block list is empty.</Text>
                     </View>
                     : <FlatList
                         data={this.state.blockedProfiles}
                         renderItem={({ item }) => renderItem(item)}
                         keyExtractor={keyExtractor}
                         onEndReachedThreshold={0.1}
-                        onEndReached={() => this.init(true)}
+                        onEndReached={() => this.loadData(true)}
                         maxToRenderPerBatch={10}
                         windowSize={8}
                         ListFooterComponent={renderFooter}

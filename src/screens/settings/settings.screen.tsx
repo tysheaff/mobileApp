@@ -26,7 +26,7 @@ export function SettingsScreen({ navigation }: any) {
         },
         {
             title: 'Blocked Users',
-            icon: <Entypo name="block" size={24} color={themeStyles.fontColorMain.color} />,
+            icon: <Entypo name="block" size={22} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('BlockedUsers')
         },
         {

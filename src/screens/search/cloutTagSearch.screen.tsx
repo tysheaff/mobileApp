@@ -84,7 +84,6 @@ export default class CloutTagSearchScreen extends React.Component<Props, State> 
                             }
                             this._timer = undefined;
                         } catch (p_error) {
-                            console.log(p_error);
                             globals.defaultHandleError(p_error);
                         }
                     },

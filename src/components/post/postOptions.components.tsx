@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { EventType, Post } from '@types';
 import { globals } from "@globals/globals";
 import { signing } from "@services/authorization/signing";
-import { api } from "@services";
+import { api, cache } from "@services";
 import { eventManager } from "@globals/injector";
 import Clipboard from 'expo-clipboard';
 import { snackbar } from "@services/snackbar";
@@ -54,12 +54,15 @@ export class PostOptionsComponent extends React.Component<Props> {
                     const jwt = await signing.signJWT();
 
                     api.blockUser(globals.user.publicKey, this.props.post.ProfileEntryResponse.PublicKeyBase58Check, jwt as string, false).then(
-                        () => this.props.navigation.navigate(
-                            'Home',
-                            {
-                                blockedUser: this.props.post.ProfileEntryResponse.PublicKeyBase58Check
-                            }
-                        )
+                        () => {
+                            this.props.navigation.navigate(
+                                'Home',
+                                {
+                                    blockedUser: this.props.post.ProfileEntryResponse.PublicKeyBase58Check
+                                }
+                            );
+                            cache.user.getData(true);
+                        }
                     ).catch(() => Alert.alert('Error', 'Something went wrong! Please try again.'));
                     break;
             }
