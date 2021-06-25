@@ -14,6 +14,7 @@ export default class CloutfeedButtonComponent extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props);
+        this.onPress = this.onPress.bind(this);
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
@@ -21,12 +22,16 @@ export default class CloutfeedButtonComponent extends React.Component<Props> {
             this.props.title !== p_nextProps.title;
     }
 
+    onPress(){
+        this.props.onPress();
+    }
+
     render() {
         return (
             <TouchableOpacity
                 disabled={this.props.disabled}
                 activeOpacity={1}
-                onPress={this.props.onPress}
+                onPress={this.onPress}
                 style={[
                     styles.btnContainer,
                     this.props.styles,
