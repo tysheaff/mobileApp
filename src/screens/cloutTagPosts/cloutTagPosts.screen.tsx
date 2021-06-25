@@ -42,9 +42,9 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
             isRefreshing: false,
         };
 
-        this.init = this.init.bind(this);
+        this.loadData = this.loadData.bind(this);
         this.refresh = this.refresh.bind(this);
-        this.init(false);
+        this.loadData(false);
     }
 
     componentDidMount() {
@@ -58,16 +58,16 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
     async processPosts(p_posts: Post[]): Promise<Post[]> {
         const user = await cache.user.getData();
         const blockedUsers = user?.BlockedPubKeys ? user.BlockedPubKeys : [];
-        let filteredPosts: Post[] = p_posts.filter((p_post: Post) =>
-            !!p_post.ProfileEntryResponse &&
-            !p_post.IsHidden &&
-            !blockedUsers[p_post.ProfileEntryResponse.PublicKeyBase58Check] &&
-            !blockedUsers[p_post.RecloutedPostEntryResponse?.ProfileEntryResponse?.PublicKeyBase58Check]
-        )
+        const filteredPosts: Post[] = p_posts.filter(
+            p_post => !!p_post.ProfileEntryResponse &&
+                !p_post.IsHidden &&
+                !blockedUsers[p_post.ProfileEntryResponse.PublicKeyBase58Check] &&
+                !blockedUsers[p_post.RecloutedPostEntryResponse?.ProfileEntryResponse?.PublicKeyBase58Check]
+        );
         return filteredPosts;
     }
 
-    async init(p_loadMore: boolean) {
+    async loadData(p_loadMore: boolean) {
 
         if (this.state.isLoadingMore || this._noMoreData) {
             return;
@@ -77,21 +77,22 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
             this.setState({ isLoading: !p_loadMore, isLoadingMore: p_loadMore });
         }
 
-        let promises: Promise<Post>[] = [];
-        let post: Post | any;
-        let posts: Post[];
+        const promises: Promise<Post>[] = [];
+
         try {
-            const response = await cloutApi.getCloutTagPosts(this.props.route.params?.cloutTag, 10, this._lastCloutTagPostIndex);
-            if (response.length < 10) {
+            const cloutTagPosts = await cloutApi.getCloutTagPosts(this.props.route.params?.cloutTag, 10, this._lastCloutTagPostIndex);
+
+            if (!cloutTagPosts || cloutTagPosts.length < 10) {
                 this._noMoreData = true;
             }
-            if (response?.length > 0) {
-                for (const newPost of response) {
+
+            if (cloutTagPosts?.length > 0) {
+                for (const postHashHex of cloutTagPosts) {
                     const promise = new Promise<Post | any>(
                         async (p_resolve, _reject) => {
                             try {
-                                post = await api.getSinglePost(globals.user.publicKey, newPost, true, 0, 0);
-                                p_resolve(post?.PostFound);
+                                const response = await api.getSinglePost(globals.user.publicKey, postHashHex, true, 0, 0);
+                                p_resolve(response?.PostFound);
                             }
                             catch {
                                 p_resolve(undefined);
@@ -101,34 +102,30 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
                     promises.push(promise);
                 }
 
-                this._lastCloutTagPostIndex += response.length;
+                this._lastCloutTagPostIndex += cloutTagPosts.length;
+
+                let posts = await Promise.all(promises);
+                posts = await this.processPosts(posts);
+
                 if (p_loadMore) {
                     posts = this.state.posts.concat(await Promise.all(promises));
-                } else {
-                    posts = await Promise.all(promises);
                 }
 
-                let filteredPosts = await this.processPosts(posts);
-
                 if (this._isMounted) {
-                    this.setState({ posts: filteredPosts, isLoadingMore: false, isLoading: false });
-                }
-
-            } else {
-                if (this._isMounted) {
-                    this.setState({ isLoadingMore: false });
-                    this._lastCloutTagPostIndex = 0;
+                    this.setState({ posts });
                 }
             }
+            if (this._isMounted) {
+                this.setState({ isLoadingMore: false, isLoading: false, isRefreshing: false });
+            }
 
-        } catch (p_error) {
-            globals.defaultHandleError(p_error);
+        } catch {
         }
     }
 
     refresh() {
         this._lastCloutTagPostIndex = 0;
-        this.init(false);
+        this.loadData(false);
     }
 
     render() {
@@ -160,21 +157,24 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
                         renderItem={({ item }) => renderItem(item)}
                         onEndReachedThreshold={3}
                         maxToRenderPerBatch={5}
-                        onEndReached={() => this.init(true)}
+                        onEndReached={() => this.loadData(true)}
                         ListFooterComponent={renderFooter}
                         refreshControl={renderRefresh}
                     />
                 }
             </View>
-        )
+        );
     }
 }
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    activityIndicator: {
-        height: 200,
-        alignSelf: 'center'
+
+const styles = StyleSheet.create(
+    {
+        container: {
+            flex: 1,
+        },
+        activityIndicator: {
+            height: 200,
+            alignSelf: 'center'
+        }
     }
-})
+);

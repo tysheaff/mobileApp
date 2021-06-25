@@ -42,11 +42,14 @@ export class PostOptionsComponent extends React.Component<Props> {
         const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
                 case 0:
-                    return this.copyToClipBoard(true);
+                    this.copyToClipBoard(true);
+                    break;
                 case 1:
-                    return this.copyToClipBoard(false);
+                    this.copyToClipBoard(false);
+                    break;
                 case 2:
-                    return Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
+                    Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
+                    break;
                 case 3:
                     const jwt = await signing.signJWT();
 
@@ -58,6 +61,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                             }
                         )
                     ).catch(() => Alert.alert('Error', 'Something went wrong! Please try again.'));
+                    break;
             }
         };
 
@@ -91,6 +95,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                     } else {
                         Alert.alert('Sorry!', 'You cannot edit a reclout, if it does not include a quote.');
                     }
+                    break;
                 case 3:
                     api.hidePost(
                         globals.user.publicKey,
@@ -119,6 +124,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                             }
                         }
                     ).catch(p_error => globals.defaultHandleError(p_error));
+                    break;
             }
         }
 

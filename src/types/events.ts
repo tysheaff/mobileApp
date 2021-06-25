@@ -8,17 +8,11 @@ export enum EventType {
     ToggleProfileManager = 3,
     Navigation = 4,
     ToggleNotificationsFilter = 5,
-    ToggleActionSheet = 6,
-    SwitchSearchTab = 7
+    ToggleActionSheet = 6
 }
 
 export interface ChangeFollowersEvent {
     publicKey: string;
-}
-
-export interface SwitchSearchTabsEvent {
-    tabName: string;
-    isFocused: boolean;
 }
 
 export interface ToggleActionSheetEvent {

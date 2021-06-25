@@ -274,7 +274,7 @@ export class PostComponent extends React.Component<Props, State> {
                     && <Animated.View style={[styles.floatingHeart, { transform: [{ scale: this.scale }] }]} >
                         <Ionicons
                             name={'ios-heart-sharp'}
-                            size={90}
+                            size={75}
                             color={'#eb1b0c'}
                         />
                     </Animated.View>}

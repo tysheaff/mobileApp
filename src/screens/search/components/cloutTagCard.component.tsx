@@ -11,22 +11,12 @@ interface Props {
     navigation: NavigationProp<any>;
 }
 
-export default class CloutListCardComponentComponent extends React.Component<Props> {
-
-    private _isMounted = false;
+export default class CloutListCardComponent extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props);
 
         this.navigateToPost = this.navigateToPost.bind(this);
-    }
-
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
@@ -40,10 +30,11 @@ export default class CloutListCardComponentComponent extends React.Component<Pro
     render() {
         return (
             <TouchableOpacity
-                activeOpacity={1}
-                onPress={this.navigateToPost} style={styles.rowContainer}>
-                <View style={[styles.cloutTagContainer, themeStyles.borderColor]}>
-                    <Feather name="hash" size={24} color={themeStyles.fontColorMain.color} />
+                style={[styles.container]}
+                activeOpacity={0.7}
+                onPress={this.navigateToPost}>
+                <View style={[styles.cloutTagContainer, themeStyles.lightBorderColor]}>
+                    <Feather name="hash" size={22} color={themeStyles.fontColorMain.color} />
                 </View>
                 <View>
                     <Text style={[styles.cloutTag, themeStyles.fontColorMain]}>#{this.props.cloutTag.clouttag}</Text>
@@ -54,27 +45,29 @@ export default class CloutListCardComponentComponent extends React.Component<Pro
     }
 }
 
-const styles = StyleSheet.create({
-    rowContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        marginVertical: 10,
-    },
-    cloutTagContainer: {
-        borderWidth: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 15,
-        width: 55,
-        height: 55,
-        borderRadius: 28,
-    },
-    cloutTag: {
-        fontSize: 15,
-        fontWeight: '700'
-    },
-    count: {
-        fontSize: 13,
+const styles = StyleSheet.create(
+    {
+        container: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 10,
+            paddingVertical: 10
+        },
+        cloutTagContainer: {
+            borderWidth: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 15,
+            width: 55,
+            height: 55,
+            borderRadius: 50,
+        },
+        cloutTag: {
+            fontSize: 15,
+            fontWeight: '700'
+        },
+        count: {
+            fontSize: 13,
+        }
     }
-})
+);

@@ -141,7 +141,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
                 ? <ActivityIndicator style={{ height: 200, alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
                 : this.state.blockedProfiles.length === 0
                     ? <View style={[styles.emptyTextContainer, themeStyles.containerColorMain]}>
-                        <Text style={[themeStyles.fontColorMain, styles.emptyText]}>You block list is empty!</Text>
+                        <Text style={[themeStyles.fontColorMain, styles.emptyText]}>Your block list is empty!</Text>
                     </View>
                     : <FlatList
                         data={this.state.blockedProfiles}
@@ -163,6 +163,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     emptyText: {
-        fontSize: 20,
+        fontSize: 16,
     }
 })

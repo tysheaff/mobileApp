@@ -8,7 +8,6 @@ import { PostScreen } from '@screens/post.screen';
 import { MessageTopHoldersOptionsScreen } from '@screens/messageTopHolders/messageTopHoldersOptions';
 import { MessageTopHoldersInputScreen } from '@screens/messageTopHolders/messageTopHoldersInput';
 import { ChatHeaderComponent } from '@components/chatHeader.component';
-import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
 import { MessagesHeaderComponent } from '@screens/messages/components/messagesHeader';
 import { navigatorGlobals, globals } from '@globals';
 import { themeStyles } from '@styles';
@@ -20,8 +19,7 @@ import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
-import SearchTabNavigator from './searchTabNavigator';
-import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
+import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 
 const MessageStack = createStackNavigator();
 
@@ -172,16 +170,6 @@ export default function MessageStackScreen() {
                 }}
                 name="PostStats"
                 component={PostStatsScreen}
-            />
-
-            <MessageStack.Screen
-                options={{
-                    headerTitle: ' ',
-                    headerLeft: () => <SearchHeaderComponent />,
-                    headerBackTitle: ' ',
-                }}
-                name="SearchTabNavigator"
-                component={SearchTabNavigator}
             />
 
             <MessageStack.Screen

@@ -15,7 +15,7 @@ import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
-import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
+import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 
 const WalletStack = createStackNavigator();
 

@@ -16,7 +16,7 @@ import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
-import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
+import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 
 const NotificationStack = createStackNavigator();
 

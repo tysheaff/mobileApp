@@ -18,7 +18,7 @@ import { CreatePostScreen } from '@screens/createPost.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 import SearchTabNavigator from './searchTabNavigator';
-import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
+import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 
 const HomeStack = createStackNavigator();
 
@@ -154,7 +154,7 @@ export default function HomeStackScreen() {
                     ({ route }) => (
                         {
                             headerTitle: ' ',
-                            headerLeft: () => <SearchHeaderComponent route={route} />,
+                            headerLeft: () => <SearchHeaderComponent />,
                             headerBackTitle: ' ',
                         }
                     )}

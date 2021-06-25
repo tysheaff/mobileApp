@@ -9,7 +9,6 @@ import { NavigationProp } from '@react-navigation/native';
 
 interface Props {
     navigation: NavigationProp<any>;
-    selectedTab: any;
 }
 
 interface State {
@@ -21,9 +20,10 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
     private _timer: number | undefined = undefined;
-    private _leaderBoardsCopy: Profile[] = [];
+    private _leaderBoard: Profile[] = [];
     private _lastUsernamePrefix: string = '';
     private _loggedInUserFollowingMap: { [key: string]: Profile } = {};
+    private _focusSubscription: any;
 
     constructor(props: Props) {
         super(props);
@@ -34,6 +34,17 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
         };
 
         this.init();
+
+        this._focusSubscription = this.props.navigation.addListener(
+            'focus',
+            () => {
+                this.setSearchMethod();
+
+                if (this._leaderBoard.length && this._isMounted) {
+                    this.setState({ profiles: this._leaderBoard });
+                }
+            }
+        );
     }
 
     componentDidMount() {
@@ -42,53 +53,50 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
 
     componentWillUnmount() {
         this._isMounted = false;
+        this._focusSubscription();
     }
 
-    componentDidUpdate() {
-        const { tabName } = this.props.selectedTab;
+    setSearchMethod() {
+        navigatorGlobals.searchResults = (p_usernamePrefix: string) => {
+            this._lastUsernamePrefix = p_usernamePrefix;
+            p_usernamePrefix = p_usernamePrefix.trim();
 
-        if (tabName === 'Creators' || tabName === undefined) {
-            navigatorGlobals.searchResults = (p_usernamePrefix: string) => {
-                this._lastUsernamePrefix = p_usernamePrefix;
-                p_usernamePrefix = p_usernamePrefix.trim();
+            if (isNumber(this._timer)) {
+                window.clearTimeout(this._timer);
+            }
 
-                if (isNumber(this._timer)) {
-                    window.clearTimeout(this._timer);
+            if (!p_usernamePrefix) {
+                if (this._isMounted) {
+                    this.setState({ profiles: this._leaderBoard, isLoading: false });
                 }
-
-                if (!p_usernamePrefix) {
-                    if (this._isMounted) {
-                        this.setState({ profiles: this._leaderBoardsCopy, isLoading: false });
-                    }
-                } else {
-                    if (this._isMounted) {
-                        this.setState({ isLoading: true });
-                    }
-                    this._timer = window.setTimeout(
-                        async () => {
-                            try {
-                                const usernamePrefixCopy = p_usernamePrefix;
-                                const response = await api.searchProfiles(globals.user.publicKey, p_usernamePrefix);
-                                let foundProfiles = response?.ProfilesFound;
-                                if (!foundProfiles) {
-                                    foundProfiles = [];
-                                }
-
-                                if (this._isMounted && this._lastUsernamePrefix === usernamePrefixCopy) {
-                                    this.setState({ profiles: foundProfiles, isLoading: false });
-                                }
-
-                                this._timer = undefined;
-                            }
-                            catch (p_error) {
-                                globals.defaultHandleError(p_error);
-                            }
-                        },
-                        500
-                    );
+            } else {
+                if (this._isMounted) {
+                    this.setState({ isLoading: true });
                 }
-            };
-        }
+                this._timer = window.setTimeout(
+                    async () => {
+                        try {
+                            const usernamePrefixCopy = p_usernamePrefix;
+                            const response = await api.searchProfiles(globals.user.publicKey, p_usernamePrefix);
+                            let foundProfiles = response?.ProfilesFound;
+                            if (!foundProfiles) {
+                                foundProfiles = [];
+                            }
+
+                            if (this._isMounted && this._lastUsernamePrefix === usernamePrefixCopy) {
+                                this.setState({ profiles: foundProfiles, isLoading: false });
+                            }
+
+                            this._timer = undefined;
+                        }
+                        catch (p_error) {
+                            globals.defaultHandleError(p_error);
+                        }
+                    },
+                    500
+                );
+            }
+        };
     }
 
     async init() {
@@ -107,7 +115,7 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
 
             if (this._isMounted) {
                 this.setFollowedByUserMap(response[1]);
-                this._leaderBoardsCopy = foundProfiles;
+                this._leaderBoard = foundProfiles;
                 this.setState({ profiles: foundProfiles, isLoading: false });
             }
         } catch (p_error) {
@@ -136,11 +144,11 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
         const keyExtractor = (item: Profile, index: number) => `${item.PublicKeyBase58Check}_${index}`;
 
         return this.state.isLoading ?
-            <View style={[styles.container, themeStyles.containerColorSub]}>
+            <View style={[styles.container, themeStyles.containerColorMain]}>
                 <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
             </View>
             :
-            <View style={[styles.container, themeStyles.containerColorSub]}>
+            <View style={[styles.container, themeStyles.containerColorMain]}>
                 {
                     this.state.profiles.length > 0 ?
                         <FlatList
@@ -163,9 +171,9 @@ const styles = StyleSheet.create(
             flex: 1
         },
         noProfilesText: {
-            fontWeight: '500',
-            marginTop: 10,
-            marginLeft: 10
+            fontSize: 15,
+            textAlign: 'center',
+            marginTop: 40,
         }
     }
 );

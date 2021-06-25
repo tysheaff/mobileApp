@@ -33,7 +33,8 @@ const getCloutTagPosts = (p_term: string, p_numToFetch: number, p_offset: number
 }
 
 const searchCloutTags = (p_term: string) => {
-    const route = `/clouttags/search/${p_term}`;
+    const encodedTerm = encodeURIComponent(p_term);
+    const route = `/clouttags/search/${encodedTerm}`;
     return get(route);
 }
 

@@ -18,8 +18,7 @@ import { IdentityScreen } from '@screens/login/identity.screen';
 import { FeedSettingsScreen } from '@screens/feedSettings.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 import BlockedUsersScreen from '@screens/settings/blockedUsers.screen';
-import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
-
+import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 
 const ProfileStack = createStackNavigator();
 

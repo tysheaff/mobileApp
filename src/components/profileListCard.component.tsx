@@ -82,7 +82,7 @@ export function ProfileListCardComponent({ profile, isFollowing }:
     }
 
     return <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
-        <View style={[styles.profileListCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
+        <View style={[styles.profileListCard, themeStyles.containerColorMain]}>
             <Image style={styles.profileImage}
                 source={{ uri: profile?.ProfilePic }}></Image>
 
@@ -130,13 +130,12 @@ const styles = StyleSheet.create(
             paddingBottom: 16,
             paddingLeft: 10,
             paddingRight: 10,
-            borderBottomWidth: 1,
             width: Dimensions.get('window').width,
             alignItems: 'center'
         },
         profileImage: {
-            width: 30,
-            height: 30,
+            width: 40,
+            height: 40,
             borderRadius: 6,
             marginRight: 12
         },
