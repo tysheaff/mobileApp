@@ -17,7 +17,9 @@ import { CreatePostScreen } from '@screens/createPost.screen';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { FeedSettingsScreen } from '@screens/feedSettings.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
+import BlockedUsersScreen from '@screens/settings/blockedUsers.screen';
 import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
+
 
 const ProfileStack = createStackNavigator();
 
@@ -122,6 +124,14 @@ export default function ProfileStackScreen() {
                 }}
                 name="Settings"
                 component={SettingsScreen}
+            />
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Blocked Users',
+                    headerBackTitle: ' ',
+                }}
+                name="BlockedUsers"
+                component={BlockedUsersScreen}
             />
             <ProfileStack.Screen
                 options={{

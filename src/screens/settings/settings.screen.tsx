@@ -8,6 +8,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
 import { globals } from '@globals';
+import { Entypo } from '@expo/vector-icons';
 
 interface Settings {
     title: string;
@@ -22,6 +23,11 @@ export function SettingsScreen({ navigation }: any) {
             title: 'Feed',
             icon: <MaterialCommunityIcons name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('FeedSettings')
+        },
+        {
+            title: 'Blocked Users',
+            icon: <Entypo name="block" size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => navigation.navigate('BlockedUsers')
         },
         {
             title: 'Privacy Policy',
