@@ -1,6 +1,6 @@
 import { settingsGlobals } from '@globals/settingsGlobals';
 import { themeStyles } from '@styles/globalColors';
-import React from 'react'
+import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native'
 
 interface Props {

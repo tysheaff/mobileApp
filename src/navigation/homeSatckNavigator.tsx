@@ -5,7 +5,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { PostScreen } from '@screens/post.screen';
-import { SearchScreen } from '@screens/search/search.screen';
 import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
 import { globals } from '@globals';
 import { themeStyles } from '@styles';
@@ -18,6 +17,8 @@ import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
+import SearchTabNavigator from './searchTabNavigator';
+import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
 
 const HomeStack = createStackNavigator();
 
@@ -34,8 +35,8 @@ export default function HomeStackScreen() {
                 headerLeft: () => <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
                     <Ionicons name="chevron-back" size={32} color="#007ef5" />
                 </TouchableOpacity>
-            })}
-        >
+            })}>
+
             <HomeStack.Screen
                 options={
                     ({ navigation }) => ({
@@ -46,7 +47,7 @@ export default function HomeStackScreen() {
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
                                     style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
-                                    onPress={() => navigation.navigate('Search')}
+                                    onPress={() => navigation.navigate('SearchTabNavigator')}
                                 >
                                     <Ionicons name="ios-search" size={26} color={themeStyles.fontColorMain.color} />
                                 </TouchableOpacity>
@@ -71,7 +72,7 @@ export default function HomeStackScreen() {
                 }}
                 name="UserProfile"
                 component={ProfileScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
                 options={{
@@ -80,7 +81,7 @@ export default function HomeStackScreen() {
                 }}
                 name="EditProfile"
                 component={EditProfileScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
                 options={
@@ -93,7 +94,7 @@ export default function HomeStackScreen() {
                 }
                 name="ProfileFollowers"
                 component={ProfileFollowersScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
                 options={
@@ -107,7 +108,7 @@ export default function HomeStackScreen() {
                 }
                 name="CreatorCoin"
                 component={CreatorCoinScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
                 options={
@@ -128,7 +129,7 @@ export default function HomeStackScreen() {
                     )}
                 name="CreatePost"
                 component={CreatePostScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
                 options={{
@@ -137,7 +138,7 @@ export default function HomeStackScreen() {
                 }}
                 name="Post"
                 component={PostScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
                 options={{
@@ -146,27 +147,42 @@ export default function HomeStackScreen() {
                 }}
                 name="PostStats"
                 component={PostStatsScreen}
-            ></HomeStack.Screen>
+            />
 
             <HomeStack.Screen
-                options={{
-                    headerTitle: ' ',
-                    headerLeft: () => <SearchHeaderComponent></SearchHeaderComponent>,
-                    headerBackTitle: ' ',
-                }}
-                name="Search"
-                component={SearchScreen}
-            ></HomeStack.Screen>
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: ' ',
+                            headerLeft: () => <SearchHeaderComponent route={route} />,
+                            headerBackTitle: ' ',
+                        }
+                    )}
+                name="SearchTabNavigator"
+                component={SearchTabNavigator}
+            />
+
+            <HomeStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: `#${(route.params as any).cloutTag}`,
+                            headerBackTitle: ' ',
+                        }
+                    )}
+                name="CloutTagPosts"
+                component={CloutTagPostsScreen}
+            />
 
             <HomeStack.Screen
                 options={
                     {
-                        headerStyle: { backgroundColor: '#121212', shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
+                        headerStyle: styles.identityHeader,
                         headerTitleStyle: { color: 'white', fontSize: 20 }
                     }
                 }
                 name="Identity" component={IdentityScreen}
-            ></HomeStack.Screen>
+            />
         </HomeStack.Navigator>
     )
 };
@@ -176,20 +192,22 @@ const styles = StyleSheet.create(
     {
         postButton: {
             backgroundColor: 'black',
-            display: 'flex',
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
             marginRight: 10,
-            paddingRight: 12,
-            paddingLeft: 12,
-            paddingTop: 6,
-            paddingBottom: 6,
+            paddingHorizontal: 12,
+            paddingVertical: 6,
             borderRadius: 4,
             borderWidth: 1
         },
         postButtonText: {
             color: 'white'
+        },
+        identityHeader: {
+            backgroundColor: '#121212',
+            shadowRadius: 0,
+            shadowOffset: { height: 0, width: 0 }
         }
     }
 )

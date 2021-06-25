@@ -5,15 +5,19 @@ import { globals, navigatorGlobals } from '@globals';
 import { Profile, User } from '@types';
 import { api, cache, isNumber } from '@services';
 import { themeStyles } from '@styles';
+import { NavigationProp } from '@react-navigation/native';
 
-interface Props { }
+interface Props {
+    navigation: NavigationProp<any>;
+    selectedTab: any;
+}
 
 interface State {
     isLoading: boolean;
     profiles: Profile[];
 }
 
-export class SearchScreen extends React.Component<Props, State> {
+export class CreatorsSearchScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
     private _timer: number | undefined = undefined;
@@ -41,46 +45,50 @@ export class SearchScreen extends React.Component<Props, State> {
     }
 
     componentDidUpdate() {
-        navigatorGlobals.searchProfiles = (p_usernamePrefix: string) => {
-            this._lastUsernamePrefix = p_usernamePrefix;
-            p_usernamePrefix = p_usernamePrefix.trim();
+        const { tabName } = this.props.selectedTab;
 
-            if (isNumber(this._timer)) {
-                window.clearTimeout(this._timer);
-            }
+        if (tabName === 'Creators' || tabName === undefined) {
+            navigatorGlobals.searchResults = (p_usernamePrefix: string) => {
+                this._lastUsernamePrefix = p_usernamePrefix;
+                p_usernamePrefix = p_usernamePrefix.trim();
 
-            if (!p_usernamePrefix) {
-                if (this._isMounted) {
-                    this.setState({ profiles: this._leaderBoardsCopy, isLoading: false });
+                if (isNumber(this._timer)) {
+                    window.clearTimeout(this._timer);
                 }
-            } else {
-                if (this._isMounted) {
-                    this.setState({ isLoading: true });
+
+                if (!p_usernamePrefix) {
+                    if (this._isMounted) {
+                        this.setState({ profiles: this._leaderBoardsCopy, isLoading: false });
+                    }
+                } else {
+                    if (this._isMounted) {
+                        this.setState({ isLoading: true });
+                    }
+                    this._timer = window.setTimeout(
+                        async () => {
+                            try {
+                                const usernamePrefixCopy = p_usernamePrefix;
+                                const response = await api.searchProfiles(globals.user.publicKey, p_usernamePrefix);
+                                let foundProfiles = response?.ProfilesFound;
+                                if (!foundProfiles) {
+                                    foundProfiles = [];
+                                }
+
+                                if (this._isMounted && this._lastUsernamePrefix === usernamePrefixCopy) {
+                                    this.setState({ profiles: foundProfiles, isLoading: false });
+                                }
+
+                                this._timer = undefined;
+                            }
+                            catch (p_error) {
+                                globals.defaultHandleError(p_error);
+                            }
+                        },
+                        500
+                    );
                 }
-                this._timer = window.setTimeout(
-                    async () => {
-                        try {
-                            const usernamePrefixCopy = p_usernamePrefix;
-                            const response = await api.searchProfiles(globals.user.publicKey, p_usernamePrefix);
-                            let foundProfiles = response?.ProfilesFound;
-                            if (!foundProfiles) {
-                                foundProfiles = [];
-                            }
-
-                            if (this._isMounted && this._lastUsernamePrefix === usernamePrefixCopy) {
-                                this.setState({ profiles: foundProfiles, isLoading: false });
-                            }
-
-                            this._timer = undefined;
-                        }
-                        catch (p_error) {
-                            globals.defaultHandleError(p_error);
-                        }
-                    },
-                    500
-                );
-            }
-        };
+            };
+        }
     }
 
     async init() {
@@ -119,6 +127,7 @@ export class SearchScreen extends React.Component<Props, State> {
     }
 
     render() {
+
         const renderItem = (item: Profile) =>
             <ProfileListCardComponent
                 profile={item}
@@ -145,7 +154,6 @@ export class SearchScreen extends React.Component<Props, State> {
             </View>
     }
 }
-
 const styles = StyleSheet.create(
     {
         activityIndicator: {

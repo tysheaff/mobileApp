@@ -175,3 +175,9 @@ export interface CreatorCoinTransaction {
     usdValue: number;
     timeStamp: number
 }
+
+export interface CloutTag {
+    Index: number,
+    clouttag: string;
+    count: number;
+}

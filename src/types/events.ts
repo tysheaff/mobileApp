@@ -1,7 +1,6 @@
 import { NavigationProp } from "@react-navigation/core";
 import { ActionSheetConfig } from "@services/actionSheet";
 
-
 export enum EventType {
     IncreaseFollowers = 0,
     DecreaseFollowers = 1,
@@ -10,11 +9,18 @@ export enum EventType {
     Navigation = 4,
     ToggleNotificationsFilter = 5,
     ToggleActionSheet = 6,
+    SwitchSearchTab = 7
 }
 
 export interface ChangeFollowersEvent {
     publicKey: string;
 }
+
+export interface SwitchSearchTabsEvent {
+    tabName: string;
+    isFocused: boolean;
+}
+
 export interface ToggleActionSheetEvent {
     visible: boolean;
     config: ActionSheetConfig,

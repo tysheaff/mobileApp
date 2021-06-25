@@ -5,7 +5,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { ChatScreen } from '@screens/chatScreen';
 import { PostScreen } from '@screens/post.screen';
-import { SearchScreen } from '@screens/search/search.screen';
 import { MessageTopHoldersOptionsScreen } from '@screens/messageTopHolders/messageTopHoldersOptions';
 import { MessageTopHoldersInputScreen } from '@screens/messageTopHolders/messageTopHoldersInput';
 import { ChatHeaderComponent } from '@components/chatHeader.component';
@@ -21,6 +20,8 @@ import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
+import SearchTabNavigator from './searchTabNavigator';
+import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
 
 const MessageStack = createStackNavigator();
 
@@ -41,11 +42,11 @@ export default function MessageStackScreen() {
         >
             <MessageStack.Screen
                 options={{
-                    headerRight: () => <MessagesHeaderComponent></MessagesHeaderComponent>
+                    headerRight: () => <MessagesHeaderComponent />
                 }}
                 name="Messages"
                 component={MessagesScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
@@ -54,7 +55,7 @@ export default function MessageStackScreen() {
                 }}
                 name="MessageTopHoldersOptions"
                 component={MessageTopHoldersOptionsScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
@@ -72,7 +73,7 @@ export default function MessageStackScreen() {
                 }}
                 name="MessageTopHoldersInput"
                 component={MessageTopHoldersInputScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={({ route }) => (
@@ -80,14 +81,14 @@ export default function MessageStackScreen() {
                         title: ' ',
                         headerBackTitle: ' ',
                         headerLeft: () => (
-                            route.params ?
-                                <ChatHeaderComponent contactWithMessages={(route.params as any).contactWithMessages}></ChatHeaderComponent> : undefined
+                            route.params &&
+                            <ChatHeaderComponent contactWithMessages={(route.params as any).contactWithMessages} />
                         )
                     }
                 )}
                 name="Chat"
                 component={ChatScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
@@ -96,7 +97,7 @@ export default function MessageStackScreen() {
                 }}
                 name="UserProfile"
                 component={ProfileScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
@@ -105,7 +106,7 @@ export default function MessageStackScreen() {
                 }}
                 name="EditProfile"
                 component={EditProfileScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={
@@ -118,7 +119,7 @@ export default function MessageStackScreen() {
                 }
                 name="ProfileFollowers"
                 component={ProfileFollowersScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={
@@ -132,7 +133,7 @@ export default function MessageStackScreen() {
                 }
                 name="CreatorCoin"
                 component={CreatorCoinScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={
@@ -153,7 +154,7 @@ export default function MessageStackScreen() {
                     )}
                 name="CreatePost"
                 component={CreatePostScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
@@ -162,7 +163,7 @@ export default function MessageStackScreen() {
                 }}
                 name="Post"
                 component={PostScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
@@ -171,27 +172,39 @@ export default function MessageStackScreen() {
                 }}
                 name="PostStats"
                 component={PostStatsScreen}
-            ></MessageStack.Screen>
+            />
 
             <MessageStack.Screen
                 options={{
                     headerTitle: ' ',
-                    headerLeft: () => <SearchHeaderComponent></SearchHeaderComponent>,
+                    headerLeft: () => <SearchHeaderComponent />,
                     headerBackTitle: ' ',
                 }}
-                name="Search"
-                component={SearchScreen}
-            ></MessageStack.Screen>
+                name="SearchTabNavigator"
+                component={SearchTabNavigator}
+            />
+
+            <MessageStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: `#${(route.params as any).cloutTag}`,
+                            headerBackTitle: ' ',
+                        }
+                    )}
+                name="CloutTagPosts"
+                component={CloutTagPostsScreen}
+            />
 
             <MessageStack.Screen
                 options={
                     {
-                        headerStyle: { backgroundColor: '#121212', shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
+                        headerStyle: styles.identity,
                         headerTitleStyle: { color: 'white', fontSize: 20 }
                     }
                 }
                 name="Identity" component={IdentityScreen}
-            ></MessageStack.Screen>
+            />
         </MessageStack.Navigator>
     )
 };
@@ -216,5 +229,10 @@ const styles = StyleSheet.create(
         postButtonText: {
             color: 'white'
         },
+        identity: {
+            backgroundColor: '#121212',
+            shadowRadius: 0,
+            shadowOffset: { height: 0, width: 0 }
+        }
     }
 )

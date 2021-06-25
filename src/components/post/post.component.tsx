@@ -328,8 +328,8 @@ const styles = StyleSheet.create(
         },
         bodyText: {
             fontSize: 15,
-            paddingLeft: 10,
-            paddingRight: 10
+            paddingHorizontal: 10,
+            marginBottom: 10,
         },
         usernameContainer: {
             display: 'flex',

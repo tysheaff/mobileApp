@@ -3,6 +3,6 @@ export const navigatorGlobals = {
     refreshNotifications: () => { },
     refreshProfile: () => { },
     refreshWallet: () => { },
-    searchProfiles: (p_usernamePrefix: string) => { },
+    searchResults: (p_query: string) => { },
     broadcastMessage: () => { }
 }

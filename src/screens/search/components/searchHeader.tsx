@@ -4,9 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { themeStyles } from '@styles';
 import { navigatorGlobals, settingsGlobals } from '@globals';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/core';
 
-export function SearchHeaderComponent() {
+export function SearchHeaderComponent({ route }: any) {
+
     const navigation = useNavigation();
+    const activeRoute: string | undefined = getFocusedRouteNameFromRoute(route)
 
     return <View style={[styles.container]}>
         <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
@@ -16,18 +19,16 @@ export function SearchHeaderComponent() {
             <Ionicons style={[styles.searchIcon, themeStyles.fontColorSub]} name="ios-search" size={20} color={themeStyles.fontColorMain.color} />
             <TextInput
                 style={[styles.textInput, themeStyles.fontColorMain]}
-                onChangeText={navigatorGlobals.searchProfiles}
+                onChangeText={navigatorGlobals.searchResults}
                 blurOnSubmit={true}
                 maxLength={50}
-                placeholder={'Search'}
+                placeholder={`Search ${activeRoute ? activeRoute : `Creators`}`}
                 placeholderTextColor={themeStyles.fontColorSub.color}
                 keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
-            >
-            </TextInput>
+            />
         </View>
     </View>
 }
-
 const styles = StyleSheet.create(
     {
         container: {
@@ -35,7 +36,6 @@ const styles = StyleSheet.create(
             alignItems: 'center'
         },
         textInputContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             borderBottomWidth: 1,

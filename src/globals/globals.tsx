@@ -9,13 +9,12 @@ export const globals = {
     createPost: () => { },
     tickers: { USD: { last: 0 } },
     exchangeRate: { SatoshisPerBitCloutExchangeRate: 0 },
+    lastCloutTagPostIndex: 0,
     investorFeatures: false,
     followerFeatures: false,
     setGlobalTheme: (p_theme: string) => { },
     pushNotificationsToken: '',
     readonly: true,
-    identityBaseUrl: 'https://cloutfeed.app',
-    identityVersion: '1',
     defaultHandleError: (p_error: any) => {
         if (p_error?.status === 429) {
             Alert.alert('Error', 'BitClout is experiencing heavy load. Please try again in one minute.');
