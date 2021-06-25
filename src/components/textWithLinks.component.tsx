@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/core';
 import React from 'react';
 import { StyleSheet, Text, Linking } from 'react-native';
 import Autolink from 'react-native-autolink';
-import { settingsGlobals } from '@globals';
 import { themeStyles } from '@styles/globalColors';
 
 export function TextWithLinks({ text, style, numberOfLines }: { text: string, style?: any[], numberOfLines?: number }) {
@@ -40,6 +39,11 @@ export function TextWithLinks({ text, style, numberOfLines }: { text: string, st
                     key: 'Post_' + userName
                 });
                 break;
+            case 'hashtag':
+                return (navigation as any).push('CloutTagPosts', {
+                    cloutTag: p_match.hashtag,
+                    key: 'CloutTag_' + p_match.hashtag
+                });
         }
     }
 
@@ -58,6 +62,7 @@ export function TextWithLinks({ text, style, numberOfLines }: { text: string, st
         style={style}
         text={text}
         mention="twitter"
+        hashtag="twitter"
         renderLink={(text, match, index) => (
             <Text
                 style={[styles.link, themeStyles.linkColor]}

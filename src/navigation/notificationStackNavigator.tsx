@@ -16,6 +16,7 @@ import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
+import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
 
 const NotificationStack = createStackNavigator();
 
@@ -126,6 +127,18 @@ export default function NotificationStackScreen() {
                     )}
                 name="CreatePost"
                 component={CreatePostScreen}
+            ></NotificationStack.Screen>
+
+            <NotificationStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: `#${(route.params as any).cloutTag}`,
+                            headerBackTitle: ' ',
+                        }
+                    )}
+                name="CloutTagPosts"
+                component={CloutTagPostsScreen}
             ></NotificationStack.Screen>
 
             <NotificationStack.Screen

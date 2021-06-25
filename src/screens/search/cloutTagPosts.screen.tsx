@@ -28,8 +28,9 @@ interface State {
 
 export default class CloutTagPostsScreen extends React.Component<Props, State> {
 
-    private _isMounted = false;
-    private _noMoreData = false;
+    private _isMounted: boolean = false;
+    private _noMoreData: boolean = false;
+    private _lastCloutTagPostIndex: number = 0;
 
     constructor(props: Props) {
         super(props);
@@ -52,7 +53,6 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
 
     componentWillUnmount() {
         this._isMounted = false;
-        globals.lastCloutTagPostIndex = 0;
     }
 
     async processPosts(p_posts: Post[]): Promise<Post[]> {
@@ -81,8 +81,8 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
         let post: Post | any;
         let posts: Post[];
         try {
-            const response = await cloutApi.getCloutTagPosts(this.props.route.params?.cloutTag, 10, globals.lastCloutTagPostIndex);
-            if (response.data < 10 && this._isMounted) {
+            const response = await cloutApi.getCloutTagPosts(this.props.route.params?.cloutTag, 10, this._lastCloutTagPostIndex);
+            if (response.length < 10) {
                 this._noMoreData = true;
             }
             if (response?.length > 0) {
@@ -101,7 +101,7 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
                     promises.push(promise);
                 }
 
-                globals.lastCloutTagPostIndex += response.length;
+                this._lastCloutTagPostIndex += response.length;
                 if (p_loadMore) {
                     posts = this.state.posts.concat(await Promise.all(promises));
                 } else {
@@ -117,7 +117,7 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
             } else {
                 if (this._isMounted) {
                     this.setState({ isLoadingMore: false });
-                    globals.lastCloutTagPostIndex = 0;
+                    this._lastCloutTagPostIndex = 0;
                 }
             }
 
@@ -127,7 +127,7 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
     }
 
     refresh() {
-        globals.lastCloutTagPostIndex = 0;
+        this._lastCloutTagPostIndex = 0;
         this.init(false);
     }
 

@@ -9,7 +9,6 @@ export const globals = {
     createPost: () => { },
     tickers: { USD: { last: 0 } },
     exchangeRate: { SatoshisPerBitCloutExchangeRate: 0 },
-    lastCloutTagPostIndex: 0,
     investorFeatures: false,
     followerFeatures: false,
     setGlobalTheme: (p_theme: string) => { },

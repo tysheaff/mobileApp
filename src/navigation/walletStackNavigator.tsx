@@ -15,6 +15,7 @@ import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
+import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
 
 const WalletStack = createStackNavigator();
 
@@ -50,6 +51,18 @@ export default function WalletStackScreen() {
                 }}
                 name="UserProfile"
                 component={ProfileScreen}
+            ></WalletStack.Screen>
+
+            <WalletStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: `#${(route.params as any).cloutTag}`,
+                            headerBackTitle: ' ',
+                        }
+                    )}
+                name="CloutTagPosts"
+                component={CloutTagPostsScreen}
             ></WalletStack.Screen>
 
             <WalletStack.Screen

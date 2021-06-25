@@ -17,6 +17,7 @@ import { CreatePostScreen } from '@screens/createPost.screen';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { FeedSettingsScreen } from '@screens/feedSettings.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
+import CloutTagPostsScreen from '@screens/search/cloutTagPosts.screen';
 
 const ProfileStack = createStackNavigator();
 
@@ -129,6 +130,17 @@ export default function ProfileStackScreen() {
                 }}
                 name="Appearance"
                 component={AppearanceScreen}
+            />
+            <ProfileStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: `#${(route.params as any).cloutTag}`,
+                            headerBackTitle: ' ',
+                        }
+                    )}
+                name="CloutTagPosts"
+                component={CloutTagPostsScreen}
             />
             <ProfileStack.Screen
                 options={{
