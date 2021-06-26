@@ -114,7 +114,7 @@ export function CreatePostComponent(
             }
 
         } else {
-            Alert.alert('Error', 'The video link is not valid. We just support YouTube, TikTok or Vimeo videos.');
+            Alert.alert('Error', 'The video link is not valid. We just support YouTube, TikTok, Vimeo, Spotify, SoundCloud and GIPHY links.');
         }
     }
 
@@ -175,8 +175,8 @@ export function CreatePostComponent(
                 <TouchableOpacity onPress={onPasteVideoLink}>
                     <View style={styles.insertVideoContainer}>
                         <Ionicons name="md-videocam-outline" size={60} color={themeStyles.fontColorMain.color} />
-                        <Text style={themeStyles.fontColorMain}>Click here to paste your video URL</Text>
-                        <Text style={themeStyles.fontColorMain}>YouTube, TikTok and Vimeo videos are supported</Text>
+                        <Text style={[styles.insertVideoText, themeStyles.fontColorMain]}>Click here to paste your video URL</Text>
+                        <Text style={[styles.insertVideoText, themeStyles.fontColorMain]}>YouTube, TikTok, Vimeo, Spotify, SoundCloud and GIPHY links are supported</Text>
                         <TouchableOpacity
                             style={[
                                 styles.cancelVideoButton,
@@ -313,9 +313,14 @@ const styles = StyleSheet.create(
         },
         insertVideoContainer: {
             height: 200,
-            width: '100%',
+            width: '75%',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+        },
+        insertVideoText: {
+            textAlign: 'center'
         },
         cancelVideoButton: {
             display: 'flex',
