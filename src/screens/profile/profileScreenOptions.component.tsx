@@ -109,7 +109,7 @@ export function ProfileScreenOptionsComponent(
                                 await cache.user.getData(true);
                                 snackbar.showSnackBar(
                                     {
-                                        text: 'User has been ' + blockedText
+                                        text: 'User has been ' + blockedText + ' successfully'
                                     }
                                 );
                                 if (!isUserBlocked) {

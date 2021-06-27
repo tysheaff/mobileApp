@@ -48,10 +48,14 @@ const signJWT = async (): Promise<string> => {
     const keyEncoder = new KeyEncoder("secp256k1");
     const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, "raw", "pem");
 
+    const expDate = new Date();
+    expDate.setSeconds(expDate.getSeconds() + 60);
+    expDate.setHours(expDate.getHours() + 1);
+
     var signedJWT = JWS.sign(
         header.alg,
         JSON.stringify(header),
-        JSON.stringify(payload),
+        JSON.stringify({ exp: Math.floor(expDate.getTime() / 1000) }),
         encodedPrivateKey
     );
 

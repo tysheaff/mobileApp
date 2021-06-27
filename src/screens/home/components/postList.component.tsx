@@ -42,7 +42,7 @@ export class PostListComponent extends React.Component<Props, State> {
     private _postsCountPerLoad = 10;
     private _currentScrollPosition: number = 0;
     private _isMounted = false;
-    
+
     constructor(props: Props) {
         super(props);
 
@@ -151,6 +151,10 @@ export class PostListComponent extends React.Component<Props, State> {
     };
 
     async loadPosts(p_loadMore: boolean) {
+        if (this.state.isLoadingMore) {
+            return;
+        }
+
         if (this._isMounted) {
             this.setState({ isLoading: !p_loadMore, isLoadingMore: p_loadMore });
         }

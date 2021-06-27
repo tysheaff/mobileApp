@@ -62,6 +62,11 @@ export class PostOptionsComponent extends React.Component<Props> {
                                 }
                             );
                             cache.user.getData(true);
+                            snackbar.showSnackBar(
+                                {
+                                    text: 'User has been blocked successfully'
+                                }
+                            );
                         }
                     ).catch(() => Alert.alert('Error', 'Something went wrong! Please try again.'));
                     break;

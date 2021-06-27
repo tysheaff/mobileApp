@@ -116,7 +116,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
             );
             if (this._isMounted) {
                 this.setState({ blockedProfiles: filteredUsers });
-                snackbar.showSnackBar({ text: 'User unblocked successfully.' });
+                snackbar.showSnackBar({ text: 'User has been unblocked successfully' });
             }
         }
     }

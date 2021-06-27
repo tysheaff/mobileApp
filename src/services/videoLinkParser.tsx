@@ -79,7 +79,7 @@ export function parseVideoLink(p_videoLink: string) {
     // sound cloud
     const soundCloudRegExp = /^.*(soundcloud.com\/([a-z0-9-_]+)\/(sets\/)?([a-z0-9-_]+)).*/;
     const soundCloudMatch = p_videoLink.match(soundCloudRegExp);
-    console.log(soundCloudMatch);
+
     if (soundCloudMatch && soundCloudMatch.length > 1) {
         const videoId = soundCloudMatch[1]
         const videoLink = `https://w.soundcloud.com/player/?url=https://${videoId}?hide_related=true&show_comments=false`;
