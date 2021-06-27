@@ -116,7 +116,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
             );
             if (this._isMounted) {
                 this.setState({ blockedProfiles: filteredUsers });
-                snackbar.showSnackBar({ text: 'User has been unblocked successfully' });
+                snackbar.showSnackBar({ text: 'User has been unblocked' });
             }
         }
     }
@@ -140,7 +140,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
                 ? <ActivityIndicator style={{ height: 200, alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
                 : this.state.blockedProfiles.length === 0
                     ? <View style={[styles.emptyTextContainer, themeStyles.containerColorMain]}>
-                        <Text style={[themeStyles.fontColorMain, styles.emptyText]}>Your block list is empty.</Text>
+                        <Text style={[themeStyles.fontColorMain, styles.emptyText]}>Your block list is empty</Text>
                     </View>
                     : <FlatList
                         data={this.state.blockedProfiles}
@@ -155,13 +155,15 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
         )
     }
 }
-const styles = StyleSheet.create({
-    emptyTextContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    emptyText: {
-        fontSize: 16,
+const styles = StyleSheet.create(
+    {
+        emptyTextContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        emptyText: {
+            fontSize: 16,
+        }
     }
-})
+);

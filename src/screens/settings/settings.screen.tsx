@@ -1,14 +1,11 @@
 import React from 'react';
 import { Text, View, StyleSheet, FlatList, Linking } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
 import { globals } from '@globals';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, Ionicons, Feather, SimpleLineIcons } from '@expo/vector-icons';
 
 interface Settings {
     title: string;
@@ -17,12 +14,16 @@ interface Settings {
 }
 
 export function SettingsScreen({ navigation }: any) {
-
     const settings: Settings[] = [
         {
             title: 'Feed',
-            icon: <MaterialCommunityIcons name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />,
+            icon: <MaterialCommunityIcons style={{ marginRight: -4 }} name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('FeedSettings')
+        },
+        {
+            title: 'Saved Posts',
+            icon: <Feather name="bookmark" size={22} color={themeStyles.fontColorMain.color} />,
+            action: () => navigation.navigate('SavedPosts')
         },
         {
             title: 'Blocked Users',
@@ -50,7 +51,7 @@ export function SettingsScreen({ navigation }: any) {
             action: () => globals.onLogout()
         },
         {
-            title: 'CloutFeed v 1.4.2',
+            title: 'CloutFeed v 1.4.3',
             icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={18} color={themeStyles.fontColorMain.color} />,
             action: () => { }
         },

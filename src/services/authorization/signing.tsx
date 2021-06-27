@@ -50,7 +50,6 @@ const signJWT = async (): Promise<string> => {
 
     const expDate = new Date();
     expDate.setSeconds(expDate.getSeconds() + 60);
-    expDate.setHours(expDate.getHours() + 1);
 
     var signedJWT = JWS.sign(
         header.alg,

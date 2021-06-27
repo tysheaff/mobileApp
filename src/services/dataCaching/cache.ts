@@ -2,13 +2,14 @@ import { api } from "../api/api";
 import { CacheableObject } from "./cacheableObject";
 import { globals } from "@globals";
 import { User } from "@types";
+import { SavedPostsCache } from "./savedPostsCache";
 
 const loggedInUserCacheableObject = new CacheableObject<User>(
     () => api.getProfile([globals.user.publicKey]),
-    p_response => { 
+    p_response => {
         const user = p_response.UserList[0] as User;
 
-        if(user.ProfileEntryResponse && !user.ProfileEntryResponse.ProfilePic){
+        if (user.ProfileEntryResponse && !user.ProfileEntryResponse.ProfilePic) {
             user.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(globals.user.publicKey);
         }
 
@@ -47,20 +48,22 @@ const removeFollower = async (p_publicKey: string) => {
     }
 }
 
-export let cache = {
-    user: loggedInUserCacheableObject,
-    addFollower: addFollower,
-    removeFollower: removeFollower
-};
-
-export function resetCache() {
-    cache.user.reset();
+interface Cache {
+    user: CacheableObject<User>;
+    addFollower: (publicKey: string) => void;
+    removeFollower: (publicKey: string) => void;
+    savedPosts: SavedPostsCache;
 }
+
+export let cache: Cache;
 
 export function initCache() {
     cache = {
         user: loggedInUserCacheableObject,
         addFollower: addFollower,
-        removeFollower: removeFollower
+        removeFollower: removeFollower,
+        savedPosts: new SavedPostsCache()
     };
 }
+
+initCache();

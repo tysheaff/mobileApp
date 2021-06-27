@@ -121,10 +121,12 @@ export default function App() {
     if (mount) {
       setLoading(true);
     }
-
+    initCache();
+  
     Promise.all(
       [
-        cache.user.getData()
+        cache.user.getData(),
+        cache.savedPosts.reloadData()
       ]
     ).then(
       async p_responses => {
@@ -137,7 +139,6 @@ export default function App() {
           notificationsService.registerPushToken().catch(() => { });
         }
 
-        initCache();
         await setTheme();
       }
     ).catch(() => { })

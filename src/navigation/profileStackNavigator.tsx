@@ -19,6 +19,7 @@ import { FeedSettingsScreen } from '@screens/feedSettings.screen';
 import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 import BlockedUsersScreen from '@screens/settings/blockedUsers.screen';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
+import { SavedPostsScreen } from '@screens/savedPosts/savedPosts.screen';
 
 const ProfileStack = createStackNavigator();
 
@@ -159,6 +160,16 @@ export default function ProfileStackScreen() {
                 name="FeedSettings"
                 component={FeedSettingsScreen}
             />
+
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Saved Posts',
+                    headerBackTitle: ' ',
+                }}
+                name="SavedPosts"
+                component={SavedPostsScreen}
+            />
+
             <ProfileStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',

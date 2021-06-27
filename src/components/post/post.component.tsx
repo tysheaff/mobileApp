@@ -37,7 +37,6 @@ interface State {
 
 export class PostComponent extends React.Component<Props, State> {
 
-    private _isMounted = true;
     private _animation = new Animated.Value(0);
     private _inputRange = [0, 1.3];
     private _outputRange = [0, 1.3];
@@ -66,10 +65,6 @@ export class PostComponent extends React.Component<Props, State> {
         this.goToRecloutedPost = this.goToRecloutedPost.bind(this);
         this.getEmbeddedVideoLink = this.getEmbeddedVideoLink.bind(this);
         this.toggleHeartIcon = this.toggleHeartIcon.bind(this);
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
     }
 
     shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {

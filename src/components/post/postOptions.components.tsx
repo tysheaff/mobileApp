@@ -1,7 +1,7 @@
 import React from "react";
 import { Alert, Linking, TouchableOpacity } from "react-native";
 import { Feather } from '@expo/vector-icons';
-import { EventType, Post } from '@types';
+import { EventType, Post, UnsavePostEvent } from '@types';
 import { globals } from "@globals/globals";
 import { signing } from "@services/authorization/signing";
 import { api, cache } from "@services";
@@ -9,6 +9,7 @@ import { eventManager } from "@globals/injector";
 import Clipboard from 'expo-clipboard';
 import { snackbar } from "@services/snackbar";
 import { NavigationProp } from "@react-navigation/native";
+import { cloutApi } from "@services/api/cloutApi";
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -37,20 +38,30 @@ export class PostOptionsComponent extends React.Component<Props> {
     }
 
     private showNotOwnPostOptions() {
-        const options = ['Copy Link', 'Copy Text', 'Report', 'Block User', 'Cancel'];
+        const isPostSaved = !!cache.savedPosts.savedPosts[this.props.post.PostHashHex];
+        const savePostText = isPostSaved ? 'Unsave Post' : 'Save Post';
+
+        const options = [savePostText, 'Copy Link', 'Copy Text', 'Report', 'Block User', 'Cancel'];
 
         const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
                 case 0:
-                    this.copyToClipBoard(true);
+                    if (isPostSaved) {
+                        await this.unsavePost();
+                    } else {
+                        await this.savePost();
+                    }
                     break;
                 case 1:
-                    this.copyToClipBoard(false);
+                    this.copyToClipBoard(true);
                     break;
                 case 2:
-                    Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
+                    this.copyToClipBoard(false);
                     break;
                 case 3:
+                    Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
+                    break;
+                case 4:
                     const jwt = await signing.signJWT();
 
                     api.blockUser(globals.user.publicKey, this.props.post.ProfileEntryResponse.PublicKeyBase58Check, jwt as string, false).then(
@@ -64,7 +75,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                             cache.user.getData(true);
                             snackbar.showSnackBar(
                                 {
-                                    text: 'User has been blocked successfully'
+                                    text: 'User has been blocked'
                                 }
                             );
                         }
@@ -77,21 +88,31 @@ export class PostOptionsComponent extends React.Component<Props> {
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [2, 3] }
+                config: { options, callback, destructiveButtonIndex: [3, 4] }
             }
         );
     }
 
     private showOwnPostOptions() {
-        const options = ['Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
+        const isPostSaved = !!cache.savedPosts.savedPosts[this.props.post.PostHashHex];
+        const savePostText = isPostSaved ? 'Unsave Post' : 'Save Post';
 
-        const callback = (p_optionIndex: number) => {
+        const options = [savePostText, 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
+
+        const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
                 case 0:
-                    return this.copyToClipBoard(true);
+                    if (isPostSaved) {
+                        await this.unsavePost();
+                    } else {
+                        await this.savePost();
+                    }
+                    break;
                 case 1:
-                    return this.copyToClipBoard(false);
+                    return this.copyToClipBoard(true);
                 case 2:
+                    return this.copyToClipBoard(false);
+                case 3:
                     if (this.props.post.Body || this.props.post.ImageURLs?.length > 0) {
                         this.props.navigation.navigate(
                             'CreatePost',
@@ -104,7 +125,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                         Alert.alert('Sorry!', 'You cannot edit a reclout, if it does not include a quote.');
                     }
                     break;
-                case 3:
+                case 4:
                     api.hidePost(
                         globals.user.publicKey,
                         this.props.post.PostHashHex,
@@ -140,7 +161,7 @@ export class PostOptionsComponent extends React.Component<Props> {
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [3] }
+                config: { options, callback, destructiveButtonIndex: [4] }
             }
         );
     }
@@ -150,6 +171,38 @@ export class PostOptionsComponent extends React.Component<Props> {
         const postLink = p_isLink ? `https://bitclout.com/posts/${this.props.post.PostHashHex}` : this.props.post.Body
         Clipboard.setString(postLink);
         snackbar.showSnackBar({ text });
+    }
+
+    private async savePost() {
+        const jwt = await signing.signJWT();
+        let message = '';
+
+        try {
+            await cloutApi.savePost(globals.user.publicKey, jwt, this.props.post.PostHashHex);
+            cache.savedPosts.savedPosts[this.props.post.PostHashHex] = true;
+            message = 'Post has been saved';
+        } catch {
+            message = 'Something went wrong';
+        }
+
+        snackbar.showSnackBar({ text: message });
+    }
+
+    private async unsavePost() {
+        const jwt = await signing.signJWT();
+        let message = '';
+
+        try {
+            await cloutApi.unsavePost(globals.user.publicKey, jwt, this.props.post.PostHashHex);
+            cache.savedPosts.savedPosts[this.props.post.PostHashHex] = false;
+            message = 'Post has been unsaved';
+            const event: UnsavePostEvent = { post: this.props.post };
+            eventManager.dispatchEvent(EventType.UnsavePost, event);
+        } catch {
+            message = 'Something went wrong';
+        }
+
+        snackbar.showSnackBar({ text: message });
     }
 
     render() {

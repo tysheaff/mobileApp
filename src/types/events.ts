@@ -1,5 +1,6 @@
 import { NavigationProp } from "@react-navigation/core";
 import { ActionSheetConfig } from "@services/actionSheet";
+import { Post } from "./models";
 
 export enum EventType {
     IncreaseFollowers = 0,
@@ -8,7 +9,8 @@ export enum EventType {
     ToggleProfileManager = 3,
     Navigation = 4,
     ToggleNotificationsFilter = 5,
-    ToggleActionSheet = 6
+    ToggleActionSheet = 6,
+    UnsavePost = 7
 }
 
 export interface ChangeFollowersEvent {
@@ -32,4 +34,8 @@ export interface NavigationEvent {
     username?: string;
     postHashHex?: string;
     priorityCommentHashHex?: string;
+}
+
+export interface UnsavePostEvent {
+    post: Post;
 }

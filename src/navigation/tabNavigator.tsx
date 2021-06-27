@@ -7,8 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { eventManager, globals, navigatorGlobals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
 import { cache } from '@services/dataCaching';
-import { EventType, NavigationEvent } from '@types';
-import { notificationsService } from '@services/notificationsService';
+import { EventType } from '@types';
 import HomeStackScreen from './homeSatckNavigator';
 import ProfileStackScreen from './profileStackNavigator';
 import NotificationStackScreen from './notificationStackNavigator';
@@ -170,8 +169,6 @@ const TabBar = ({ state, navigation }: any) => {
 }
 
 export function TabNavigator({ navigation }: any) {
-
-
     return (
         <Tab.Navigator
             tabBar={props => <TabBar {...props}></TabBar>}>
