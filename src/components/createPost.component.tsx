@@ -16,6 +16,7 @@ import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types';
 import { MentionInput, replaceMentionValues } from 'react-native-controlled-mentions';
 import { UserSuggestionList } from './userSuggestionList.component';
 import { parseVideoLinkAsync } from '@services/videoLinkParser';
+import { CloutTagSuggestionList } from './cloutTagSuggestionList.component';
 
 export function CreatePostComponent(
     { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }:
@@ -143,7 +144,7 @@ export function CreatePostComponent(
             autoFocus
             inputAccessoryViewID={inputAccessoryViewId}
             onChange={(p_value) => {
-                const replaceMention = replaceMentionValues(p_value, ({ name }) => `@${name}`);
+                const replaceMention = replaceMentionValues(p_value, ({ name, trigger }) => `${trigger}${name}`);
                 setPostText(replaceMention);
                 setInternalPostText(p_value);
                 inputRef?.focus();
@@ -158,6 +159,14 @@ export function CreatePostComponent(
                     allowedSpacesCount: 0,
                     textStyle: [styles.link, themeStyles.linkColor]
                 },
+                {
+                    trigger: '#',
+                    renderSuggestions: CloutTagSuggestionList,
+                    isBottomMentionSuggestionsRender: true,
+                    isInsertSpaceAfterMention: true,
+                    allowedSpacesCount: 0,
+                    textStyle: [styles.link, themeStyles.linkColor]
+                }
             ]}
         ></MentionInput>
         {

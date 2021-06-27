@@ -6,7 +6,6 @@ import { CloutTag } from '@types';
 import { NavigationProp } from '@react-navigation/native';
 
 interface Props {
-
     cloutTag: CloutTag;
     navigation: NavigationProp<any>;
 }

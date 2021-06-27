@@ -177,7 +177,6 @@ export interface CreatorCoinTransaction {
 }
 
 export interface CloutTag {
-    Index: number,
     clouttag: string;
     count: number;
 }
