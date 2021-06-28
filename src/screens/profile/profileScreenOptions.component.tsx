@@ -166,11 +166,12 @@ const styles = StyleSheet.create(
     {
         container: {
             flexDirection: 'row',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            marginBottom: 10,
         },
         followButton: {
             marginRight: 10,
-            marginBottom: 8,
         },
     }
 );

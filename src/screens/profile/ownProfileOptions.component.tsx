@@ -1,22 +1,69 @@
-import { settingsGlobals } from '@globals/settingsGlobals'
+import React from 'react';
+import { Linking, StyleSheet, Text, View } from 'react-native';
+import { settingsGlobals } from '@globals/settingsGlobals';
 import { NavigationProp } from '@react-navigation/native';
-import { themeStyles } from '@styles/globalColors'
-import React, { Component } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { themeStyles } from '@styles/globalColors';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
+import { snackbar } from '@services/snackbar';
+import Clipboard from 'expo-clipboard';
+import { eventManager } from '@globals/injector';
+import { EventType } from '@types';
 
 interface Props {
-    navigation: NavigationProp<any>
+    navigation: NavigationProp<any>;
+    publicKey: string;
+    username: string;
 }
 
-interface State {
+export default class OwnProfileOptionsComponent extends React.Component<Props> {
 
-}
+    private _isMounted = false;
 
-export class OwnProfileOptionsComponent extends Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        this.onOwnProfileOptionsClick = this.onOwnProfileOptionsClick.bind(this);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
     handleEditButtonPress = () => {
         this.props.navigation.navigate('EditProfile');
     }
+
+    async onOwnProfileOptionsClick() {
+        const options = ['Open in Browser', 'Copy Public Key', 'Cancel'];
+        const callback = async (p_optionIndex: number) => {
+            switch (p_optionIndex) {
+                case 0:
+                    Linking.openURL(`https://bitclout.com/u/${this.props.username}`);
+                    break;
+                case 1:
+                    Clipboard.setString(this.props.publicKey as string);
+                    snackbar.showSnackBar(
+                        {
+                            text: 'Public key copied to clipboard.'
+                        }
+                    );
+                    break;
+            }
+        }
+        eventManager.dispatchEvent(
+            EventType.ToggleActionSheet,
+            {
+                visible: true,
+                config: { options, callback, destructiveButtonIndex: [] }
+            }
+        );
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -34,32 +81,31 @@ export class OwnProfileOptionsComponent extends Component<Props, State> {
                         style={styles.optionButtonText}
                     >Edit Profile</Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={this.onOwnProfileOptionsClick}
+                >
+                    <Feather name="more-horizontal" size={24} color={themeStyles.fontColorMain.color} />
+                </TouchableOpacity>
             </View>
         )
     }
 }
-
-export default OwnProfileOptionsComponent;
-
 const styles = StyleSheet.create({
     container: {
-        display: 'flex',
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     optionButton: {
-        display: 'flex',
-        flexDirection: 'column',
         maxWidth: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 2,
-        paddingRight: 12,
-        paddingLeft: 12,
-        paddingTop: 6,
-        paddingBottom: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        marginHorizontal: 10,
         borderRadius: 4,
-        marginBottom: 8,
         backgroundColor: 'black',
     },
     optionButtonText: {

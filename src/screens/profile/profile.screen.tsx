@@ -475,7 +475,10 @@ export function ProfileScreen({ navigation, route }: any) {
                                             username={profile.Username}
                                         ></ProfileScreenOptionsComponent>
                                         :
-                                        <OwnProfileOptionsComponent navigation={navigation} />
+                                        <OwnProfileOptionsComponent
+                                            username={profile.Username}
+                                            publicKey={profile.PublicKeyBase58Check}
+                                            navigation={navigation} />
                                     :
                                     undefined
                             }
