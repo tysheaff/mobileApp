@@ -18,8 +18,8 @@ import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
-import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
+import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 
 const MessageStack = createStackNavigator();
 
@@ -168,8 +168,8 @@ export default function MessageStackScreen() {
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
-                name="PostStats"
-                component={PostStatsScreen}
+                name="PostStatsTabNavigator"
+                component={postStatsTabNavigator}
             />
 
             <MessageStack.Screen

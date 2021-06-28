@@ -1,5 +1,5 @@
-import { View, ActivityIndicator, FlatList } from 'react-native';
 import React from "react";
+import { ActivityIndicator, Text, StyleSheet, FlatList, View } from 'react-native';
 import { Profile, User } from "@types";
 import { api } from "@services";
 import { globals } from "@globals/globals";
@@ -48,9 +48,7 @@ export class PostRecloutStatsComponent extends React.Component<Props, State> {
             const user = await cache.user.getData();
             this.setFollowedByUserMap(user);
             await this.loadReclouters(false);
-        } catch {
-
-        }
+        } catch { }
     }
 
     setFollowedByUserMap(p_user: User) {
@@ -84,7 +82,6 @@ export class PostRecloutStatsComponent extends React.Component<Props, State> {
             if (profiles?.length > 0) {
                 for (const profile of profiles) {
                     profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
-
                 }
 
                 newProfiles.push(...profiles);
@@ -98,29 +95,48 @@ export class PostRecloutStatsComponent extends React.Component<Props, State> {
                 this.setState({ profiles: newProfiles, isLoading: false, isLoadingMore: false });
             }
 
-        } catch {
-        }
+        } catch { }
     }
 
     render() {
-        if (this.state.isLoading) {
-            return <View style={{ height: 200, justifyContent: 'center' }}>
-                <ActivityIndicator style={{ alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
-            </View>;
-        }
-
         const keyExtractor = (item: Profile, index: number) => item.PublicKeyBase58Check + index;
-        const renderItem = ({ item }: { item: Profile }) => <ProfileListCardComponent profile={item} isFollowing={!!this._followedByUserMap[item.PublicKeyBase58Check]}></ProfileListCardComponent>;
+        const renderItem = ({ item }: { item: Profile }) => <ProfileListCardComponent profile={item} isFollowing={!!this._followedByUserMap[item.PublicKeyBase58Check]} />;
+        const renderFooter = this.state.isLoadingMore && !this.state.isLoading
+            ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
+            : undefined;
 
-        return <FlatList
-            data={this.state.profiles}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            onEndReached={() => this.loadReclouters(true)}
-            onEndReachedThreshold={3}
-            maxToRenderPerBatch={20}
-            windowSize={20}
-            ListFooterComponent={this.state.isLoadingMore && !this.state.isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
-        />;
+        return <View style={[styles.container, themeStyles.containerColorMain]}>
+            {
+                this.state.isLoading
+                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    : this.state.profiles.length === 0
+                        ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No reclouts for this post yet</Text>
+                        : <FlatList
+                            data={this.state.profiles}
+                            keyExtractor={keyExtractor}
+                            renderItem={renderItem}
+                            onEndReached={() => this.loadReclouters(true)}
+                            onEndReachedThreshold={3}
+                            maxToRenderPerBatch={20}
+                            windowSize={20}
+                            ListFooterComponent={renderFooter}
+                        />
+            }
+        </View>
     }
 }
+const styles = StyleSheet.create(
+    {
+        container: {
+            flex: 1,
+        },
+        activityIndicator: {
+            marginTop: 100
+        },
+        emptyText: {
+            fontSize: 16,
+            textAlign: 'center',
+            marginTop: 40,
+        }
+    }
+);

@@ -1,7 +1,7 @@
 import { View, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Image, Text, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import React from "react";
-import { Profile, User } from "@types";
+import { Profile } from "@types";
 import { api } from "@services";
 import { globals } from "@globals/globals";
 import { themeStyles } from '@styles/globalColors';
@@ -98,11 +98,6 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
     }
 
     render() {
-        if (this.state.isLoading) {
-            return <View style={{ height: 200, justifyContent: 'center' }}>
-                <ActivityIndicator style={{ alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
-            </View>;
-        }
 
         const keyExtractor = (item: DiamondSender, index: number) => item.DiamondSenderProfile.PublicKeyBase58Check + index;
         const renderItem = ({ item }: { item: DiamondSender }) => <TouchableOpacity onPress={() => this.goToProfile(item.DiamondSenderProfile)} activeOpacity={1}>
@@ -128,23 +123,35 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
             </View>
         </TouchableOpacity>;
 
-        return <FlatList
-            data={this.state.diamondSenders}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            onEndReached={() => this.loadDiamondSenders(true)}
-            onEndReachedThreshold={3}
-            maxToRenderPerBatch={20}
-            windowSize={20}
-            ListFooterComponent={this.state.isLoadingMore && !this.state.isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
-        />;
+        const renderFooter = this.state.isLoadingMore && !this.state.isLoading
+            ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
+            : undefined;
+
+        return <View style={[styles.container, themeStyles.containerColorMain]}>
+            {
+                this.state.isLoading
+                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    : this.state.diamondSenders.length === 0
+                        ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No diamonds for this post yet</Text>
+                        : <FlatList
+                            data={this.state.diamondSenders}
+                            keyExtractor={keyExtractor}
+                            renderItem={renderItem}
+                            onEndReached={() => this.loadDiamondSenders(true)}
+                            onEndReachedThreshold={3}
+                            maxToRenderPerBatch={20}
+                            windowSize={20}
+                            ListFooterComponent={renderFooter}
+                        />
+            }
+        </View>
     }
 }
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
+        container: {
+            flex: 1,
         },
         diamondSenderCard: {
             display: 'flex',
@@ -188,6 +195,14 @@ const styles = StyleSheet.create(
             marginLeft: 10,
             fontSize: 18,
             fontWeight: '600'
-        }
+        },
+        activityIndicator: {
+            marginTop: 100
+        },
+        emptyText: {
+            fontSize: 16,
+            textAlign: 'center',
+            marginTop: 40,
+        },
     }
 );

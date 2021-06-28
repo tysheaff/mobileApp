@@ -1,4 +1,4 @@
-import { View, ActivityIndicator, FlatList } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, View, Text } from 'react-native';
 import React from "react";
 import { Post } from "@types";
 import { api } from "@services";
@@ -88,24 +88,45 @@ export class PostQuoteStatsComponent extends React.Component<Props, State> {
     }
 
     render() {
-        if (this.state.isLoading) {
-            return <View style={{ height: 200, justifyContent: 'center' }}>
-                <ActivityIndicator style={{ alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
-            </View>;
-        }
 
         const keyExtractor = (item: Post, index: number) => item.PostHashHex + index;
-        const renderItem = ({ item }: { item: Post }) => <PostComponent route={this.props.route} navigation={this.props.navigation} post={item}></PostComponent>;
+        const renderItem = ({ item }: { item: Post }) => <PostComponent route={this.props.route} navigation={this.props.navigation} post={item} />;
+        const renderFooter = this.state.isLoadingMore && !this.state.isLoading
+            ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
+            : undefined;
 
-        return <FlatList
-            data={this.state.posts}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            onEndReached={() => this.loadQuotes(true)}
-            onEndReachedThreshold={3}
-            maxToRenderPerBatch={5}
-            windowSize={8}
-            ListFooterComponent={this.state.isLoadingMore && !this.state.isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
-        />;
+        return <View style={[styles.container, themeStyles.containerColorMain]}>
+            {
+                this.state.isLoading
+                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    : this.state.posts.length === 0
+                        ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No quotes for this post yet</Text>
+                        : <FlatList
+                            data={this.state.posts}
+                            keyExtractor={keyExtractor}
+                            renderItem={renderItem}
+                            onEndReached={() => this.loadQuotes(true)}
+                            onEndReachedThreshold={3}
+                            maxToRenderPerBatch={5}
+                            windowSize={8}
+                            ListFooterComponent={renderFooter}
+                        />
+            }
+        </View>
     }
 }
+const styles = StyleSheet.create(
+    {
+        container: {
+            flex: 1,
+        },
+        activityIndicator: {
+            marginTop: 100
+        },
+        emptyText: {
+            fontSize: 16,
+            textAlign: 'center',
+            marginTop: 40,
+        }
+    }
+);

@@ -9,7 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
 import { globals } from '@globals';
-import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow, diamondAnimation } from '@services';
+import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow } from '@services';
 import { themeStyles } from '@styles';
 import { parseVideoLink } from '@services/videoLinkParser';
 import { PostOptionsComponent } from './postOptions.components';
@@ -74,7 +74,7 @@ export class PostComponent extends React.Component<Props, State> {
 
     private goToStats() {
         (this.props.navigation as any).push(
-            'PostStats',
+            'PostStatsTabNavigator',
             {
                 postHashHex: this.props.post.PostHashHex
             }

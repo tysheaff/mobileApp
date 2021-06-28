@@ -1,5 +1,5 @@
-import { View, ActivityIndicator, FlatList } from 'react-native';
 import React from "react";
+import { ActivityIndicator, FlatList, StyleSheet, View, Text } from 'react-native';
 import { Profile, User } from "@types";
 import { api } from "@services";
 import { globals } from "@globals/globals";
@@ -103,24 +103,45 @@ export class PostLikeStatsComponent extends React.Component<Props, State> {
     }
 
     render() {
-        if (this.state.isLoading) {
-            return <View style={{ height: 200, justifyContent: 'center' }}>
-                <ActivityIndicator style={{ alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
-            </View>;
-        }
-
         const keyExtractor = (item: Profile, index: number) => item.PublicKeyBase58Check + index;
-        const renderItem = ({ item }: { item: Profile }) => <ProfileListCardComponent profile={item} isFollowing={!!this._followedByUserMap[item.PublicKeyBase58Check]}></ProfileListCardComponent>;
+        const renderItem = ({ item }: { item: Profile }) => <ProfileListCardComponent profile={item} isFollowing={!!this._followedByUserMap[item.PublicKeyBase58Check]} />;
+        const renderFooter = this.state.isLoadingMore && !this.state.isLoading
+            ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
+            : undefined;
 
-        return <FlatList
-            data={this.state.profiles}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            onEndReached={() => this.loadLikers(true)}
-            onEndReachedThreshold={3}
-            maxToRenderPerBatch={20}
-            windowSize={20}
-            ListFooterComponent={this.state.isLoadingMore && !this.state.isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
-        />;
+        return <View style={[styles.container, themeStyles.containerColorMain]}>
+            {
+                this.state.isLoading
+                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    : this.state.profiles.length === 0
+                        ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No likes for this post yet</Text>
+                        : <FlatList
+                            data={this.state.profiles}
+                            keyExtractor={keyExtractor}
+                            renderItem={renderItem}
+                            onEndReached={() => this.loadLikers(true)}
+                            onEndReachedThreshold={3}
+                            maxToRenderPerBatch={20}
+                            windowSize={20}
+                            ListFooterComponent={renderFooter}
+                        />
+            }
+        </View>
     }
 }
+
+const styles = StyleSheet.create(
+    {
+        container: {
+            flex: 1,
+        },
+        activityIndicator: {
+            marginTop: 100
+        },
+        emptyText: {
+            fontSize: 16,
+            textAlign: 'center',
+            marginTop: 40,
+        }
+    }
+);

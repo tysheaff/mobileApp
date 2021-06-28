@@ -3,7 +3,7 @@ import { ActivityIndicator, View, StyleSheet, Text, Dimensions } from 'react-nat
 import { VictoryPie } from 'victory-native';
 import { PostStatsCard } from '@components/postStatsCard.components';
 import { calculateBitCloutInUSD, formatNumber, isNumber } from '@services';
-import { CreatorCoinHODLer, Post, Profile } from '@types';
+import { Post, Profile } from '@types';
 import { themeStyles } from '@styles';
 
 interface Stats {

@@ -16,10 +16,10 @@ import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { FeedSettingsScreen } from '@screens/feedSettings.screen';
-import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 import BlockedUsersScreen from '@screens/settings/blockedUsers.screen';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import { SavedPostsScreen } from '@screens/savedPosts/savedPosts.screen';
+import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 
 const ProfileStack = createStackNavigator();
 
@@ -184,8 +184,8 @@ export default function ProfileStackScreen() {
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
-                name="PostStats"
-                component={PostStatsScreen}
+                name="PostStatsTabNavigator"
+                component={postStatsTabNavigator}
             ></ProfileStack.Screen>
 
             <ProfileStack.Screen

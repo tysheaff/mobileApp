@@ -14,8 +14,8 @@ import { CreatePostScreen } from '@screens/createPost.screen';
 import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
-import { PostStatsScreen } from '@screens/postStats/postStats.screen';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
+import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 
 const WalletStack = createStackNavigator();
 
@@ -115,8 +115,8 @@ export default function WalletStackScreen() {
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
-                name="PostStats"
-                component={PostStatsScreen}
+                name="PostStatsTabNavigator"
+                component={postStatsTabNavigator}
             ></WalletStack.Screen>
 
             <WalletStack.Screen
