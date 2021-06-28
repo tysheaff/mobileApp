@@ -317,8 +317,8 @@ export function ProfileScreen({ navigation, route }: any) {
             p_response => {
                 const holders = p_response.Hodlers as CreatorCoinHODLer[] ?? [];
 
-                for(const holder of holders){
-                    if(holder.ProfileEntryResponse){
+                for (const holder of holders) {
+                    if (holder.ProfileEntryResponse) {
                         holder.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(holder.HODLerPublicKeyBase58Check);
                     }
                 }
@@ -339,7 +339,7 @@ export function ProfileScreen({ navigation, route }: any) {
         const response = await api.getProfileDiamonds(profile.PublicKeyBase58Check);
         const newDiamondSenders: DiamondSender[] = response.DiamondSenderSummaryResponses ?? [];
         for (const sender of newDiamondSenders) {
-            if(sender.ProfileEntryResponse){
+            if (sender.ProfileEntryResponse) {
                 sender.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(sender.SenderPublicKeyBase58Check);
             }
         }
@@ -404,8 +404,8 @@ export function ProfileScreen({ navigation, route }: any) {
             const holders = response.Hodlers as CreatorCoinHODLer[] ?? [];
 
             if (holders?.length > 0) {
-                for(const holder of holders){
-                    if(holder.ProfileEntryResponse){
+                for (const holder of holders) {
+                    if (holder.ProfileEntryResponse) {
                         holder.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(holder.HODLerPublicKeyBase58Check);
                     }
                 }
@@ -472,6 +472,7 @@ export function ProfileScreen({ navigation, route }: any) {
                                         <ProfileScreenOptionsComponent
                                             publicKey={profile.PublicKeyBase58Check}
                                             goToChat={goToChat}
+                                            username={profile.Username}
                                         ></ProfileScreenOptionsComponent>
                                         :
                                         <OwnProfileOptionsComponent navigation={navigation} />

@@ -41,7 +41,7 @@ export class PostOptionsComponent extends React.Component<Props> {
         const isPostSaved = !!cache.savedPosts.savedPosts[this.props.post.PostHashHex];
         const savePostText = isPostSaved ? 'Unsave Post' : 'Save Post';
 
-        const options = [savePostText, 'Copy Link', 'Copy Text', 'Report', 'Block User', 'Cancel'];
+        const options = [savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Report', 'Block User', 'Cancel'];
 
         const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
@@ -53,15 +53,18 @@ export class PostOptionsComponent extends React.Component<Props> {
                     }
                     break;
                 case 1:
-                    this.copyToClipBoard(true);
+                    Linking.openURL(`https://bitclout.com/posts/${this.props.post.PostHashHex}`);
                     break;
                 case 2:
-                    this.copyToClipBoard(false);
+                    this.copyToClipBoard(true);
                     break;
                 case 3:
-                    Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
+                    this.copyToClipBoard(false);
                     break;
                 case 4:
+                    Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
+                    break;
+                case 5:
                     const jwt = await signing.signJWT();
 
                     api.blockUser(globals.user.publicKey, this.props.post.ProfileEntryResponse.PublicKeyBase58Check, jwt as string, false).then(
@@ -88,7 +91,7 @@ export class PostOptionsComponent extends React.Component<Props> {
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [3, 4] }
+                config: { options, callback, destructiveButtonIndex: [4, 5] }
             }
         );
     }
@@ -97,7 +100,7 @@ export class PostOptionsComponent extends React.Component<Props> {
         const isPostSaved = !!cache.savedPosts.savedPosts[this.props.post.PostHashHex];
         const savePostText = isPostSaved ? 'Unsave Post' : 'Save Post';
 
-        const options = [savePostText, 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
+        const options = [savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
 
         const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
@@ -109,10 +112,13 @@ export class PostOptionsComponent extends React.Component<Props> {
                     }
                     break;
                 case 1:
-                    return this.copyToClipBoard(true);
+                    Linking.openURL(`https://bitclout.com/posts/${this.props.post.PostHashHex}`);
+                    break;
                 case 2:
-                    return this.copyToClipBoard(false);
+                    return this.copyToClipBoard(true);
                 case 3:
+                    return this.copyToClipBoard(false);
+                case 4:
                     if (this.props.post.Body || this.props.post.ImageURLs?.length > 0) {
                         this.props.navigation.navigate(
                             'CreatePost',
@@ -125,7 +131,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                         Alert.alert('Sorry!', 'You cannot edit a reclout, if it does not include a quote.');
                     }
                     break;
-                case 4:
+                case 5:
                     api.hidePost(
                         globals.user.publicKey,
                         this.props.post.PostHashHex,
@@ -161,7 +167,7 @@ export class PostOptionsComponent extends React.Component<Props> {
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [4] }
+                config: { options, callback, destructiveButtonIndex: [5] }
             }
         );
     }

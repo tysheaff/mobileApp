@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/core';
 import { Feather } from '@expo/vector-icons';
@@ -13,7 +13,7 @@ import NotificationSubscriptionComponent from '@screens/profile/notificationSubs
 import CloudFeedButton from '@components/cloutfeedButton.component'
 
 export function ProfileScreenOptionsComponent(
-    { publicKey, goToChat }: { publicKey: string, goToChat: () => void }
+    { publicKey, goToChat, username }: { publicKey: string, goToChat: () => void, username: string }
 ) {
     const navigation = useNavigation();
 
@@ -88,11 +88,14 @@ export function ProfileScreenOptionsComponent(
         const isUserBlocked = user?.BlockedPubKeys && !!user.BlockedPubKeys[publicKey];
         const blockOptionText = isUserBlocked ? 'Unblock User' : 'Block User';
 
-        const options = ['Copy Public Key', blockOptionText, 'Cancel'];
+        const options = ['Open in Browser', 'Copy Public Key', blockOptionText, 'Cancel'];
 
         const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
                 case 0:
+                    Linking.openURL(`https://bitclout.com/u/${username}`);
+                    break;
+                case 1:
                     Clipboard.setString(publicKey);
                     snackbar.showSnackBar(
                         {
@@ -100,7 +103,7 @@ export function ProfileScreenOptionsComponent(
                         }
                     );
                     return;
-                case 1:
+                case 2:
                     const jwt = await signing.signJWT();
                     api.blockUser(globals.user.publicKey, publicKey, jwt as string, isUserBlocked).then(
                         async () => {
@@ -132,7 +135,7 @@ export function ProfileScreenOptionsComponent(
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [1] }
+                config: { options, callback, destructiveButtonIndex: [2] }
             }
         );
     }
