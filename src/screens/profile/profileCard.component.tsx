@@ -191,6 +191,7 @@ export class ProfileCard extends React.Component<Props, State> {
 
                 <View style={styles.description}>
                     <TextWithLinks
+                        navigation={this.props.navigation}
                         isProfile
                         numberOfLines={5}
                         style={[styles.description, themeStyles.fontColorSub]}

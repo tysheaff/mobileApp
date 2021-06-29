@@ -221,6 +221,7 @@ export class PostComponent extends React.Component<Props, State> {
 
                         <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
                             <TextWithLinks
+                                navigation={this.props.navigation}
                                 numberOfLines={5}
                                 style={[styles.bodyText, themeStyles.fontColorMain]}
                                 text={this.props.post.Body?.trimEnd()}

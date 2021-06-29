@@ -1,18 +1,49 @@
-import { useNavigation } from '@react-navigation/core';
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, Linking } from 'react-native';
 import Autolink from 'react-native-autolink';
 import { themeStyles } from '@styles/globalColors';
+import { NavigationProp } from '@react-navigation/native';
 
-export function TextWithLinks({ text, style, numberOfLines, isProfile }: { text: string, style?: any[], numberOfLines?: number, isProfile?: boolean }) {
+interface Props {
+    navigation: NavigationProp<any>;
+    text: string;
+    style?: any[];
+    numberOfLines?: number;
+    isProfile?: boolean;
+}
 
-    const navigation = useNavigation();
-    style = style ? style : [];
+interface State {
+    textHidden: boolean;
+    numberOfLines: number | undefined;
+    showMoreButton: boolean;
+}
 
-    const [textHidden, setIsTextHidden] = useState<Boolean>(true);
-    const [lengthLimit, setLengthLimit] = useState<number>(0);
+export class TextWithLinks extends React.Component<Props, State>{
 
-    function onLinkPressed(p_url: string, p_match: any) {
+    private _textInit = false;
+
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            textHidden: true,
+            showMoreButton: false,
+            numberOfLines: this.props.numberOfLines != null ? this.props.numberOfLines + 1 : undefined
+        };
+
+        this.onLinkPressed = this.onLinkPressed.bind(this);
+        this.renderLink = this.renderLink.bind(this);
+        this.toggleText = this.toggleText.bind(this);
+        this.onTextLayout = this.onTextLayout.bind(this);
+    }
+
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+        return p_nextProps.text !== this.props.text ||
+            p_nextState.textHidden !== this.state.textHidden ||
+            p_nextState.showMoreButton !== this.state.showMoreButton;
+    }
+
+    onLinkPressed(p_url: string, p_match: any) {
         const linkType = p_match.getType();
 
         switch (linkType) {
@@ -23,10 +54,13 @@ export function TextWithLinks({ text, style, numberOfLines, isProfile }: { text:
                 if (isPostLink) {
                     const postHashHexStartIndex = p_url.indexOf(postLink) + postLink.length;
                     const postHashHex = p_url.slice(postHashHexStartIndex, postHashHexStartIndex + 64);
-                    (navigation as any).push('Post', {
-                        postHashHex: postHashHex,
-                        key: 'Post_' + postHashHex
-                    });
+                    (this.props.navigation as any).push(
+                        'Post',
+                        {
+                            postHashHex: postHashHex,
+                            key: 'Post_' + postHashHex
+                        }
+                    );
                 } else {
                     if (!p_url.startsWith('https://') && !p_url.startsWith('https://')) {
                         p_url = 'https://' + p_url;
@@ -36,21 +70,27 @@ export function TextWithLinks({ text, style, numberOfLines, isProfile }: { text:
                 break;
             case 'mention':
                 const userName = p_url.slice(1);
-                (navigation as any).push('UserProfile', {
-                    username: userName,
-                    navigateByUsername: true,
-                    key: 'Post_' + userName
-                });
+                (this.props.navigation as any).push(
+                    'UserProfile',
+                    {
+                        username: userName,
+                        navigateByUsername: true,
+                        key: 'Post_' + userName
+                    }
+                );
                 break;
             case 'hashtag':
-                return (navigation as any).push('CloutTagPosts', {
-                    cloutTag: p_match.hashtag,
-                    key: 'CloutTag_' + p_match.hashtag
-                });
+                return (this.props.navigation as any).push(
+                    'CloutTagPosts',
+                    {
+                        cloutTag: p_match.hashtag,
+                        key: 'CloutTag_' + p_match.hashtag
+                    }
+                );
         }
     }
 
-    function renderLink(p_text: string) {
+    renderLink(p_text: string) {
         const postLink = 'bitclout.com/posts/';
         const isPostLink = p_text.includes(postLink);
 
@@ -61,36 +101,64 @@ export function TextWithLinks({ text, style, numberOfLines, isProfile }: { text:
         }
     }
 
-    function toggleText() {
-        setIsTextHidden(!textHidden);
+    toggleText() {
+        const textHidden = !this.state.textHidden;
+        this.setState(
+            {
+                textHidden,
+                numberOfLines: textHidden ? this.props.numberOfLines : undefined
+            }
+        );
     }
 
-    function onTextLayout(e: any) {
-        setLengthLimit(e.nativeEvent.lines.length);
+    onTextLayout(e: any) {
+        if (this._textInit) {
+            return;
+        }
+
+        this._textInit = true;
+
+        const linesLength = e.nativeEvent.lines.length;
+        const showMoreButton = this.props.numberOfLines != null && linesLength > this.props.numberOfLines;
+
+        this.setState(
+            {
+                showMoreButton,
+                numberOfLines: showMoreButton ? this.props.numberOfLines : undefined
+            }
+        );
     }
 
-    return <>
-        <Autolink
-            style={style}
-            text={text}
-            onTextLayout={onTextLayout}
-            mention="twitter"
-            hashtag="twitter"
-            numberOfLines={textHidden ? numberOfLines : undefined}
-            renderLink={(text, match, index) => (
+    render() {
+        const style = this.props.style ? this.props.style : [];
+
+        return <>
+            <Autolink
+                style={style}
+                text={this.props.text}
+                onTextLayout={this.onTextLayout}
+                mention="twitter"
+                hashtag="twitter"
+                numberOfLines={this.state.numberOfLines}
+                renderLink={(text, match, index) => (
+                    <Text
+                        style={[styles.link, themeStyles.linkColor]}
+                        key={index}
+                        onPress={() => this.onLinkPressed(text, match)}
+                    >
+                        {this.renderLink(text)}
+
+                    </Text>
+                )}
+            />
+            {
+                this.state.showMoreButton &&
                 <Text
-                    style={[styles.link, themeStyles.linkColor]}
-                    key={index}
-                    onPress={() => onLinkPressed(text, match)}
-                >
-                    {renderLink(text)}
-
-                </Text>
-            )}
-        />
-        {lengthLimit > 4 && <Text onPress={toggleText} style={[themeStyles.linkColor, styles.readMore, isProfile && styles.isProfile]}>{textHidden ? 'Read More' : 'Read Less'}</Text>}
-    </>
-
+                    onPress={this.toggleText}
+                    style={[themeStyles.linkColor, styles.readMore, this.props.isProfile && styles.isProfile]}
+                >{this.state.textHidden ? 'Read More' : 'Read Less'}</Text>}
+        </>
+    }
 }
 
 const styles = StyleSheet.create(

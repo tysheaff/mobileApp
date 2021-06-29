@@ -34,7 +34,7 @@ export default class postStatsTabNavigator extends React.Component<Props> {
                     indicatorStyle: { backgroundColor: themeStyles.fontColorMain.color },
                     tabStyle: { marginTop: 0 },
                     activeTintColor: themeStyles.fontColorMain.color,
-                    labelStyle: { fontWeight: '600', textTransform: 'none' },
+                    labelStyle: { fontWeight: 'bold', textTransform: 'none' },
                     inactiveTintColor: themeStyles.fontColorSub.color,
                 }}
                 initialRouteName={'Likes'}
