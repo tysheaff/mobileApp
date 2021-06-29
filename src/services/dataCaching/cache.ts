@@ -3,6 +3,7 @@ import { CacheableObject } from "./cacheableObject";
 import { globals } from "@globals";
 import { User } from "@types";
 import { SavedPostsCache } from "./savedPostsCache";
+import { cloutApi } from "@services/api/cloutApi";
 
 const loggedInUserCacheableObject = new CacheableObject<User>(
     () => api.getProfile([globals.user.publicKey]),
@@ -53,16 +54,24 @@ interface Cache {
     addFollower: (publicKey: string) => void;
     removeFollower: (publicKey: string) => void;
     savedPosts: SavedPostsCache;
+    pinnedPost: CacheableObject<{ postHashHex: string }>;
 }
 
 export let cache: Cache;
+
+const pinnedPostCacheableObject = new CacheableObject<{ postHashHex: string }>(
+    () => cloutApi.getPinnedPost(globals.user.publicKey),
+    p_response => p_response,
+    600
+);
 
 export function initCache() {
     cache = {
         user: loggedInUserCacheableObject,
         addFollower: addFollower,
         removeFollower: removeFollower,
-        savedPosts: new SavedPostsCache()
+        savedPosts: new SavedPostsCache(),
+        pinnedPost: pinnedPostCacheableObject
     };
 }
 

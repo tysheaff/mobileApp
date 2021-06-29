@@ -12,7 +12,6 @@ var rs = require("jsrsasign");
 var JWS = rs.jws.JWS;
 
 var header = { alg: "ES256", typ: "JWT" };
-var payload = { expire: "60" };
 
 async function getSeedHex(): Promise<string> {
     const publicKey = globals.user.publicKey;

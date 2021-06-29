@@ -96,29 +96,39 @@ export class PostOptionsComponent extends React.Component<Props> {
         );
     }
 
-    private showOwnPostOptions() {
+    private async showOwnPostOptions() {
         const isPostSaved = !!cache.savedPosts.savedPosts[this.props.post.PostHashHex];
         const savePostText = isPostSaved ? 'Unsave Post' : 'Save Post';
 
-        const options = [savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
+        const pinnedPost = await cache.pinnedPost.getData();
+        const isPostPinned = pinnedPost?.postHashHex === this.props.post.PostHashHex;
+        const pinPostText = isPostPinned ? 'Unpin from Profile' : 'Pin to Profile';
+        const options = [pinPostText, savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
 
         const callback = async (p_optionIndex: number) => {
             switch (p_optionIndex) {
                 case 0:
+                    if (isPostPinned) {
+                        this.unpinPost();
+                    } else {
+                        this.pinPost();
+                    }
+                    break;
+                case 1:
                     if (isPostSaved) {
                         await this.unsavePost();
                     } else {
                         await this.savePost();
                     }
                     break;
-                case 1:
+                case 2:
                     Linking.openURL(`https://bitclout.com/posts/${this.props.post.PostHashHex}`);
                     break;
-                case 2:
-                    return this.copyToClipBoard(true);
                 case 3:
-                    return this.copyToClipBoard(false);
+                    return this.copyToClipBoard(true);
                 case 4:
+                    return this.copyToClipBoard(false);
+                case 5:
                     if (this.props.post.Body || this.props.post.ImageURLs?.length > 0) {
                         this.props.navigation.navigate(
                             'CreatePost',
@@ -131,7 +141,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                         Alert.alert('Sorry!', 'You cannot edit a reclout, if it does not include a quote.');
                     }
                     break;
-                case 5:
+                case 6:
                     api.hidePost(
                         globals.user.publicKey,
                         this.props.post.PostHashHex,
@@ -167,7 +177,7 @@ export class PostOptionsComponent extends React.Component<Props> {
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [5] }
+                config: { options, callback, destructiveButtonIndex: [6] }
             }
         );
     }
@@ -204,6 +214,36 @@ export class PostOptionsComponent extends React.Component<Props> {
             message = 'Post has been unsaved';
             const event: UnsavePostEvent = { post: this.props.post };
             eventManager.dispatchEvent(EventType.UnsavePost, event);
+        } catch {
+            message = 'Something went wrong';
+        }
+
+        snackbar.showSnackBar({ text: message });
+    }
+
+    private async unpinPost() {
+        const jwt = await signing.signJWT();
+        let message = '';
+
+        try {
+            await cloutApi.unpinPost(globals.user.publicKey, jwt, this.props.post.PostHashHex);
+            cache.pinnedPost.getData(true);
+            message = 'Post has been unpinned';
+        } catch {
+            message = 'Something went wrong';
+        }
+
+        snackbar.showSnackBar({ text: message });
+    }
+
+    private async pinPost() {
+        const jwt = await signing.signJWT();
+        let message = '';
+
+        try {
+            await cloutApi.pinPost(globals.user.publicKey, jwt, this.props.post.PostHashHex);
+            cache.pinnedPost.getData(true);
+            message = 'Post has been pinned';
         } catch {
             message = 'Something went wrong';
         }

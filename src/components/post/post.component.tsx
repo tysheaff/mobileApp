@@ -2,10 +2,9 @@ import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { Post } from '../../types';
 import { Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
 import WebView from 'react-native-webview';
 import { NavigationProp } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
 import { globals } from '@globals';
@@ -24,7 +23,8 @@ interface Props {
     actionsDisabled?: boolean,
     hideBottomBorder?: boolean,
     recloutedPostIndex?: number,
-    isParentPost?: boolean
+    isParentPost?: boolean;
+    isPinned?: boolean;
 }
 
 interface State {
@@ -204,6 +204,11 @@ export class PostComponent extends React.Component<Props, State> {
                                 </View>
 
                                 <View style={styles.headerRightContainer}>
+                                    {
+                                        this.props.isPinned &&
+                                        <Entypo style={{ marginRight: 6 }} name="pin" size={16} color={themeStyles.fontColorMain.color} />
+                                    }
+
                                     <View style={[styles.coinPriceContainer, themeStyles.chipColor]}>
                                         <Text style={[styles.coinPriceText, themeStyles.fontColorMain]}>
                                             ${this.state.coinPrice}
@@ -213,7 +218,6 @@ export class PostComponent extends React.Component<Props, State> {
                                     {
                                         !this.state.actionsDisabled &&
                                         <PostOptionsComponent navigation={this.props.navigation} route={this.props.route} post={this.props.post} />
-
                                     }
                                 </View>
                             </View>

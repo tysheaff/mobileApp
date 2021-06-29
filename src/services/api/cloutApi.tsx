@@ -78,11 +78,43 @@ const unsavePost = (publicKey: string, jwt: string, postHashHex: string) => {
     );
 }
 
+const getPinnedPost = (publicKey: string) => {
+    const route = `pinned-posts/${publicKey}`;
+    return get(route);
+}
+
+const pinPost = (publicKey: string, jwt: string, postHashHex: string) => {
+    const route = `pinned-posts/pin`;
+    return post(
+        route,
+        {
+            publicKey,
+            jwt,
+            postHashHex
+        }
+    );
+}
+
+const unpinPost = (publicKey: string, jwt: string, postHashHex: string) => {
+    const route = `pinned-posts/unpin`;
+    return post(
+        route,
+        {
+            publicKey,
+            jwt,
+            postHashHex
+        }
+    );
+}
+
 export const cloutApi = {
     getTrendingClouts,
     searchCloutTags,
     getCloutTagPosts,
     getSavedPosts,
     savePost,
-    unsavePost
+    unsavePost,
+    getPinnedPost,
+    pinPost,
+    unpinPost
 };

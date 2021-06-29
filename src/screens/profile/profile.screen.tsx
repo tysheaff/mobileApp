@@ -14,6 +14,7 @@ import { DiamondSenderComponent } from './diamondSender.component';
 import { PostComponent } from '@components/post/post.component';
 import OwnProfileOptionsComponent from './ownProfileOptions.component';
 import { useFocusEffect } from '@react-navigation/core';
+import { cloutApi } from '@services/api/cloutApi';
 
 enum ProfileScreenTab {
     Posts = 'Posts',
@@ -45,6 +46,7 @@ export function ProfileScreen({ navigation, route }: any) {
     const [selectedTab, setSelectedTab] = useState<ProfileScreenTab>(ProfileScreenTab.Posts);
     const [sections, setSections] = useState<any>({});
     const sectionListRef = useRef(null);
+    const pinnedPostHashHex = useRef('');
 
     let mount = true;
     let reload = { posts: () => { }, creatorCoin: () => { }, stats: () => { } };
@@ -154,10 +156,13 @@ export function ProfileScreen({ navigation, route }: any) {
                     for (const post of profile.Posts) {
                         post.ProfileEntryResponse = getProfileCopy(profile);
                     }
-                    setProfile(p_responses[1]);
-                    setSelectedTab(ProfileScreenTab.Posts);
-                    configureSections(p_responses[1], ProfileScreenTab.Posts);
-                    setLoading(false);
+
+                    if (mount) {
+                        setProfile(profile);
+                        setSelectedTab(ProfileScreenTab.Posts);
+                        configureSections(profile, ProfileScreenTab.Posts);
+                        setLoading(false);
+                    }
                 }
             }
         ).catch(p_error => globals.defaultHandleError(p_error));
@@ -182,7 +187,28 @@ export function ProfileScreen({ navigation, route }: any) {
     async function loadPosts() {
         const response = await api.getProfilePostsBatch(globals.user.publicKey, username, 10);
         let posts = response.Posts as Post[] ?? [];
-        posts = posts.filter(p_post => !p_post.IsHidden);
+
+        let publicKey = route.params?.publicKey;
+        if (!publicKey) {
+            publicKey = globals.user.publicKey;
+        }
+
+        try {
+            const pinnedPost = await cloutApi.getPinnedPost(publicKey);
+            if (pinnedPost?.postHashHex) {
+                pinnedPostHashHex.current = pinnedPost?.postHashHex;
+                const post = await api.getSinglePost(globals.user.publicKey, pinnedPost.postHashHex, false, 0, 0);
+                if (post?.PostFound) {
+                    posts.unshift(post.PostFound);
+                }
+            } else {
+                pinnedPostHashHex.current = '';
+            }
+        } catch {
+            pinnedPostHashHex.current = '';
+        }
+
+        posts = posts.filter((p_post, p_index) => !p_post.IsHidden && (p_post.PostHashHex !== pinnedPostHashHex.current || p_index === 0));
         return posts;
     }
 
@@ -193,7 +219,11 @@ export function ProfileScreen({ navigation, route }: any) {
         if (p_selectedTab === ProfileScreenTab.Posts) {
             if (p_profile.Posts?.length > 0) {
                 tabData = p_profile.Posts;
-                renderItem = ({ item }: any) => <PostComponent route={route} navigation={navigation} post={item}></PostComponent>
+                renderItem = ({ item }: { item: Post }) => <PostComponent
+                    route={route}
+                    navigation={navigation}
+                    post={item}
+                    isPinned={item.PostHashHex === pinnedPostHashHex.current}></PostComponent>
             } else {
                 renderItem = ({ item }: any) => <View style={styles.noPostsContainer}>
                     <Text style={[styles.noPostsText, themeStyles.fontColorSub]}>No posts yet</Text>
@@ -387,7 +417,7 @@ export function ProfileScreen({ navigation, route }: any) {
                 for (const post of newPosts) {
                     post.ProfileEntryResponse = getProfileCopy(profile);
                 }
-                newPosts = newPosts.filter(p_post => !p_post.IsHidden);
+                newPosts = newPosts.filter(p_post => !p_post.IsHidden && p_post.PostHashHex !== pinnedPostHashHex.current);
                 profile.Posts = profile.Posts.concat(newPosts);
             } else {
                 if (mount) {
