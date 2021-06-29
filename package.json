@@ -48,7 +48,6 @@
     "react-native-gesture-handler": "~1.8.0",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-modal": "^11.10.0",
-    "react-native-read-more-text": "^1.1.2",
     "react-native-reanimated": "~1.13.0",
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "~2.15.2",
@@ -64,7 +63,6 @@
     "@types/react": "~16.9.35",
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",
-    "@types/react-native-read-more-text": "^1.0.0",
     "typescript": "~4.0.0"
   },
   "private": true

@@ -9,7 +9,6 @@ import { api, cache, formatNumber } from '@services';
 import { eventManager, globals, settingsGlobals } from '@globals';
 import { ChangeFollowersEvent, EventType, Profile, User } from '@types';
 import { themeStyles } from '@styles';
-import ReadMore from "react-native-read-more-text";
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -165,28 +164,6 @@ export class ProfileCard extends React.Component<Props, State> {
         );
     }
 
-    private renderTruncatedText = (handlePress: any) => {
-        return (
-            <Text
-                style={[styles.description, themeStyles.linkColor]}
-                onPress={handlePress}
-            >
-                Read more
-            </Text>
-        );
-    };
-
-    private renderRevealedText = (handlePress: any) => {
-        return (
-            <Text
-                style={[styles.description, themeStyles.linkColor]}
-                onPress={handlePress}
-            >
-                Show less
-            </Text>
-        );
-    };
-
     render() {
         return (
             <View style={[styles.container, themeStyles.containerColorMain, themeStyles.shadowColor]}>
@@ -213,16 +190,12 @@ export class ProfileCard extends React.Component<Props, State> {
                 </View>
 
                 <View style={styles.description}>
-                    <ReadMore
+                    <TextWithLinks
+                        isProfile
                         numberOfLines={5}
-                        renderTruncatedFooter={this.renderTruncatedText}
-                        renderRevealedFooter={this.renderRevealedText}
-                    >
-                        <TextWithLinks
-                            style={[styles.description, themeStyles.fontColorSub]}
-                            text={this.props.profile.Description}
-                        ></TextWithLinks>
-                    </ReadMore>
+                        style={[styles.description, themeStyles.fontColorSub]}
+                        text={this.props.profile.Description}
+                    />
                 </View>
 
                 <View style={styles.infoContainer}>
