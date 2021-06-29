@@ -22,8 +22,7 @@ export function TextWithLinks({ text, style, numberOfLines, isProfile }: { text:
 
                 if (isPostLink) {
                     const postHashHexStartIndex = p_url.indexOf(postLink) + postLink.length;
-                    const postHashHex = p_url.slice(postHashHexStartIndex);
-
+                    const postHashHex = p_url.slice(postHashHexStartIndex, postHashHexStartIndex + 64);
                     (navigation as any).push('Post', {
                         postHashHex: postHashHex,
                         key: 'Post_' + postHashHex
