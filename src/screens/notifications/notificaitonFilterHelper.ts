@@ -28,13 +28,18 @@ function checkMention(p_notification: Notification, p_posts: any): boolean {
         } else {
             return true;
         }
+    } else if (post.RecloutedPostEntryResponse.ProfileEntryResponse?.PublicKeyBase58Check !== globals.user.publicKey) {
+        return true;
     }
+
     return false;
 }
 
 function checkRecloutNotification(p_notification: Notification, p_posts: any): boolean {
     const postHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.PostHashBeingModifiedHex as string;
-    return !!p_posts[postHashHex]?.RecloutedPostEntryResponse;
+    const post: Post = p_posts[postHashHex];
+    return !!post?.RecloutedPostEntryResponse &&
+        post.RecloutedPostEntryResponse.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey;
 }
 
 function checkCreatorCoinTransfer(p_notification: Notification, p_diamond: boolean): boolean {

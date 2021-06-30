@@ -242,15 +242,19 @@ export class NotificationsScreen extends React.Component<Props, State> {
         }
 
         if (post.RecloutedPostEntryResponse) {
-            return <PostRecloutNotificationComponent
-                post={post}
-                notification={p_notification}
-                goToPost={this.goToPost}
-                styles={styles}
-                goToProfile={this.goToProfile}
-                profile={profile}
-                postHashHex={postHashHex}
-            />
+            if (post.RecloutedPostEntryResponse.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey) {
+                return <PostRecloutNotificationComponent
+                    post={post}
+                    notification={p_notification}
+                    goToPost={this.goToPost}
+                    styles={styles}
+                    goToProfile={this.goToProfile}
+                    profile={profile}
+                    postHashHex={postHashHex}
+                />;
+            } else {
+                return this.renderPostMentionNotification(p_notification, false);
+            }
         } else {
             const parentPostHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.ParentPostHashHex;
 
