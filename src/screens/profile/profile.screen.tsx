@@ -144,14 +144,14 @@ export function ProfileScreen({ navigation, route }: any) {
         Promise.all(
             [
                 loadTickersAndExchangeRate(),
-                loadSingleProfile(),
-                loadPosts()
+                loadSingleProfile()
             ]
         ).then(
-            p_responses => {
+            async p_responses => {
                 if (mount) {
                     const profile = p_responses[1];
-                    profile.Posts = p_responses[2];
+                    const posts = await loadPosts(profile.PublicKeyBase58Check);
+                    profile.Posts = posts;
 
                     for (const post of profile.Posts) {
                         post.ProfileEntryResponse = getProfileCopy(profile);
@@ -184,14 +184,9 @@ export function ProfileScreen({ navigation, route }: any) {
         return newProfile;
     }
 
-    async function loadPosts() {
+    async function loadPosts(publicKey: string) {
         const response = await api.getProfilePostsBatch(globals.user.publicKey, username, 10);
         let posts = response.Posts as Post[] ?? [];
-
-        let publicKey = route.params?.publicKey;
-        if (!publicKey) {
-            publicKey = globals.user.publicKey;
-        }
 
         try {
             const pinnedPost = await cloutApi.getPinnedPost(publicKey);
