@@ -43,7 +43,11 @@ export class TextWithLinks extends React.Component<Props, State>{
             p_nextState.showMoreButton !== this.state.showMoreButton;
     }
 
-    onLinkPressed(p_url: string, p_match: any) {
+    private processUsername(username: string): String {
+        return username.replace(/[^\w]|_/g, '');
+    }
+
+    private onLinkPressed(p_url: string, p_match: any) {
         const linkType = p_match.getType();
 
         switch (linkType) {
@@ -69,7 +73,7 @@ export class TextWithLinks extends React.Component<Props, State>{
                 }
                 break;
             case 'mention':
-                const userName = p_url.slice(1);
+                const userName = this.processUsername(p_url.slice(1));
                 (this.props.navigation as any).push(
                     'UserProfile',
                     {
@@ -90,7 +94,7 @@ export class TextWithLinks extends React.Component<Props, State>{
         }
     }
 
-    renderLink(p_text: string) {
+    private renderLink(p_text: string) {
         const postLink = 'bitclout.com/posts/';
         const isPostLink = p_text.includes(postLink);
 
@@ -101,7 +105,7 @@ export class TextWithLinks extends React.Component<Props, State>{
         }
     }
 
-    toggleText() {
+    private toggleText() {
         const textHidden = !this.state.textHidden;
         this.setState(
             {
@@ -111,7 +115,7 @@ export class TextWithLinks extends React.Component<Props, State>{
         );
     }
 
-    onTextLayout(e: any) {
+    private onTextLayout(e: any) {
         if (this._textInit) {
             return;
         }
