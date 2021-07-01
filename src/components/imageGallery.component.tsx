@@ -33,9 +33,12 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
     useEffect(
         () => {
             selectedImageIndex = selectedImageIndex != null ? selectedImageIndex : 0;
-            setInternalIndex(selectedImageIndex);
-            if (scrollRef.current) {
-                (scrollRef.current as any).scrollTo({ x: Dimensions.get('window').width * selectedImageIndex });
+
+            if (mount) {
+                setInternalIndex(selectedImageIndex);
+                if (scrollRef.current) {
+                    (scrollRef.current as any).scrollTo({ x: Dimensions.get('window').width * selectedImageIndex });
+                }
             }
         },
         [selectedImageIndex]

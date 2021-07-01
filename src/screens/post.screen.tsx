@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text, View, StyleSheet, SectionList } from 'react-native';
 import { themeStyles } from '@styles';
 import { globals } from '@globals';
@@ -14,6 +14,7 @@ export function PostScreen({ route, navigation }: any) {
     const [isLoadingMore, setLoadingMore] = useState(false);
     const [commentIndex, setCommentIndex] = useState(0);
     const [sections, setSections] = useState<any>({});
+    const noMoreData = useRef(false);
 
     let mount = true;
 
@@ -114,14 +115,14 @@ export function PostScreen({ route, navigation }: any) {
             }
 
             if (mount) {
-                let _parentPosts = p_response?.PostFound?.ParentPosts as Post[] || [];
-                setParentPosts(_parentPosts);
+                const parentPosts = p_response?.PostFound?.ParentPosts as Post[] || [];
+                setParentPosts(parentPosts);
                 setPost(backendPost);
                 setCommentIndex(backendPost.Comments ? backendPost.Comments.length : 0);
                 const sections = [
                     {
                         parentPost: true,
-                        data: _parentPosts
+                        data: parentPosts
                     },
                     {
                         headerPost: true,
@@ -139,7 +140,13 @@ export function PostScreen({ route, navigation }: any) {
     }
 
     function loadMoreComments() {
-        setLoadingMore(true);
+        if (isLoadingMore || noMoreData.current) {
+            return;
+        }
+
+        if (mount) {
+            setLoadingMore(true);
+        }
         api.getSinglePost(globals.user.publicKey, postHashHex, false, commentIndex, 20).then(
             p_response => {
                 const backendPost = p_response.PostFound as Post;
@@ -168,8 +175,9 @@ export function PostScreen({ route, navigation }: any) {
                         setSections(sections);
                         setCommentIndex(newComments.length);
                     }
+                } else {
+                    noMoreData.current = true;
                 }
-
             }
         ).catch(
             p_response => globals.defaultHandleError(p_response)
@@ -209,10 +217,8 @@ export function PostScreen({ route, navigation }: any) {
                     }
                 }
                 onEndReached={loadMoreComments}
+                ListFooterComponent={isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
             />
-            {
-                isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined
-            }
         </View >
 
 }

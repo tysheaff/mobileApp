@@ -109,18 +109,16 @@ const TabBar = ({ state, navigation }: any) => {
         if (selectedTab === p_screenName) {
             if (selectedTab === 'HomeStack' && (focusedRouteName === 'Home' || focusedRouteName === undefined)) {
                 navigatorGlobals.refreshHome();
+            } else if (p_screenName === 'NotificationStack' && (focusedRouteName === 'Notifications' || focusedRouteName === undefined)) {
+                navigatorGlobals.refreshNotifications();
+            } else if (p_screenName === 'WalletStack' && (focusedRouteName === 'Wallet' || focusedRouteName === undefined)) {
+                navigatorGlobals.refreshWallet();
+            } else if (p_screenName === 'ProfileStack' && (focusedRouteName === 'Profile' || focusedRouteName === undefined)) {
+                navigatorGlobals.refreshProfile();
             }
             navigation.navigate(selectedTab, { screen: firstScreen[selectedTab] });
         } else {
             navigation.navigate(p_screenName);
-        }
-
-        if (p_screenName === 'NotificationStack' && (focusedRouteName === 'Notifications' || focusedRouteName === undefined)) {
-            navigatorGlobals.refreshNotifications();
-        } else if (p_screenName === 'WalletStack' && (focusedRouteName === 'Wallet' || focusedRouteName === undefined)) {
-            navigatorGlobals.refreshWallet();
-        } else if (p_screenName === 'ProfileStack' && (focusedRouteName === 'Profile' || focusedRouteName === undefined)) {
-            navigatorGlobals.refreshProfile();
         }
     }
 

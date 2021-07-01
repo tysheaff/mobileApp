@@ -35,7 +35,6 @@ interface State {
     refreshing: boolean;
     isLoadingMore: boolean;
     lastNotificationIndex: number;
-    init: boolean;
     filter: NotificationsFilter | undefined;
     showFilter: boolean;
     filterSet: boolean;
@@ -44,8 +43,10 @@ interface State {
 
 export class NotificationsScreen extends React.Component<Props, State> {
 
+    private _flatListRef: React.RefObject<FlatList>;
+    private _currentScrollPosition: number = 0;
     private _lastLoadMoreId: number = -1;
-    private _isMounted = true;
+    private _isMounted = false;
 
     private _subscriptions: (() => void)[] = [];
 
@@ -61,7 +62,6 @@ export class NotificationsScreen extends React.Component<Props, State> {
             refreshing: false,
             isLoadingMore: false,
             lastNotificationIndex: -999,
-            init: false,
             filter: undefined,
             showFilter: false,
             filterSet: false,
@@ -71,6 +71,16 @@ export class NotificationsScreen extends React.Component<Props, State> {
         this._subscriptions.push(
             eventManager.addEventListener(EventType.ToggleNotificationsFilter, this.toggleNotificationsFilter.bind(this))
         );
+
+        this._flatListRef = React.createRef();
+        this.initScreen();
+        navigatorGlobals.refreshNotifications = () => {
+            if (this._currentScrollPosition > 0 || !this._flatListRef.current) {
+                (this._flatListRef.current as any)?.scrollToOffset({ animated: true, offset: 0 });
+            } else {
+                this.loadNotifications(false);
+            }
+        };
 
         this.loadNotifications = this.loadNotifications.bind(this);
         this.loadMoreNotifications = this.loadMoreNotifications.bind(this);
@@ -84,8 +94,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        this.setState({ init: true });
-        this.initScreen();
+        this._isMounted = true;
     }
 
     componentWillUnmount() {
@@ -108,16 +117,19 @@ export class NotificationsScreen extends React.Component<Props, State> {
         }
 
         this.setState({ showFilter: showFilter === 'true', filter });
-        this.loadNotifications(true);
+        this.loadNotifications();
     }
 
-    loadNotifications(p_force = false) {
-        if (!this.state.init && !p_force) {
-            return;
-        }
-
+    loadNotifications(p_showLoading = true) {
         if (this._isMounted) {
-            this.setState({ isLoading: true, isLoadingMore: false, noMoreNotifications: false, notifications: [], filteredNotifications: [] });
+            this.setState(
+                {
+                    isLoading: p_showLoading,
+                    isLoadingMore: false,
+                    noMoreNotifications: false,
+                    refreshing: !p_showLoading
+                }
+            );
         }
 
         this._lastLoadMoreId = Math.floor(Math.random() * 1000);
@@ -436,8 +448,6 @@ export class NotificationsScreen extends React.Component<Props, State> {
     }
 
     render() {
-        navigatorGlobals.refreshNotifications = this.loadNotifications;
-
         const keyExtractor = (item: any, index: number) => item.Index?.toString() + index.toString();
         return this.state.isLoading ?
             <CloutFeedLoader />
@@ -457,6 +467,8 @@ export class NotificationsScreen extends React.Component<Props, State> {
                             undefined
                     }
                     <FlatList
+                        ref={this._flatListRef}
+                        onMomentumScrollEnd={(p_event: any) => this._currentScrollPosition = p_event.nativeEvent.contentOffset.y}
                         data={this.state.filterSet ? this.state.filteredNotifications : this.state.notifications}
                         keyExtractor={keyExtractor}
                         renderItem={({ item }) => this.renderNotification(item)}
@@ -468,7 +480,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                             tintColor={themeStyles.fontColorMain.color}
                             titleColor={themeStyles.fontColorMain.color}
                             refreshing={this.state.refreshing}
-                            onRefresh={this.loadNotifications} />}
+                            onRefresh={() => this.loadNotifications(false)} />}
                         ListFooterComponent={() => this.state.isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : <View></View>}
 
                     />

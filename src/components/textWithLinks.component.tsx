@@ -21,6 +21,7 @@ interface State {
 export class TextWithLinks extends React.Component<Props, State>{
 
     private _textInit = false;
+    private _isMounted = false;
 
     constructor(props: Props) {
         super(props);
@@ -35,6 +36,14 @@ export class TextWithLinks extends React.Component<Props, State>{
         this.renderLink = this.renderLink.bind(this);
         this.toggleText = this.toggleText.bind(this);
         this.onTextLayout = this.onTextLayout.bind(this);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
@@ -125,12 +134,14 @@ export class TextWithLinks extends React.Component<Props, State>{
         const linesLength = e.nativeEvent.lines.length;
         const showMoreButton = this.props.numberOfLines != null && linesLength > this.props.numberOfLines;
 
-        this.setState(
-            {
-                showMoreButton,
-                numberOfLines: showMoreButton ? this.props.numberOfLines : undefined
-            }
-        );
+        if (this._isMounted) {
+            this.setState(
+                {
+                    showMoreButton,
+                    numberOfLines: showMoreButton ? this.props.numberOfLines : undefined
+                }
+            );
+        }
     }
 
     render() {

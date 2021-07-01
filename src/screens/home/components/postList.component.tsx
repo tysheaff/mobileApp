@@ -42,6 +42,7 @@ export class PostListComponent extends React.Component<Props, State> {
     private _flatListRef: React.RefObject<FlatList>;
     private _postsCountPerLoad = 10;
     private _currentScrollPosition: number = 0;
+    private _noMoreData = false;
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -58,7 +59,7 @@ export class PostListComponent extends React.Component<Props, State> {
             if (this._currentScrollPosition > 0 || !this._flatListRef.current) {
                 (this._flatListRef.current as any)?.scrollToOffset({ animated: true, offset: 0 });
             } else {
-                this.refresh();
+                this.refresh(false);
             }
         };
 
@@ -110,57 +111,29 @@ export class PostListComponent extends React.Component<Props, State> {
         };
     };
 
-    async refresh() {
-        if (this._isMounted) {
+    async refresh(p_showLoading = true) {
+        if (this._isMounted && p_showLoading) {
             this.setState({ isLoading: true });
+        } else if (this._isMounted) {
+            this.setState({ isRefreshing: true });
         }
 
+        this._currentScrollPosition = 0;
+        this._noMoreData = false;
         await loadTickersAndExchangeRate();
         await this.loadPosts(false);
     };
 
-    async processPosts(p_posts: Post[]): Promise<Post[]> {
-        let posts: Post[] = [];
-
-        if (posts) {
-            const user = await cache.user.getData();
-            const blockedUsers = user?.BlockedPubKeys ? user.BlockedPubKeys : [];
-            posts = p_posts.filter(
-                p_post => !!p_post.ProfileEntryResponse &&
-                    !p_post.IsHidden &&
-                    !blockedUsers[p_post.ProfileEntryResponse.PublicKeyBase58Check] &&
-                    !blockedUsers[p_post.RecloutedPostEntryResponse?.ProfileEntryResponse?.PublicKeyBase58Check]
-            );
-        }
-        return posts;
-    };
-
-    async getPinnedPost(): Promise<Post | undefined> {
-        let post: Post | undefined = undefined;
-
-        try {
-            const response = await cloutFeedApi.getPinnedPost();
-            const pinnedPost = response.pinnedPost;
-            if (pinnedPost) {
-                const postResponse = await api.getSinglePost(globals.user.publicKey, pinnedPost, false, 0, 0);
-                post = postResponse?.PostFound as Post;
-            }
-
-        } catch { }
-
-        return post;
-    };
-
-    async loadPosts(p_loadMore: boolean) {
-        if (this.state.isLoadingMore) {
+    private async loadPosts(p_loadMore: boolean) {
+        if (this.state.isLoadingMore || this._noMoreData) {
             return;
         }
 
         if (this._isMounted) {
-            this.setState({ isLoading: !p_loadMore, isLoadingMore: p_loadMore });
+            this.setState({ isLoadingMore: p_loadMore });
         }
 
-        const post: Post | undefined = !p_loadMore && this.props.selectedTab === 'Global' ? await this.getPinnedPost() : undefined;
+        const post: Post | undefined = !p_loadMore && this.props.selectedTab === HomeScreenTab.Global ? await this.getPinnedPost() : undefined;
 
         const callback = this.props.api
         const lastPosHash = this.state.posts?.length > 0 && p_loadMore ? this.state.posts[this.state.posts.length - 1].PostHashHex : undefined;
@@ -170,7 +143,9 @@ export class PostListComponent extends React.Component<Props, State> {
             let allPosts: Post[] = [];
             let newPosts = response.PostsFound as Post[];
 
-            if (this.props.selectedTab === HomeScreenTab.Global && post) {
+            this._noMoreData = !newPosts || newPosts.length === 0;
+
+            if (post) {
                 newPosts?.unshift(post);
             }
 
@@ -195,6 +170,38 @@ export class PostListComponent extends React.Component<Props, State> {
         }
     };
 
+    private async processPosts(p_posts: Post[]): Promise<Post[]> {
+        let posts: Post[] = [];
+
+        if (posts) {
+            const user = await cache.user.getData();
+            const blockedUsers = user?.BlockedPubKeys ? user.BlockedPubKeys : [];
+            posts = p_posts.filter(
+                p_post => !!p_post.ProfileEntryResponse &&
+                    !p_post.IsHidden &&
+                    !blockedUsers[p_post.ProfileEntryResponse.PublicKeyBase58Check] &&
+                    !blockedUsers[p_post.RecloutedPostEntryResponse?.ProfileEntryResponse?.PublicKeyBase58Check]
+            );
+        }
+        return posts;
+    };
+
+    private async getPinnedPost(): Promise<Post | undefined> {
+        let post: Post | undefined = undefined;
+
+        try {
+            const response = await cloutFeedApi.getPinnedPost();
+            const pinnedPost = response.pinnedPost;
+            if (pinnedPost) {
+                const postResponse = await api.getSinglePost(globals.user.publicKey, pinnedPost, false, 0, 0);
+                post = postResponse?.PostFound as Post;
+            }
+
+        } catch { }
+
+        return post;
+    };
+
     render() {
         if (this.state.isLoading) {
             return <CloutFeedLoader />;
@@ -209,13 +216,13 @@ export class PostListComponent extends React.Component<Props, State> {
         };
         const renderFooter = this.state.isLoadingMore && !this.state.isLoading
             ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
-            : undefined
+            : undefined;
 
         const refreshControl = <RefreshControl
             tintColor={themeStyles.fontColorMain.color}
             titleColor={themeStyles.fontColorMain.color}
             refreshing={this.state.isRefreshing}
-            onRefresh={this.refresh} />
+            onRefresh={() => this.refresh(false)} />
 
         return (
             <View style={{ flex: 1 }}>
@@ -224,7 +231,7 @@ export class PostListComponent extends React.Component<Props, State> {
                     onMomentumScrollEnd={
                         (p_event: any) => this._currentScrollPosition = p_event.nativeEvent.contentOffset.y}
                     data={this.state.posts}
-                    showsVerticalScrollIndicator={true}
+                    showsVerticalScrollIndicator={false}
                     keyExtractor={keyExtractor}
                     renderItem={({ item }) => renderItem(item)}
                     onEndReached={() => this.loadPosts(true)}

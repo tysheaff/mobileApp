@@ -131,7 +131,10 @@ export class PostActionsRow extends React.Component<Props, State> {
         } catch {
             post.PostEntryReaderState.DiamondLevelBestowed = 0;
             post.DiamondCount--;
-            this.setState({ diamondLevel: 0 });
+
+            if (this._isMounted) {
+                this.setState({ diamondLevel: 0 });
+            }
         }
     }
 

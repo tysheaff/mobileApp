@@ -276,14 +276,16 @@ export class PostComponent extends React.Component<Props, State> {
                     </View >
                 </View>
 
-                {this.state.isHeartShowed
-                    && <Animated.View style={[styles.floatingHeart, { transform: [{ scale: this.scale }] }]} >
+                {
+                    this.state.isHeartShowed &&
+                    <Animated.View style={[styles.floatingHeart, { transform: [{ scale: this.scale }] }]} >
                         <Ionicons
                             name={'ios-heart-sharp'}
                             size={75}
                             color={'#eb1b0c'}
                         />
-                    </Animated.View>}
+                    </Animated.View>
+                }
             </View>
         );
     }
