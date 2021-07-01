@@ -44,7 +44,7 @@ export class TextWithLinks extends React.Component<Props, State>{
     }
 
     private processUsername(username: string): String {
-        return username.replace(/[^\w]|_/g, '');
+        return username.replace(/[^\w+$]/g, '');
     }
 
     private onLinkPressed(p_url: string, p_match: any) {
