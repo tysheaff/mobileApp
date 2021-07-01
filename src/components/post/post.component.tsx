@@ -154,6 +154,8 @@ export class PostComponent extends React.Component<Props, State> {
 
     render() {
         const embeddedVideoLink: any = this.props.post.PostExtraData?.EmbedVideoURL && parseVideoLink(this.props.post.PostExtraData?.EmbedVideoURL);
+        const bodyText = this.props.post.Body?.trimEnd();
+
         return (
             <View style={this.props.isParentPost ? [
                 styles.parentPostContainer,
@@ -226,9 +228,9 @@ export class PostComponent extends React.Component<Props, State> {
                         <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
                             <TextWithLinks
                                 navigation={this.props.navigation}
-                                numberOfLines={9}
+                                numberOfLines={bodyText?.length > 280 ? 9 : 16}
                                 style={[styles.bodyText, themeStyles.fontColorMain]}
-                                text={this.props.post.Body?.trimEnd()}
+                                text={bodyText}
                             />
                         </TouchableOpacity>
 
