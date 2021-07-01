@@ -7,6 +7,7 @@ import { globals } from '@globals/globals';
 import { CloutTag, Post } from '@types'
 import { PostComponent } from '@components/post/post.component';
 import { api, cache } from '@services';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 type RouteParams = {
     CloutTag: {
@@ -149,18 +150,19 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
 
         return (
             <View style={[styles.container, themeStyles.containerColorMain]}>
-                {this.state.isLoading
-                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
-                    : <FlatList
-                        data={this.state.posts}
-                        keyExtractor={keyExtractor}
-                        renderItem={({ item }) => renderItem(item)}
-                        onEndReachedThreshold={3}
-                        maxToRenderPerBatch={5}
-                        onEndReached={() => this.loadData(true)}
-                        ListFooterComponent={renderFooter}
-                        refreshControl={renderRefresh}
-                    />
+                {
+                    this.state.isLoading
+                        ? <CloutFeedLoader />
+                        : <FlatList
+                            data={this.state.posts}
+                            keyExtractor={keyExtractor}
+                            renderItem={({ item }) => renderItem(item)}
+                            onEndReachedThreshold={3}
+                            maxToRenderPerBatch={5}
+                            onEndReached={() => this.loadData(true)}
+                            ListFooterComponent={renderFooter}
+                            refreshControl={renderRefresh}
+                        />
                 }
             </View>
         );
@@ -170,11 +172,7 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
 const styles = StyleSheet.create(
     {
         container: {
-            flex: 1,
-        },
-        activityIndicator: {
-            height: 200,
-            alignSelf: 'center'
+            flex: 1
         }
     }
 );

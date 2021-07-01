@@ -2,11 +2,10 @@ import { NavigationContainer, NavigationProp } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { ActivityIndicator, View } from 'react-native';
 import { WelcomeScreen } from './src/screens/welcome.screen';
 import { CreatorCoinHODLer, EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
-import { themeStyles, updateThemeStyles } from './styles/globalColors';
+import { updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
 import { constants } from './src/globals/constants';
 import { SnackbarComponent } from './src/components/snackbarComponent';
@@ -25,6 +24,7 @@ import { StatusBar } from 'expo-status-bar';
 import { TabNavigator } from './src/navigation/tabNavigator';
 import MessageStackScreen from './src/navigation/messageStackNavigator';
 import { ActionSheetConfig } from '@services/actionSheet';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 enableScreens();
 
@@ -122,7 +122,7 @@ export default function App() {
       setLoading(true);
     }
     initCache();
-  
+
     Promise.all(
       [
         cache.user.getData(),
@@ -224,9 +224,7 @@ export default function App() {
   }
 
   return isLoading ?
-    <View style={[{ flex: 1 }, themeStyles.containerColorMain]}>
-      <ActivityIndicator style={{ marginTop: 200 }} color={themeStyles.fontColorMain.color} />
-    </View>
+    <CloutFeedLoader />
     :
     <NavigationContainer>
       <StatusBar style={settingsGlobals.darkMode ? 'light' : 'dark'} hidden={false} />

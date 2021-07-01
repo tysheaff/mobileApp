@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, ActivityIndicator, RefreshControl, Text, SectionList } from "react-native";
+import { View, StyleSheet, RefreshControl, Text, SectionList } from "react-native";
 import { globals } from "@globals/globals";
 import { themeStyles } from "@styles/globalColors";
 import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from "@services/bitCloutCalculator";
@@ -10,6 +10,7 @@ import { CreatorCoinHODLerComponent } from "@components/creatorCoinHODLer.compon
 import { formatNumber } from "@services/helpers";
 import { navigatorGlobals } from "@globals/navigatorGlobals";
 import { api } from "@services";
+import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 enum WalletTab {
     Purchased = 'Purchased',
@@ -247,9 +248,7 @@ export class WalletScreen extends React.Component<Props, State> {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading ?
-                    <View style={[styles.container, themeStyles.containerColorMain]}>
-                        <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-                    </View>
+                    <CloutFeedLoader />
                     :
                     <SectionList
                         ref={ref => (this.sectionListRef = ref)}
@@ -305,9 +304,6 @@ const styles = StyleSheet.create(
         container: {
             flex: 1,
             width: '100%'
-        },
-        activityIndicator: {
-            marginTop: 175
         },
         bitCloutPriceContainer: {
             flexDirection: 'row',

@@ -6,6 +6,7 @@ import { globals } from "@globals/globals";
 import { cache } from '@services/dataCaching';
 import { ProfileListCardComponent } from '@components/profileListCard.component';
 import { themeStyles } from '@styles/globalColors';
+import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 interface Props {
     postHashHex: string;
@@ -108,7 +109,7 @@ export class PostRecloutStatsComponent extends React.Component<Props, State> {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading
-                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    ? <CloutFeedLoader />
                     : this.state.profiles.length === 0
                         ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No reclouts for this post yet</Text>
                         : <FlatList

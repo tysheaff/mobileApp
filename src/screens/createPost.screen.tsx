@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, ActivityIndicator, Linking, Alert, Platform } from 'react-native';
+import { Text, View, StyleSheet, Linking, Alert, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { globals } from '@globals';
 import { api, cache } from '@services';
@@ -7,6 +7,7 @@ import { themeStyles, globalStyles } from '@styles';
 import { CreatePostComponent } from '@components/createPost.component';
 import { Post, Profile } from '@types';
 import { signing } from '@services/authorization/signing';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 const mime = require('mime');
 
 export function CreatePostScreen({ navigation, route }: any) {
@@ -60,7 +61,7 @@ export function CreatePostScreen({ navigation, route }: any) {
                 if (jwt) {
                     const promises = files.map(p_file => Platform.OS === "android" ? api.uploadImageAndroid(globals.user.publicKey, jwt, p_file) : api.uploadImage(globals.user.publicKey, jwt, p_file));
                     const responses = await Promise.all(promises);
-                    imageUrls = imageUrls.concat(responses.map(p_response => p_response.ImageURL));
+                    imageUrls = imageUrls.concat(responses.map((p_response: any) => p_response.ImageURL));
                     fnCreatePost(postText, imageUrls)
                 } else {
                     if (mount) {
@@ -224,7 +225,8 @@ export function CreatePostScreen({ navigation, route }: any) {
         <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 isLoading ?
-                    <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator> :
+                    <CloutFeedLoader />
+                    :
                     canCreateProfile ?
                         <CreatePostComponent
                             profile={profile}
@@ -258,9 +260,6 @@ export function CreatePostScreen({ navigation, route }: any) {
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             flex: 1
         }

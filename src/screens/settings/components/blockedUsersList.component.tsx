@@ -8,6 +8,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { signing } from '@services/authorization/signing';
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -137,7 +138,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
 
         return (
             this.state.isLoading
-                ? <ActivityIndicator style={{ height: 200, alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
+                ? <CloutFeedLoader />
                 : this.state.blockedProfiles.length === 0
                     ? <View style={[styles.emptyTextContainer, themeStyles.containerColorMain]}>
                         <Text style={[themeStyles.fontColorMain, styles.emptyText]}>Your block list is empty</Text>

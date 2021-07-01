@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing, StyleSheet } from 'react-native';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import CloutFeedLoaderLogoComponent from "@components/loader/cloutFeedLoaderLogo.component";
+import { themeStyles } from "@styles/globalColors";
 
 export default function CloutFeedLoader() {
 
@@ -17,7 +18,7 @@ export default function CloutFeedLoader() {
 
     const scaleValue = scale.interpolate({
         inputRange: [0, 1],
-        outputRange: [1, 2]
+        outputRange: [1, 1.75]
     });
 
     useEffect(
@@ -67,20 +68,21 @@ export default function CloutFeedLoader() {
     }
 
     return (
-        <Animated.View style={
-            [
-                styles.container,
-                {
-                    transform: [
-                        { rotate: spinValue },
-                        { scale: scaleValue },
-                    ],
-                }
-            ]
-        }>
-            <CloutFeedLoaderLogoComponent />
-        </Animated.View>
-
+        <View style={[{ flex: 1 }, themeStyles.containerColorMain]}>
+            <Animated.View style={
+                [
+                    styles.container,
+                    {
+                        transform: [
+                            { rotate: spinValue },
+                            { scale: scaleValue },
+                        ],
+                    }
+                ]
+            }>
+                <CloutFeedLoaderLogoComponent />
+            </Animated.View>
+        </View>
     )
 }
 
@@ -89,7 +91,7 @@ const styles = StyleSheet.create(
         container: {
             position: 'absolute',
             top: 0,
-            bottom: 0,
+            bottom: '30%',
             right: 0,
             left: 0,
             justifyContent: 'center',

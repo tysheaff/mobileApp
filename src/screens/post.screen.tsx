@@ -5,6 +5,7 @@ import { globals } from '@globals';
 import { api } from '@services';
 import { Post } from '@types';
 import { PostComponent } from '@components/post/post.component';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 export function PostScreen({ route, navigation }: any) {
     const [isLoading, setLoading] = useState(true);
@@ -182,9 +183,7 @@ export function PostScreen({ route, navigation }: any) {
     }
 
     return isLoading ?
-        <View style={[styles.container, themeStyles.containerColorMain]}>
-            <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-        </View>
+        <CloutFeedLoader />
         :
         <View style={[styles.container, themeStyles.containerColorMain]}>
             <SectionList
@@ -218,12 +217,8 @@ export function PostScreen({ route, navigation }: any) {
 
 }
 
-
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             flex: 1
         },

@@ -2,13 +2,14 @@ import { globals } from '@globals/globals';
 import { api } from '@services';
 import React, { Component } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { ActivityIndicator, Image, Platform, StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { Image, Platform, StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Profile } from '@types';
 import { themeStyles } from '@styles/globalColors';
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types';
 import { NavigationProp } from '@react-navigation/core';
 import { settingsGlobals } from '@globals/settingsGlobals';
 import { signing } from '@services/authorization/signing';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     navigation: NavigationProp<any>
@@ -203,10 +204,8 @@ export class EditProfileScreen extends Component<Props, State> {
     render() {
         if (this.state.loading) {
             return (
-                <View style={[styles.container, themeStyles.containerColorMain]}>
-                    <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-                </View>
-            )
+                <CloutFeedLoader />
+            );
         }
 
         return (
@@ -275,9 +274,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center'
-    },
-    activityIndicator: {
-        marginTop: 175
     },
     profilePicContainer: {
         marginTop: '10%',

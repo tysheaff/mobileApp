@@ -7,6 +7,7 @@ import { CreatorCoinTransaction, Profile } from "@types";
 import { CreatorCoinHeaderComponent } from "./components/creatorCoinHeader.component";
 import { api, cloutFeedApi } from "@services";
 import { CreatorCoinTransactionComponent } from "./components/creatorCoinTransaction.component";
+import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 type RouteParams = {
     CreatorCoin: {
@@ -160,9 +161,7 @@ export class CreatorCoinScreen extends React.Component<Props, State> {
 
     render() {
         return this.state.loading ?
-            <View style={[styles.container, themeStyles.containerColorSub]}>
-                <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-            </View>
+            <CloutFeedLoader />
             :
             <View style={[styles.container, themeStyles.containerColorMain]}>
                 <FlatList
@@ -209,9 +208,6 @@ export class CreatorCoinScreen extends React.Component<Props, State> {
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             flex: 1
         },

@@ -7,6 +7,7 @@ import { themeStyles } from "@styles/globalColors";
 import { globals } from "@globals/globals";
 import { api, cloutFeedApi, loadTickersAndExchangeRate, cache } from "@services";
 import { navigatorGlobals } from "@globals/navigatorGlobals";
+import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 enum HomeScreenTab {
     Global = 'Global',
@@ -196,7 +197,7 @@ export class PostListComponent extends React.Component<Props, State> {
 
     render() {
         if (this.state.isLoading) {
-            return <ActivityIndicator style={{ height: 200, alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />;
+            return <CloutFeedLoader />;
         }
 
         const keyExtractor = (item: any, index: number) => item.PostHashHex + index;

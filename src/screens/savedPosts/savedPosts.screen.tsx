@@ -8,6 +8,7 @@ import { cache } from "@services/dataCaching";
 import { api } from "@services";
 import { globals } from "@globals/globals";
 import { eventManager } from "@globals/injector";
+import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 interface Props {
     navigation: NavigationProp<any>
@@ -158,9 +159,7 @@ export class SavedPostsScreen extends React.Component<Props, State> {
 
     render() {
         if (this.state.isLoading) {
-            return <View style={[{ flex: 1 }, themeStyles.containerColorMain]}>
-                <ActivityIndicator style={{ height: 200, alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
-            </View>;
+            return <CloutFeedLoader />;
         }
 
         if (this.state.posts.length === 0) {

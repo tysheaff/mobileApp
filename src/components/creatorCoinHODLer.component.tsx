@@ -82,9 +82,6 @@ export function CreatorCoinHODLerComponent({
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         userWhoHODLCard: {
             display: 'flex',
             flexDirection: 'row',

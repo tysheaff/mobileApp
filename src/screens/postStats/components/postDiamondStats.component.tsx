@@ -7,6 +7,7 @@ import { globals } from "@globals/globals";
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { NavigationProp } from '@react-navigation/native';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface DiamondSender {
     DiamondLevel: number;
@@ -130,7 +131,7 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading
-                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    ? <CloutFeedLoader />
                     : this.state.diamondSenders.length === 0
                         ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No diamonds for this post yet</Text>
                         : <FlatList
@@ -195,9 +196,6 @@ const styles = StyleSheet.create(
             marginLeft: 10,
             fontSize: 18,
             fontWeight: '600'
-        },
-        activityIndicator: {
-            marginTop: 100
         },
         emptyText: {
             fontSize: 16,

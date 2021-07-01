@@ -10,6 +10,7 @@ import { globals } from "@globals/globals";
 import { api } from "@services";
 import { getAnonymousProfile } from "@services";
 import { ContactMessagesListCardComponent } from "@screens/messages/components/contactMessagesListCard.component";
+import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 interface Props { }
 
@@ -220,9 +221,7 @@ export class MessagesScreen extends React.Component<Props, State>{
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading ?
-                    <View style={[styles.listContainer, themeStyles.containerColorMain]}>
-                        <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-                    </View>
+                    <CloutFeedLoader />
                     :
                     globals.readonly ?
                         <View style={[{ alignItems: 'center', justifyContent: 'center' }, styles.listContainer, themeStyles.containerColorSub]}>
@@ -267,9 +266,6 @@ const styles = StyleSheet.create(
         container: {
             flex: 1,
             width: '100%'
-        },
-        activityIndicator: {
-            marginTop: 175
         },
         listContainer: {
             flex: 1,

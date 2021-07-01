@@ -16,6 +16,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { NotificationsFilter, NotificationsFilterComponent } from './components/notificationsFilter.component';
 import { filterNotifications } from './notificaitonFilterHelper';
 import * as SecureStore from 'expo-secure-store';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     standardPublicKey: string;
@@ -439,9 +440,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
 
         const keyExtractor = (item: any, index: number) => item.Index?.toString() + index.toString();
         return this.state.isLoading ?
-            <View style={[styles.listContainer, themeStyles.containerColorMain]}>
-                <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-            </View>
+            <CloutFeedLoader />
             :
             globals.readonly ?
                 <View style={[{ alignItems: 'center', justifyContent: 'center' }, styles.listContainer, themeStyles.containerColorSub]}>

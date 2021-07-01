@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import { StyleSheet, FlatList, ActivityIndicator, Text, View } from 'react-native';
+import { StyleSheet, FlatList, Text, View } from 'react-native';
 import { cloutApi } from '@services/api/cloutApi';
 import { CloutTag } from '@types';
 import { themeStyles } from '@styles/globalColors';
@@ -8,6 +8,7 @@ import { isNumber } from '@services/helpers';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import { globals } from '@globals/globals';
 import CloutListCardComponent from './components/cloutTagCard.component';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -62,7 +63,7 @@ export default class CloutTagSearchScreen extends React.Component<Props, State> 
         navigatorGlobals.searchResults = (p_cloutTagPrefix: string) => {
             p_cloutTagPrefix = p_cloutTagPrefix.trim();
             this._lastCloutTagPrefix = p_cloutTagPrefix;
-            
+
             if (isNumber(this._timer)) {
                 window.clearTimeout(this._timer);
             }
@@ -110,9 +111,7 @@ export default class CloutTagSearchScreen extends React.Component<Props, State> 
 
         return (
             this.state.isLoading ?
-                <View style={[styles.container, themeStyles.containerColorMain]}>
-                    <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
-                </View>
+                <CloutFeedLoader />
                 :
                 <View style={[styles.container, themeStyles.containerColorMain]}>
                     {
@@ -131,9 +130,6 @@ export default class CloutTagSearchScreen extends React.Component<Props, State> 
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             flex: 1
         },

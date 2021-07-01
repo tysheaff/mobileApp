@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, SectionList, Dimensions, KeyboardAvoidingView, Platform, Keyboard, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, SectionList, Dimensions, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { ContactWithMessages, Message } from '@types';
@@ -8,6 +8,7 @@ import { globals, settingsGlobals } from '@globals';
 import { api, setLocalMessage } from '@services';
 import { themeStyles } from '@styles';
 import { signing } from '@services/authorization/signing';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 export function ChatScreen({ route, navigation }: any) {
 
@@ -217,9 +218,7 @@ export function ChatScreen({ route, navigation }: any) {
 
 
     return isLoading ?
-        <View style={[styles.container, themeStyles.containerColorSub]}>
-            <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-        </View>
+        <CloutFeedLoader />
         :
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "position" : "height"}
@@ -283,9 +282,6 @@ export function ChatScreen({ route, navigation }: any) {
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             marginTop: 1,
             width: Dimensions.get('window').width,

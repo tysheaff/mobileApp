@@ -1,11 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { ProfileListCardComponent } from '../../components/profileListCard.component';
 import { globals, navigatorGlobals } from '@globals';
 import { Profile, User } from '@types';
 import { api, cache, isNumber } from '@services';
 import { themeStyles } from '@styles';
 import { NavigationProp } from '@react-navigation/native';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -144,9 +145,7 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
         const keyExtractor = (item: Profile, index: number) => `${item.PublicKeyBase58Check}_${index}`;
 
         return this.state.isLoading ?
-            <View style={[styles.container, themeStyles.containerColorMain]}>
-                <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
-            </View>
+            <CloutFeedLoader />
             :
             <View style={[styles.container, themeStyles.containerColorMain]}>
                 {
@@ -164,9 +163,6 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
 }
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             flex: 1
         },

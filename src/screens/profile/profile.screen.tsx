@@ -15,6 +15,7 @@ import { PostComponent } from '@components/post/post.component';
 import OwnProfileOptionsComponent from './ownProfileOptions.component';
 import { useFocusEffect } from '@react-navigation/core';
 import { cloutApi } from '@services/api/cloutApi';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 enum ProfileScreenTab {
     Posts = 'Posts',
@@ -472,9 +473,7 @@ export function ProfileScreen({ navigation, route }: any) {
     };
 
     return isLoading ?
-        <View style={[styles.container, themeStyles.containerColorSub]}>
-            <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-        </View>
+        <CloutFeedLoader />
         :
         canCreateProfile ?
             <View style={styles.container}>
@@ -538,9 +537,6 @@ export function ProfileScreen({ navigation, route }: any) {
 
 const styles = StyleSheet.create(
     {
-        activityIndicator: {
-            marginTop: 175
-        },
         container: {
             flex: 1
         },
