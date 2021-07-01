@@ -3,10 +3,13 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { settingsGlobals } from '@globals';
 import { getMessageText } from '@services';
 import { Message } from '@types';
+import { TextWithLinks } from './textWithLinks.component';
+import { useNavigation } from '@react-navigation/native';
 
 export function MessageComponent(
     { message }: { message: Message }
 ) {
+    const navigation = useNavigation();
     const [messageText, setMessageText] = useState<string>('');
     let mount = true;
 
@@ -36,7 +39,7 @@ export function MessageComponent(
         message.LastOfGroup ? styles.lastOfGroup : {}
     ]}
     >
-        <Text style={styles.messageText} selectable>{messageText}</Text>
+        <TextWithLinks style={[styles.messageText]} navigation={navigation} text={messageText}></TextWithLinks>
     </View>
 }
 
