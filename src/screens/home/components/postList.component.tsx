@@ -206,6 +206,15 @@ export class PostListComponent extends React.Component<Props, State> {
                 navigation={this.props.navigation}
                 post={item} />
         };
+        const renderFooter = this.state.isLoadingMore && !this.state.isLoading
+            ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
+            : undefined
+
+        const refreshControl = <RefreshControl
+            tintColor={themeStyles.fontColorMain.color}
+            titleColor={themeStyles.fontColorMain.color}
+            refreshing={this.state.isRefreshing}
+            onRefresh={this.refresh} />
 
         return (
             <View style={{ flex: 1 }}>
@@ -218,16 +227,12 @@ export class PostListComponent extends React.Component<Props, State> {
                     keyExtractor={keyExtractor}
                     renderItem={({ item }) => renderItem(item)}
                     onEndReached={() => this.loadPosts(true)}
+                    initialNumToRender={3}
                     onEndReachedThreshold={3}
                     maxToRenderPerBatch={5}
                     windowSize={8}
-                    refreshControl={<RefreshControl
-                        tintColor={themeStyles.fontColorMain.color}
-                        titleColor={themeStyles.fontColorMain.color}
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={this.refresh} />
-                    }
-                    ListFooterComponent={this.state.isLoadingMore && !this.state.isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color} /> : undefined}
+                    refreshControl={refreshControl}
+                    ListFooterComponent={renderFooter}
                 />
             </View>
         );
