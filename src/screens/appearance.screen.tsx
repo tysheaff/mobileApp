@@ -14,8 +14,7 @@ export function AppearanceScreen({ navigation }: any) {
             .then(
                 () => {
                     updateThemeStyles();
-                    globals.setGlobalTheme(p_theme);
-                    Alert.alert('Great!', 'You have changed your theme. Please reload the app in order for the changes to take effect.');
+                    globals.onLoginSuccess();
                 }
             )
             .catch(p_error => globals.defaultHandleError(p_error));

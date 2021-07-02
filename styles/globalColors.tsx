@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { settingsGlobals } from '@globals';
+import { globals, settingsGlobals } from '@globals';
 
 export let themeStyles = StyleSheet.create(
     {
@@ -46,4 +46,6 @@ export function updateThemeStyles() {
 
         }
     )
+
+    globals.setGlobalTheme(settingsGlobals.darkMode ? 'dark' : 'light');
 }

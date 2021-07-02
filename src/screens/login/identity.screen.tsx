@@ -55,7 +55,7 @@ export class IdentityScreen extends React.Component<Props, State> {
         ScreenCapture.preventScreenCaptureAsync();
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         ScreenCapture.allowScreenCaptureAsync();
     }
 
@@ -70,6 +70,7 @@ export class IdentityScreen extends React.Component<Props, State> {
 
             if (!isValidMnemonic) {
                 Alert.alert('Error', 'Seed phrase is invalid');
+                this.setState({ working: false });
                 return;
             }
 
@@ -89,6 +90,7 @@ export class IdentityScreen extends React.Component<Props, State> {
             );
 
         } catch {
+            this.setState({ working: false });
             Alert.alert('Error', 'Seed phrase is invalid');
         }
         this.mnemonic = '';
@@ -114,6 +116,7 @@ export class IdentityScreen extends React.Component<Props, State> {
     }
 
     render() {
+        console.log('render ', this.state.working);
         return this.state.accountLoaded ?
             <LoginUserListComponent
                 standardPublicKey={this.state.standardPublicKey}

@@ -67,7 +67,6 @@ export default function App() {
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
-
       };
     },
     []
@@ -82,6 +81,8 @@ export default function App() {
 
           if (cloutFeedIdentity) {
             globals.user.publicKey = p_publicKey;
+            await setTheme(true);
+
             const readonlyValue = await SecureStore.getItemAsync(constants.localStorage_readonly);
             globals.readonly = readonlyValue !== 'false';
             globals.onLoginSuccess();
@@ -138,7 +139,6 @@ export default function App() {
         if (globals.readonly === false) {
           notificationsService.registerPushToken().catch(() => { });
         }
-
         await setTheme();
       }
     ).catch(() => { })
@@ -212,14 +212,17 @@ export default function App() {
     }
   }
 
-  async function setTheme() {
+  async function setTheme(p_force = false) {
     settingsGlobals.darkMode = false;
 
-    if (globals.followerFeatures) {
-      const key = globals.user.publicKey + constants.localStorage_appearance;
+    const key = globals.user.publicKey + constants.localStorage_appearance;
+    if (globals.followerFeatures || p_force) {
       const theme = await SecureStore.getItemAsync(key);
       settingsGlobals.darkMode = theme === 'dark';
+    } else {
+      await SecureStore.setItemAsync(key, 'light')
     }
+
     updateThemeStyles();
   }
 
