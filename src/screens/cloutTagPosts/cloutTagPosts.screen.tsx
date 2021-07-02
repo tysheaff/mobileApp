@@ -154,6 +154,7 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
                     this.state.isLoading
                         ? <CloutFeedLoader />
                         : <FlatList
+                            initialNumToRender={3}
                             data={this.state.posts}
                             keyExtractor={keyExtractor}
                             renderItem={({ item }) => renderItem(item)}

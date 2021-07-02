@@ -482,6 +482,7 @@ export function ProfileScreen({ navigation, route }: any) {
                     onScrollToIndexFailed={() => { }}
                     style={themeStyles.containerColorSub}
                     stickySectionHeadersEnabled={true}
+                    initialNumToRender={3}
                     sections={sections}
                     keyExtractor={keyExtractor}
                     onEndReached={handleLoadMore}
