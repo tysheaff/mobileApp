@@ -168,10 +168,10 @@ const styles = StyleSheet.create(
             flexDirection: 'row',
             justifyContent: 'flex-end',
             alignItems: 'center',
-            marginBottom: 10,
+            marginBottom: 8,
         },
         followButton: {
-            marginRight: 10,
-        },
+            marginRight: 10
+        }
     }
 );

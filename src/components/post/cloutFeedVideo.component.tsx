@@ -20,7 +20,9 @@ export default class CloutFeedVideoComponent extends React.Component<Props> {
 
     render() {
         const parsedVideoLink: any = this.props.embeddedVideoLink && parseVideoLink(this.props.embeddedVideoLink);
-        const renderLoadingView = () => <ActivityIndicator size='large' style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />;
+        const renderLoadingView = () => <ActivityIndicator size='large'
+            style={[styles.activityIndicator, themeStyles.containerColorMain]}
+            color={themeStyles.fontColorMain.color} />;
         return (
             <WebView
                 renderLoading={renderLoadingView}
@@ -46,7 +48,7 @@ const styles = StyleSheet.create(
             top: 0,
             bottom: 0,
             right: 0,
-            left: 0,
+            left: 0
         }
     }
 );

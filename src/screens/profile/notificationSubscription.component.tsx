@@ -219,7 +219,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#007ef5',
         position: 'absolute',
-        left: 22
+        left: 22,
+        top: 2
     },
     selectList: {
         width: '100%'

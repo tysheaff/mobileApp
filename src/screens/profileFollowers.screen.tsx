@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ProfileListCardComponent } from '../components/profileListCard.component';
 import { globals } from '../globals/globals';
 import { Profile, User } from '@types';
 import { api, cache, getAnonymousProfile } from '@services';
 import { themeStyles } from '@styles';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 export function ProfileFollowersScreen({ route }: any) {
     const [isLoading, setLoading] = useState(true);
@@ -151,10 +152,19 @@ export function ProfileFollowersScreen({ route }: any) {
             }
         }
 
+        profiles.sort(
+            (p_profile1, p_profile2) => p_profile2.CoinEntry.BitCloutLockedNanos - p_profile1.CoinEntry.BitCloutLockedNanos
+        );
         return profiles;
     }
 
-    return <View style={[styles.container, themeStyles.containerColorSub]}>
+    const refreshControl = <RefreshControl
+        tintColor={themeStyles.fontColorMain.color}
+        titleColor={themeStyles.fontColorMain.color}
+        refreshing={refreshing}
+        onRefresh={loadData} />
+
+    return <View style={[styles.container, themeStyles.containerColorMain]}>
         <View style={[styles.tabsContainer, themeStyles.containerColorMain, themeStyles.borderColor]}>
             <TouchableOpacity
                 style={[
@@ -188,23 +198,22 @@ export function ProfileFollowersScreen({ route }: any) {
         {
             isLoading ?
                 (
-                    <View style={{ height: 200, justifyContent: 'center' }}>
-                        <ActivityIndicator style={{ alignSelf: 'center' }} color={themeStyles.fontColorMain.color} />
-                    </View>
+                    <CloutFeedLoader />
                 ) :
-
                 <FlatList
                     data={selectedTab === 'followers' ? followers : following}
                     keyExtractor={(item, index) => item.PublicKeyBase58Check + index}
                     renderItem={({ item }) => <ProfileListCardComponent profile={item} isFollowing={!!loggedInUserFollowingMap[item.PublicKeyBase58Check]}></ProfileListCardComponent>}
                     refreshing={refreshing}
+                    refreshControl={refreshControl}
+                    showsHorizontalScrollIndicator={false}
                     onRefresh={loadData}
                     onEndReached={loadMore}
+                    onEndReachedThreshold={3}
+                    maxToRenderPerBatch={20}
+                    windowSize={20}
+                    ListFooterComponent={isLoadingMore && !isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
                 />
-        }
-
-        {
-            isLoadingMore && !isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined
         }
     </View>;
 }

@@ -7,6 +7,7 @@ import { cache } from '@services/dataCaching';
 import { themeStyles } from '@styles/globalColors';
 import { PostComponent } from '@components/post/post.component';
 import { NavigationProp } from '@react-navigation/native';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     postHashHex: string;
@@ -98,7 +99,7 @@ export class PostQuoteStatsComponent extends React.Component<Props, State> {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading
-                    ? <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color} />
+                    ? <CloutFeedLoader />
                     : this.state.posts.length === 0
                         ? <Text style={[styles.emptyText, themeStyles.fontColorSub]}>No quotes for this post yet</Text>
                         : <FlatList

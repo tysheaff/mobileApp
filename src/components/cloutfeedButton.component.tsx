@@ -6,7 +6,7 @@ import { Text, StyleSheet, TouchableOpacity } from 'react-native'
 interface Props {
     title: string;
     onPress: () => void;
-    styles: any;
+    styles?: any;
     disabled: boolean;
 }
 
