@@ -166,9 +166,10 @@ const TabBar = ({ state, navigation }: any) => {
     );
 }
 
-export function TabNavigator({ navigation }: any) {
+export function TabNavigator() {
     return (
         <Tab.Navigator
+            sceneContainerStyle={themeStyles.containerColorMain}
             tabBar={props => <TabBar {...props}></TabBar>}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="WalletStack" component={WalletStackScreen} />
