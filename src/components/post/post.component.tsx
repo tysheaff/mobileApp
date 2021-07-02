@@ -3,16 +3,15 @@ import { View, StyleSheet, Text, Image, TouchableOpacity, Animated } from 'react
 import { Post } from '../../types';
 import { Dimensions } from 'react-native';
 import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
-import WebView from 'react-native-webview';
 import { NavigationProp } from '@react-navigation/native';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
 import { globals } from '@globals';
 import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow } from '@services';
 import { themeStyles } from '@styles';
-import { parseVideoLink } from '@services/videoLinkParser';
 import { PostOptionsComponent } from './postOptions.components';
 import { PostActionsRow } from './postActionsRow.component';
+import CloutFeedVideoComponent from '@components/post/cloutFeedVideo.component'
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -153,7 +152,6 @@ export class PostComponent extends React.Component<Props, State> {
     }
 
     render() {
-        const embeddedVideoLink: any = this.props.post.PostExtraData?.EmbedVideoURL && parseVideoLink(this.props.post.PostExtraData?.EmbedVideoURL);
         const bodyText = this.props.post.Body?.trimEnd();
 
         return (
@@ -240,13 +238,8 @@ export class PostComponent extends React.Component<Props, State> {
                         }
 
                         {
-                            embeddedVideoLink &&
-                            <WebView
-                                style={[styles.videoContainer, themeStyles.containerColorMain]}
-                                source={{ uri: embeddedVideoLink }}
-                                javaScriptEnabled={true}
-                                domStorageEnabled={true}
-                            />
+                            this.props.post.PostExtraData?.EmbedVideoURL &&
+                            <CloutFeedVideoComponent embeddedVideoLink={this.props.post.PostExtraData?.EmbedVideoURL} />
                         }
 
                         {
@@ -299,7 +292,6 @@ const styles = StyleSheet.create(
         },
         parentPostContainer: {
             flex: 1,
-            display: 'flex',
             flexDirection: 'row',
             justifyContent: 'center'
         },
@@ -311,8 +303,6 @@ const styles = StyleSheet.create(
         },
         contentContainer: {
             flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
             width: '100%'
         },
         profilePic: {
@@ -322,15 +312,12 @@ const styles = StyleSheet.create(
             marginRight: 10
         },
         headerContainer: {
-            display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginBottom: 10,
-            paddingLeft: 10,
-            paddingRight: 10
+            paddingHorizontal: 10,
         },
         headerRightContainer: {
-            display: 'flex',
             flexDirection: 'row',
             marginLeft: 'auto'
         },
@@ -340,7 +327,6 @@ const styles = StyleSheet.create(
             marginBottom: 10,
         },
         usernameContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center'
         },
@@ -351,11 +337,10 @@ const styles = StyleSheet.create(
             marginRight: 6
         },
         actionButton: {
-            display: 'flex',
+            flex: 1,
             flexDirection: 'row',
             alignItems: 'center',
             marginRight: 10,
-            flex: 1
         },
         actionText: {
             marginLeft: 4,
@@ -364,8 +349,7 @@ const styles = StyleSheet.create(
         },
         coinPriceContainer: {
             borderRadius: 12,
-            paddingRight: 10,
-            paddingLeft: 10,
+            paddingHorizontal: 10,
             marginBottom: 6,
             justifyContent: 'center',
             height: 20,
@@ -386,11 +370,6 @@ const styles = StyleSheet.create(
         },
         link: {
             fontWeight: '500'
-        },
-        videoContainer: {
-            opacity: 0.99,
-            height: 400,
-            width: '100%'
         },
         floatingHeart: {
             position: 'absolute',

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, Image, InputAccessoryView, Platform, Dimensions, KeyboardAvoidingView, Alert } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import Clipboard from 'expo-clipboard';
-import { WebView } from 'react-native-webview';
 import { Fontisto, Feather, Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -17,6 +16,7 @@ import { MentionInput, replaceMentionValues } from 'react-native-controlled-ment
 import { UserSuggestionList } from './userSuggestionList.component';
 import { parseVideoLinkAsync } from '@services/videoLinkParser';
 import { CloutTagSuggestionList } from './cloutTagSuggestionList.component';
+import CloutFeedVideoComponent from './post/cloutFeedVideo.component';
 
 export function CreatePostComponent(
     { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }:
@@ -210,13 +210,7 @@ export function CreatePostComponent(
                             <Fontisto name="close-a" size={14} color="white" />
                         </TouchableOpacity>
                     </View>
-                    <WebView
-
-                        style={[styles.videoContainer, themeStyles.containerColorMain]}
-                        source={{ uri: internalVideoLink }}
-                        javaScriptEnabled={true}
-                        domStorageEnabled={true}
-                    ></WebView>
+                    <CloutFeedVideoComponent embeddedVideoLink={internalVideoLink} />
                 </View>
                 :
                 undefined
