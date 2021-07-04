@@ -1,7 +1,6 @@
 import { crypto } from "./crypto";
 import * as SecureStore from 'expo-secure-store';
 import { SecureStoreAuthenticatedUserEncryptionKey, SecureStoreAuthenticatedUser } from '@types';
-
 import KeyEncoder from "key-encoder";
 import { constants } from "@globals/constants";
 import { globals } from "@globals/globals";

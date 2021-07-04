@@ -2,6 +2,7 @@ import * as Network from 'expo-network';
 import { Alert } from 'react-native';
 
 export const globals = {
+    cloutCastToken: '',
     user: { publicKey: '', username: '' },
     acceptTermsAndConditions: () => { },
     onLoginSuccess: () => { },

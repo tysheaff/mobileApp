@@ -5,6 +5,8 @@ import { SelectListControl } from "@controls/selectList.control";
 import * as SecureStore from 'expo-secure-store'
 import { constants } from '@globals/constants';
 import { globals } from '@globals/globals';
+import { eventManager } from '@globals/injector';
+import { EventType, ToggleCloutCastFeedEvent } from '@types';
 
 enum FeedType {
     Global = 'Global',
@@ -31,7 +33,7 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
             feed: FeedType.Global
         };
 
-        this.toggleSwitch = this.toggleSwitch.bind(this);
+        this.toggleCloutCastFeed = this.toggleCloutCastFeed.bind(this);
         this.onFeedTypeChange = this.onFeedTypeChange.bind(this);
         this.initScreen();
     }
@@ -44,11 +46,14 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
         this._isMounted = false;
     }
 
-    toggleSwitch() {
-        this.setState({ isCloutCastEnabled: !this.state.isCloutCastEnabled });
+    toggleCloutCastFeed() {
+        const newValue = !this.state.isCloutCastEnabled;
+        this.setState({ isCloutCastEnabled: newValue });
 
+        const event: ToggleCloutCastFeedEvent = { active: newValue };
+        eventManager.dispatchEvent(EventType.ToggleCloutCastFeed, event);
         const key = globals.user.publicKey + constants.localStorage_cloutCastFeedEnabled;
-        SecureStore.setItemAsync(key, String(!this.state.isCloutCastEnabled)).catch(() => { });
+        SecureStore.setItemAsync(key, String(newValue)).catch(() => { });
     }
 
     onFeedTypeChange(p_type: FeedType) {
@@ -68,7 +73,7 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
         if (this._isMounted) {
             this.setState(
                 {
-                    isCloutCastEnabled: !isCloutCastEnabledString || isCloutCastEnabledString === 'true',
+                    isCloutCastEnabled: isCloutCastEnabledString === 'true',
                     feed: feed ? feed : FeedType.Global
                 }
             );
@@ -79,19 +84,19 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
         return <View style={[styles.container, themeStyles.containerColorMain]} >
             <View style={themeStyles.containerColorMain}>
                 {
-                    globals.readonly || true ? undefined :
+                    globals.readonly ? undefined :
                         <View style={[styles.cloutCastFeedSettingsContainer, themeStyles.borderColor]}>
                             <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
                             <Switch
                                 trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
                                 thumbColor={this.state.isCloutCastEnabled ? "white" : "white"}
                                 ios_backgroundColor={themeStyles.switchColor.color}
-                                onValueChange={this.toggleSwitch}
+                                onValueChange={this.toggleCloutCastFeed}
                                 value={this.state.isCloutCastEnabled}
                             />
                         </View>
                 }
-                <View style={styles.selectList}>
+                <View>
                     <Text style={[styles.defaultFeedTitle, themeStyles.fontColorMain]}>Default Feed</Text>
                 </View>
                 <SelectListControl

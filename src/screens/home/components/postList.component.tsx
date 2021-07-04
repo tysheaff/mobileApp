@@ -12,7 +12,8 @@ import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 enum HomeScreenTab {
     Global = 'Global',
     Following = 'Following',
-    Recent = 'Recent'
+    Recent = 'Recent',
+    Cast = 'Cast'
 };
 
 type RouteParams = {

@@ -116,7 +116,6 @@ export class IdentityScreen extends React.Component<Props, State> {
     }
 
     render() {
-        console.log('render ', this.state.working);
         return this.state.accountLoaded ?
             <LoginUserListComponent
                 standardPublicKey={this.state.standardPublicKey}

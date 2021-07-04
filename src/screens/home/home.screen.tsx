@@ -3,16 +3,18 @@ import { View } from 'react-native';
 import { api, notificationsService } from '@services';
 import { themeStyles } from '@styles';
 import { constants, eventManager, globals } from '@globals';
-import { EventType, NavigationEvent, Post } from '@types';
+import { EventType, NavigationEvent, Post, ToggleCloutCastFeedEvent } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { PostListComponent } from './components/postList.component';
 import * as SecureStore from 'expo-secure-store'
+import { CloutCastFeedComponent } from './components/cloutCastFeed.component';
 
 enum HomeScreenTab {
     Global = 'Global',
     Following = 'Following',
-    Recent = 'Recent'
+    Recent = 'Recent',
+    Cast = 'Cast'
 };
 
 type RouteParams = {
@@ -37,7 +39,9 @@ interface State {
 export class HomeScreen extends React.Component<Props, State> {
 
     private _postListComponent = React.createRef<PostListComponent>();
+    private _cloutCastFeedComponent = React.createRef<CloutCastFeedComponent>();
     private _unsubscribeNavigationEvent: any;
+    private _unsubscribeCloutCastEvent: any;
 
     constructor(props: Props) {
 
@@ -51,6 +55,7 @@ export class HomeScreen extends React.Component<Props, State> {
         this.init();
         notificationsService.registerNotificationHandler();
         this.subscribeNavigationEvent();
+        this.subscribeToggleCloutCastEvent();
 
         this.onTabClick = this.onTabClick.bind(this);
     };
@@ -58,6 +63,7 @@ export class HomeScreen extends React.Component<Props, State> {
     componentWillUnmount() {
         notificationsService.unregisterNotificationHandler();
         this._unsubscribeNavigationEvent();
+        this._unsubscribeCloutCastEvent();
     };
 
     async init() {
@@ -69,18 +75,35 @@ export class HomeScreen extends React.Component<Props, State> {
         this.configureTabs();
     }
 
-    onTabClick(p_tabName: string) {
-        let apiCallback: any;
-        if (p_tabName === HomeScreenTab.Global) {
-            apiCallback = api.getGlobalPosts
-        } else if (p_tabName === HomeScreenTab.Following) {
-            apiCallback = api.getFollowingPosts
-        } else {
-            apiCallback = api.getRecentPosts
+    async configureTabs() {
+        const newTabs: TabConfig[] = [
+            {
+                name: HomeScreenTab.Global
+            },
+            {
+                name: HomeScreenTab.Following
+            },
+            {
+                name: HomeScreenTab.Recent
+            }
+        ];
+
+        if (!globals.readonly) {
+            const key = globals.user.publicKey + constants.localStorage_cloutCastFeedEnabled;
+            const cloutCastFeedEnabled = await SecureStore.getItemAsync(key).catch(() => undefined);
+            const addCloutCastFeed = cloutCastFeedEnabled === 'true';
+
+            if (addCloutCastFeed) {
+                newTabs.push(
+                    {
+                        name: HomeScreenTab.Cast
+                    }
+                );
+            }
         }
-        this.setState({ api: apiCallback, selectedTab: p_tabName as HomeScreenTab });
-        this._postListComponent?.current?.refresh();
-    };
+
+        this.setState({ tabs: newTabs });
+    }
 
     subscribeNavigationEvent() {
         this._unsubscribeNavigationEvent = eventManager.addEventListener(
@@ -117,20 +140,32 @@ export class HomeScreen extends React.Component<Props, State> {
         );
     }
 
-    configureTabs() {
-        const newTabs: TabConfig[] = [
-            {
-                name: HomeScreenTab.Global
-            },
-            {
-                name: HomeScreenTab.Following
-            },
-            {
-                name: HomeScreenTab.Recent
+    subscribeToggleCloutCastEvent() {
+        this._unsubscribeCloutCastEvent = eventManager.addEventListener(
+            EventType.ToggleCloutCastFeed,
+            () => {
+                this.init();
             }
-        ];
-        this.setState({ tabs: newTabs });
+        );
     }
+
+    onTabClick(p_tabName: string) {
+        let apiCallback: any;
+        if (p_tabName === HomeScreenTab.Global) {
+            apiCallback = api.getGlobalPosts
+        } else if (p_tabName === HomeScreenTab.Following) {
+            apiCallback = api.getFollowingPosts
+        } else {
+            apiCallback = api.getRecentPosts
+        }
+        this.setState({ api: apiCallback, selectedTab: p_tabName as HomeScreenTab });
+
+        if (p_tabName === HomeScreenTab.Cast) {
+            this._cloutCastFeedComponent?.current?.loadData();
+        } else {
+            this._postListComponent?.current?.refresh();
+        }
+    };
 
     render() {
         const renderTab = () => {
@@ -158,6 +193,12 @@ export class HomeScreen extends React.Component<Props, State> {
                         selectedTab={this.state.selectedTab}
                         navigation={this.props.navigation}
                         api={api.getRecentPosts} />;
+
+                case HomeScreenTab.Cast:
+                    return <CloutCastFeedComponent
+                        ref={this._cloutCastFeedComponent}
+                        route={this.props.route}
+                        navigation={this.props.navigation}></CloutCastFeedComponent>
             }
         };
 

@@ -10,7 +10,8 @@ export enum EventType {
     Navigation = 4,
     ToggleNotificationsFilter = 5,
     ToggleActionSheet = 6,
-    UnsavePost = 7
+    UnsavePost = 7,
+    ToggleCloutCastFeed = 8
 }
 
 export interface ChangeFollowersEvent {
@@ -25,6 +26,10 @@ export interface ToggleActionSheetEvent {
 export interface ToggleProfileManagerEvent {
     visible: boolean;
     navigation: NavigationProp<any>;
+}
+
+export interface ToggleCloutCastFeedEvent {
+    active: boolean;
 }
 
 export interface NavigationEvent {
