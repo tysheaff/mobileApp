@@ -51,7 +51,7 @@ export function SettingsScreen({ navigation }: any) {
             action: () => globals.onLogout()
         },
         {
-            title: 'CloutFeed v 1.4.3',
+            title: 'CloutFeed v 1.4.4',
             icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={18} color={themeStyles.fontColorMain.color} />,
             action: () => { }
         },
