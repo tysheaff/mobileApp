@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Animated } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, Animated, Platform } from 'react-native';
 import { Post } from '../../types';
 import { Dimensions } from 'react-native';
 import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
@@ -73,13 +73,18 @@ export class PostComponent extends React.Component<Props, State> {
     }
 
     private goToStats() {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         (this.props.navigation as any).push(
             'PostStatsTabNavigator',
             {
                 postHashHex: this.props.post.PostHashHex
             }
         );
+
+        if(Platform.OS === 'ios'){
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        } else {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
     }
 
     private goToProfile() {

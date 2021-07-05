@@ -8,6 +8,7 @@ import { diamondAnimation } from "@services/diamondAnimation";
 import { api } from "@services";
 import { signing } from "@services/authorization/signing";
 import { themeStyles } from "@styles/globalColors";
+import * as Haptics from 'expo-haptics';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -83,6 +84,7 @@ export class PostActionsRow extends React.Component<Props, State> {
         }
 
         try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             const response = await api.likePost(globals.user.publicKey, post.PostHashHex, originalLikedByReader);
             const transactionHex = response.TransactionHex;
 
@@ -122,6 +124,7 @@ export class PostActionsRow extends React.Component<Props, State> {
         this.setState({ diamondLevel: 1 });
 
         try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             const response = await api.sendDiamonds(globals.user.publicKey, post.ProfileEntryResponse.PublicKeyBase58Check, post.PostHashHex);
             const transactionHex = response.TransactionHex;
 
@@ -168,12 +171,17 @@ export class PostActionsRow extends React.Component<Props, State> {
 
     private goToStats(p_selectedTab: string) {
         (this.props.navigation as any).push(
-            'PostStats',
+            'PostStatsTabNavigator',
             {
                 postHashHex: this.props.post.PostHashHex,
                 selectedTab: p_selectedTab
             }
         );
+        if(Platform.OS === 'ios'){
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        } else {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
     }
 
     render() {

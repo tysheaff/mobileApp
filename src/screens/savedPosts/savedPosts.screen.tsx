@@ -185,7 +185,6 @@ export class SavedPostsScreen extends React.Component<Props, State> {
                     keyExtractor={keyExtractor}
                     renderItem={renderItem}
                     onEndReached={() => this.loadPosts(true)}
-                    initialNumToRender={3}
                     onEndReachedThreshold={3}
                     maxToRenderPerBatch={5}
                     windowSize={8}

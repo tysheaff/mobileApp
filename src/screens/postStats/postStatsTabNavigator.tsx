@@ -8,14 +8,14 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { themeStyles } from '@styles/globalColors';
 
 type RouteParams = {
-    PostStats: {
+    PostStatsTabNavigator: {
         postHashHex: string;
     }
 }
 
 interface Props {
     navigation: NavigationProp<any>;
-    route: RouteProp<RouteParams, 'PostStats'>;
+    route: RouteProp<RouteParams, 'PostStatsTabNavigator'>;
 }
 
 const PostStatTab = createMaterialTopTabNavigator();
@@ -29,6 +29,7 @@ export default class postStatsTabNavigator extends React.Component<Props> {
     render() {
         return (
             <PostStatTab.Navigator
+                sceneContainerStyle={themeStyles.containerColorMain}
                 tabBarOptions={{
                     style: themeStyles.containerColorMain,
                     indicatorStyle: { backgroundColor: themeStyles.fontColorMain.color },

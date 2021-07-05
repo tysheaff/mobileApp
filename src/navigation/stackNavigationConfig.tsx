@@ -1,4 +1,4 @@
-import { Easing } from "react-native";
+import { Easing, Platform } from "react-native";
 import { CardStyleInterpolators } from "@react-navigation/stack";
 
 const config = {
@@ -16,12 +16,12 @@ const config = {
 const closeConfig = {
     animation: "timing",
     config: {
-        duration: 500,
+        duration: 150,
         easing: Easing.linear,
     },
 };
 
-export const stackConfig: any = {
+export const stackConfig: any = Platform.OS === 'ios' ? undefined : {
     gestureDirection: "horizontal",
     gestureEnabled: true,
     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
