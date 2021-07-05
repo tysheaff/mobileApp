@@ -84,7 +84,9 @@ export class PostActionsRow extends React.Component<Props, State> {
         }
 
         try {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            if (!originalLikedByReader) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
             const response = await api.likePost(globals.user.publicKey, post.PostHashHex, originalLikedByReader);
             const transactionHex = response.TransactionHex;
 
@@ -177,7 +179,7 @@ export class PostActionsRow extends React.Component<Props, State> {
                 selectedTab: p_selectedTab
             }
         );
-        if(Platform.OS === 'ios'){
+        if (Platform.OS === 'ios') {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         } else {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
