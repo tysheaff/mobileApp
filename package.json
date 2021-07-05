@@ -57,7 +57,8 @@
     "react-native-web": "^0.15.7",
     "react-native-webview": "11.0.0",
     "sha256": "^0.2.0",
-    "victory-native": "^35.3.2"
+    "victory-native": "^35.3.2",
+    "expo-haptics": "~8.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

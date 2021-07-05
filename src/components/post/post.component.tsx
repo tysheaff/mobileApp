@@ -11,7 +11,8 @@ import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow } from 
 import { themeStyles } from '@styles';
 import { PostOptionsComponent } from './postOptions.components';
 import { PostActionsRow } from './postActionsRow.component';
-import CloutFeedVideoComponent from '@components/post/cloutFeedVideo.component'
+import CloutFeedVideoComponent from '@components/post/cloutFeedVideo.component';
+import * as Haptics from 'expo-haptics';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -72,6 +73,7 @@ export class PostComponent extends React.Component<Props, State> {
     }
 
     private goToStats() {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         (this.props.navigation as any).push(
             'PostStatsTabNavigator',
             {
