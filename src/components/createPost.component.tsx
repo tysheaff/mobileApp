@@ -166,6 +166,14 @@ export function CreatePostComponent(
                     isInsertSpaceAfterMention: true,
                     allowedSpacesCount: 0,
                     textStyle: [styles.link, themeStyles.linkColor]
+                },
+                {
+                    trigger: '$',
+                    renderSuggestions: UserSuggestionList,
+                    isBottomMentionSuggestionsRender: true,
+                    isInsertSpaceAfterMention: true,
+                    allowedSpacesCount: 0,
+                    textStyle: [styles.link, themeStyles.linkColor]
                 }
             ]}
         ></MentionInput>

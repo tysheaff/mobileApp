@@ -58,7 +58,6 @@ export class TextWithLinks extends React.Component<Props, State>{
 
     private onLinkPressed(p_url: string, p_match: any) {
         const linkType = p_match.getType();
-
         switch (linkType) {
             case 'url':
                 const postLink = 'bitclout.com/posts/';
@@ -82,13 +81,13 @@ export class TextWithLinks extends React.Component<Props, State>{
                 }
                 break;
             case 'mention':
-                const userName = this.processUsername(p_url.slice(1));
+                const mentionUsername = this.processUsername(p_url.slice(1));
                 (this.props.navigation as any).push(
                     'UserProfile',
                     {
-                        username: userName,
+                        username: mentionUsername,
                         navigateByUsername: true,
-                        key: 'Post_' + userName
+                        key: 'Post_' + mentionUsername
                     }
                 );
                 break;
@@ -98,6 +97,16 @@ export class TextWithLinks extends React.Component<Props, State>{
                     {
                         cloutTag: p_match.hashtag,
                         key: 'CloutTag_' + p_match.hashtag
+                    }
+                );
+            case 'dollar':
+                const dollarUsername = this.processUsername(p_url.slice(1));
+                (this.props.navigation as any).push(
+                    'UserProfile',
+                    {
+                        username: dollarUsername,
+                        navigateByUsername: true,
+                        key: 'Post_' + dollarUsername
                     }
                 );
         }
@@ -145,6 +154,13 @@ export class TextWithLinks extends React.Component<Props, State>{
     }
 
     render() {
+
+        const dollarMatches = {
+            pattern: /\$\w+[^ :/@/w]/g,
+            type: 'dollar',
+            getLinkText: (replacerArgs: String[]) => `${replacerArgs[0]}`
+        };
+
         const style = this.props.style ? this.props.style : [];
 
         return <>
@@ -154,6 +170,7 @@ export class TextWithLinks extends React.Component<Props, State>{
                 onTextLayout={this.onTextLayout}
                 mention="twitter"
                 hashtag="twitter"
+                matchers={[dollarMatches]}
                 numberOfLines={this.state.numberOfLines}
                 renderLink={(text, match, index) => (
                     <Text
