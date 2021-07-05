@@ -179,6 +179,7 @@ export class SavedPostsScreen extends React.Component<Props, State> {
         return (
             <View style={[{ flex: 1 }, themeStyles.containerColorMain]}>
                 <FlatList
+                    initialNumToRender={3}
                     data={this.state.posts}
                     showsVerticalScrollIndicator={true}
                     keyExtractor={keyExtractor}

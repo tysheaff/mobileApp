@@ -171,6 +171,7 @@ export function TabNavigator() {
         <Tab.Navigator
             sceneContainerStyle={themeStyles.containerColorMain}
             tabBar={props => <TabBar {...props}></TabBar>}>
+
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="WalletStack" component={WalletStackScreen} />
             <Tab.Screen name="NotificationStack" component={NotificationStackScreen} />
@@ -178,7 +179,6 @@ export function TabNavigator() {
         </Tab.Navigator>
     );
 }
-
 
 const styles = StyleSheet.create(
     {

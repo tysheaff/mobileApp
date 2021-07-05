@@ -484,6 +484,7 @@ export function ProfileScreen({ navigation, route }: any) {
                     stickySectionHeadersEnabled={true}
                     initialNumToRender={3}
                     sections={sections}
+                    initialNumToRender={3}
                     keyExtractor={keyExtractor}
                     onEndReached={handleLoadMore}
                     onEndReachedThreshold={3}

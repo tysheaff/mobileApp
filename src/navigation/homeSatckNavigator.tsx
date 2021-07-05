@@ -19,6 +19,7 @@ import { LogoHeaderComponent } from '@components/logoHeader.component';
 import SearchTabNavigator from './searchTabNavigator';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
+import { stackConfig } from './stackNavigationConfig';
 
 const HomeStack = createStackNavigator();
 
@@ -26,6 +27,7 @@ export default function HomeStackScreen() {
     return (
         <HomeStack.Navigator
             screenOptions={({ navigation }: any) => ({
+                ...stackConfig,
                 headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
                 headerStyle: {
                     backgroundColor: themeStyles.containerColorMain.backgroundColor,

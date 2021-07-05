@@ -16,6 +16,7 @@ import { IdentityScreen } from '@screens/login/identity.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
+import { stackConfig } from './stackNavigationConfig';
 
 const WalletStack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export default function WalletStackScreen() {
     return (
         <WalletStack.Navigator
             screenOptions={({ navigation }) => ({
+                ...stackConfig,
                 headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
                 headerStyle: {
                     backgroundColor: themeStyles.containerColorMain.backgroundColor,

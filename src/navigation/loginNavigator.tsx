@@ -5,6 +5,7 @@ import { IdentityScreen } from '@screens/login/identity.screen';
 import { IdentityInfoScreen } from '@screens/login/identityInfo.screen';
 import { Platform, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { stackConfig } from './stackNavigationConfig';
 
 const Stack = createStackNavigator();
 
@@ -14,6 +15,7 @@ export function LoginNavigator({ navigation }: any) {
         <Stack.Navigator
             screenOptions={
                 {
+                    ...stackConfig,
                     headerStyle: { backgroundColor: '#121212', shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
                     headerTitleStyle: { alignSelf: 'center', color: 'white', fontSize: 20 }
                 }

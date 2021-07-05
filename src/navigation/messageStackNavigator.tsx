@@ -20,6 +20,7 @@ import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
+import { stackConfig } from './stackNavigationConfig';
 
 const MessageStack = createStackNavigator();
 
@@ -27,6 +28,7 @@ export default function MessageStackScreen() {
     return (
         <MessageStack.Navigator
             screenOptions={({ navigation }: any) => ({
+                ...stackConfig,
                 headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
                 headerStyle: {
                     backgroundColor: themeStyles.containerColorMain.backgroundColor,
@@ -40,7 +42,7 @@ export default function MessageStackScreen() {
         >
             <MessageStack.Screen
                 options={{
-                    headerRight: () => <MessagesHeaderComponent />
+                    headerRight: () => <MessagesHeaderComponent />,
                 }}
                 name="Messages"
                 component={MessagesScreen}

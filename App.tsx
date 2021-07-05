@@ -25,6 +25,7 @@ import { TabNavigator } from './src/navigation/tabNavigator';
 import MessageStackScreen from './src/navigation/messageStackNavigator';
 import { ActionSheetConfig } from '@services/actionSheet';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { stackConfig } from './src/navigation/stackNavigationConfig';
 
 enableScreens();
 
@@ -231,13 +232,14 @@ export default function App() {
     :
     <NavigationContainer>
       <StatusBar style={settingsGlobals.darkMode ? 'light' : 'dark'} hidden={false} />
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{ ...stackConfig }}>
         {
           !isLoggedIn ?
             areTermsAccepted ?
               <Stack.Screen
                 options={{
-                  headerShown: false
+                  headerShown: false,
                 }}
                 name="LoginNavigator" component={LoginNavigator} />
               :
