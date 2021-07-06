@@ -1,11 +1,9 @@
 import React from 'react';
 import { Text, View, StyleSheet, FlatList, Linking } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { AntDesign } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
 import { globals } from '@globals';
-import { Entypo, Ionicons, Feather, SimpleLineIcons } from '@expo/vector-icons';
+import { Entypo, Ionicons, Feather, SimpleLineIcons, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 
 interface Settings {
     title: string;
@@ -15,6 +13,11 @@ interface Settings {
 
 export function SettingsScreen({ navigation }: any) {
     const settings: Settings[] = [
+        {
+            title: 'Haptics',
+            icon: <MaterialCommunityIcons name="vibrate" style={{ marginRight: -4 }} size={28} color={themeStyles.fontColorMain.color} />,
+            action: () => navigation.navigate('HapticsSettings')
+        },
         {
             title: 'Feed',
             icon: <MaterialCommunityIcons style={{ marginRight: -4 }} name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />,

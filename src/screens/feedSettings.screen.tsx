@@ -89,7 +89,7 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
                             <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
                             <Switch
                                 trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
-                                thumbColor={this.state.isCloutCastEnabled ? "white" : "white"}
+                                thumbColor={"white"}
                                 ios_backgroundColor={themeStyles.switchColor.color}
                                 onValueChange={this.toggleCloutCastFeed}
                                 value={this.state.isCloutCastEnabled}

@@ -21,6 +21,7 @@ import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import { SavedPostsScreen } from '@screens/savedPosts/savedPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
+import HapticsScreen from '@screens/settings/haptics.screen';
 
 const ProfileStack = createStackNavigator();
 
@@ -142,6 +143,14 @@ export default function ProfileStackScreen() {
                 }}
                 name="Appearance"
                 component={AppearanceScreen}
+            />
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Haptics',
+                    headerBackTitle: ' ',
+                }}
+                name="HapticsSettings"
+                component={HapticsScreen}
             />
             <ProfileStack.Screen
                 options={
