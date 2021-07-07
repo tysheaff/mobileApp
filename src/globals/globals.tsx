@@ -15,6 +15,7 @@ export const globals = {
     setGlobalTheme: (p_theme: string) => { },
     pushNotificationsToken: '',
     readonly: true,
+    hapticsEnabled: false,
     defaultHandleError: (p_error: any) => {
         if (p_error?.status === 429) {
             Alert.alert('Error', 'BitClout is experiencing heavy load. Please try again in one minute.');

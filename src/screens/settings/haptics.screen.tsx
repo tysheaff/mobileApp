@@ -36,11 +36,11 @@ export default class HapticsScreen extends React.Component<Props, State> {
 
     private async initScreen() {
         const hapticsKey = `${globals.user.publicKey}${constants.localStorage_cloutFeedHapticsEnabled}`;
-        const isHapticsEnabledString = await SecureStore.getItemAsync(hapticsKey).catch(() => undefined);
+        const areHapticsEnabledString = await SecureStore.getItemAsync(hapticsKey).catch(() => undefined);
         if (this._isMounted) {
             this.setState(
                 {
-                    areHapticsEnabled: isHapticsEnabledString === 'true'
+                    areHapticsEnabled: !areHapticsEnabledString || areHapticsEnabledString === 'true'
                 }
             );
         }
@@ -48,6 +48,7 @@ export default class HapticsScreen extends React.Component<Props, State> {
 
     private toggleHaptics() {
         const newState = !this.state.areHapticsEnabled;
+        globals.hapticsEnabled = newState;
         this.setState({ areHapticsEnabled: newState });
         const hapticsKey = `${globals.user.publicKey}${constants.localStorage_cloutFeedHapticsEnabled}`;
         SecureStore.setItemAsync(hapticsKey, String(newState)).catch(() => { });

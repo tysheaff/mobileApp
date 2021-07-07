@@ -19,7 +19,7 @@ import { enableScreens } from 'react-native-screens';
 import { signing } from '@services/authorization/signing';
 import { authentication } from '@services/authorization/authentication';
 import { ProfileManagerComponent } from '@components/profileManager.component';
-import { eventManager } from '@globals/injector';
+import { eventManager, hapticsManager } from '@globals/injector';
 import { StatusBar } from 'expo-status-bar';
 import { TabNavigator } from './src/navigation/tabNavigator';
 import MessageStackScreen from './src/navigation/messageStackNavigator';
@@ -141,6 +141,7 @@ export default function App() {
           notificationsService.registerPushToken().catch(() => { });
         }
         await setTheme();
+        await hapticsManager.init();
       }
     ).catch(() => { })
       .finally(

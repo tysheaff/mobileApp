@@ -6,7 +6,7 @@ import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
-import { globals } from '@globals';
+import { globals, hapticsManager } from '@globals';
 import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow } from '@services';
 import { themeStyles } from '@styles';
 import { PostOptionsComponent } from './postOptions.components';
@@ -80,11 +80,7 @@ export class PostComponent extends React.Component<Props, State> {
             }
         );
 
-        if(Platform.OS === 'ios'){
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        } else {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }
+        hapticsManager.customizedImpact();
     }
 
     private goToProfile() {

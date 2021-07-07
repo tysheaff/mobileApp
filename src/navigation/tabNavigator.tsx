@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
-import { eventManager, globals, navigatorGlobals, settingsGlobals } from '@globals';
+import { eventManager, globals, hapticsManager, navigatorGlobals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
 import { cache } from '@services/dataCaching';
 import { EventType } from '@types';
@@ -66,11 +66,18 @@ const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
         []
     )
 
+    function openProfileManager() {
+        if (tab.name === 'ProfileStack' && !globals.readonly) {
+            eventManager.dispatchEvent(EventType.ToggleProfileManager, { visible: true, navigation: navigation })
+            hapticsManager.customizedImpact();
+        }
+    }
+
     return (
         <TouchableOpacity
             style={{ padding: 6 }}
             onPress={onPress}
-            onLongPress={tab.name === 'ProfileStack' && !globals.readonly ? () => { eventManager.dispatchEvent(EventType.ToggleProfileManager, { visible: true, navigation: navigation }) } : undefined}
+            onLongPress={openProfileManager}
         >
             {icon}
         </TouchableOpacity>

@@ -15,7 +15,7 @@ export function SettingsScreen({ navigation }: any) {
     const settings: Settings[] = [
         {
             title: 'Haptics',
-            icon: <MaterialCommunityIcons name="vibrate" style={{ marginRight: -4 }} size={28} color={themeStyles.fontColorMain.color} />,
+            icon: <MaterialCommunityIcons name="vibrate" size={24} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('HapticsSettings')
         },
         {
