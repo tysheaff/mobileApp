@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ImageGalleryComponent } from './imageGallery.component';
 import { themeStyles } from '@styles';
 import { settingsGlobals } from '../globals/settingsGlobals';
-import { Post, Profile } from '@types';
+import { EventType, Post, Profile } from '@types';
 import { PostComponent } from './post/post.component';
 import { useNavigation, useRoute } from '@react-navigation/core';
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types';
@@ -17,6 +17,7 @@ import { UserSuggestionList } from './userSuggestionList.component';
 import { parseVideoLinkAsync } from '@services/videoLinkParser';
 import { CloutTagSuggestionList } from './cloutTagSuggestionList.component';
 import CloutFeedVideoComponent from './post/cloutFeedVideo.component';
+import { eventManager } from '@globals/injector';
 
 export function CreatePostComponent(
     { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }:
@@ -47,38 +48,69 @@ export function CreatePostComponent(
     );
 
     const pickImage = async () => {
+
         if (imageUrls?.length === 5) {
             alert('You have reached the maximum number of images you can attach per post.');
             return;
         }
 
-        if (Platform.OS !== 'web') {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-                alert('In order to be able to choose one of your images and attach it to your comment, we need access to your photos.');
-                return;
+        const options = ['Camera', 'Gallery', 'Cancel'];
+        const callback = async (p_optionIndex: number) => {
+            let result: any;
+            switch (p_optionIndex) {
+                case 0:
+                    if (Platform.OS !== 'web') {
+                        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                        if (status !== 'granted') {
+                            alert('In order to be able to capture one of your images and attach it to your comment, we need access to your camera.');
+                            return;
+                        }
+                    }
+                    result = await ImagePicker.launchCameraAsync(
+                        {
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            quality: undefined
+                        }
+                    );
+                    break;
+                case 1:
+                    if (Platform.OS !== 'web') {
+                        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                        if (status !== 'granted') {
+                            alert('In order to be able to choose one of your images and attach it to your comment, we need access to your photos.');
+                            return;
+                        }
+                    }
+                    result = await ImagePicker.launchImageLibraryAsync(
+                        {
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            quality: undefined
+                        }
+                    );
+                    break;
             }
-        }
+            if (!result.cancelled) {
+                if (result.type === 'image') {
+                    if (mount) {
+                        const uri = (result as ImageInfo).uri;
+                        setImageUrls(p_previous => [...p_previous, uri]);
+                        setImagesBase64((p_previous: any) => [...p_previous, uri]);
+                        setSelectedImageIndex(imageUrls.length);
+                    }
+                } else {
+                    alert('We just support images at the moment.');
+                }
+            }
 
-        let result = await ImagePicker.launchImageLibraryAsync(
+        };
+
+        eventManager.dispatchEvent(
+            EventType.ToggleActionSheet,
             {
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                quality: undefined
+                visible: true,
+                config: { options, callback, destructiveButtonIndex: [] }
             }
         );
-
-        if (!result.cancelled) {
-            if (result.type === 'image') {
-                if (mount) {
-                    const uri = (result as ImageInfo).uri;
-                    setImageUrls(p_previous => [...p_previous, uri]);
-                    setImagesBase64((p_previous: any) => [...p_previous, uri]);
-                    setSelectedImageIndex(imageUrls.length);
-                }
-            } else {
-                alert('We just support images at the moment.');
-            }
-        }
     };
 
     function onRemoveImage(p_index: number) {
