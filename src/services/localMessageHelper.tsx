@@ -23,18 +23,26 @@ export async function getMessageText(p_message: Message): Promise<string> {
         }
 
         if (p_message.IsSender) {
-            const localMessage = await getLocalMessage(
-                p_message.SenderPublicKeyBase58Check, p_message.RecipientPublicKeyBase58Check, p_message.TstampNanos
-            );
+            if (p_message.V2) {
+                returnValue = await signing.decryptShared(p_message.RecipientPublicKeyBase58Check, p_message.EncryptedText);
+            } else {
+                const localMessage = await getLocalMessage(
+                    p_message.SenderPublicKeyBase58Check, p_message.RecipientPublicKeyBase58Check, p_message.TstampNanos
+                );
 
-            if (localMessage) {
-                returnValue = localMessage;
+                if (localMessage) {
+                    returnValue = localMessage;
+                }
             }
         } else {
-            const decryptedMessage = await signing.decryptData(p_message.EncryptedText);
-            return decryptedMessage;
+            if (p_message.V2) {
+                returnValue = await signing.decryptShared(p_message.SenderPublicKeyBase58Check, p_message.EncryptedText);
+            } else {
+                returnValue = await signing.decryptData(p_message.EncryptedText);
+            }
         }
-    } catch { }
+    } catch {
+    }
 
     return returnValue;
 }

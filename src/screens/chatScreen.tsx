@@ -148,7 +148,7 @@ export function ChatScreen({ route, navigation }: any) {
             p_date.getFullYear() == today.getFullYear()
     }
 
-    function onSendMessage() {
+    async function onSendMessage() {
         const contactWithMessages = route.params.contactWithMessages as ContactWithMessages;
         const timeStampNanos = new Date().getTime() * 1000000;
 
@@ -159,7 +159,8 @@ export function ChatScreen({ route, navigation }: any) {
             RecipientPublicKeyBase58Check: contactWithMessages.PublicKeyBase58Check,
             SenderPublicKeyBase58Check: globals.user.publicKey,
             TstampNanos: timeStampNanos,
-            LastOfGroup: true
+            LastOfGroup: true,
+            V2: true
         };
 
         let todaySection: any;
@@ -187,25 +188,25 @@ export function ChatScreen({ route, navigation }: any) {
         todaySection.data.push(message);
         setSections((previous) => sections);
 
-        let messageCopy = messageText;
-        setMessageText('');
+        try {
+            const encryptedMessage = await signing.encryptShared(contactWithMessages.PublicKeyBase58Check, messageText);
+            setMessageText('');
 
-        api.sendMessage(globals.user.publicKey, contactWithMessages.PublicKeyBase58Check, messageCopy)
-            .then(
-                async p_response => {
-                    const transactionHex = p_response.TransactionHex;
-                    const signedTransactionHex = await signing.signTransaction(transactionHex);
-                    await api.submitTransaction(signedTransactionHex as string);
+            api.sendMessage(globals.user.publicKey, contactWithMessages.PublicKeyBase58Check, encryptedMessage)
+                .then(
+                    async p_response => {
+                        const transactionHex = p_response.TransactionHex;
+                        const signedTransactionHex = await signing.signTransaction(transactionHex);
+                        await api.submitTransaction(signedTransactionHex as string);
 
-                    if (mount) {
-                        setChanged(true);
+                        if (mount) {
+                            setChanged(true);
+                        }
                     }
-
-                    setLocalMessage(globals.user.publicKey, contactWithMessages.PublicKeyBase58Check, p_response.TstampNanos, messageCopy)
-                        .then(() => { })
-                        .catch(() => { });
-                }
-            ).catch(p_error => globals.defaultHandleError(p_error));
+                ).catch(p_error => globals.defaultHandleError(p_error));
+        } catch (p_exception) {
+            globals.defaultHandleError(p_exception);
+        }
     }
 
     function scrollToBottom(p_animated: boolean) {

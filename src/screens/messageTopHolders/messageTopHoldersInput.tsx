@@ -81,32 +81,33 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
 
         try {
             for (const holder of p_holders) {
-                await promiseHelper.retryOperation(
-                    () => {
-                        return new Promise(
-                            (resolve: any, reject: any) => {
-                                api.sendMessage(globals.user.publicKey, holder, messageText).then(
-                                    async p_response => {
-                                        const transactionHex = p_response.TransactionHex;
-                                        const signedTransactionHex = await signing.signTransaction(transactionHex);
-                                        await api.submitTransaction(signedTransactionHex as string);
+                try {
+                    const encryptedMessage = await signing.encryptShared(holder, messageText);
 
-                                        await setLocalMessage(globals.user.publicKey, holder, p_response.TstampNanos, messageText)
-                                            .then(() => { })
-                                            .catch(() => { });
-                                        resolve();
-                                    }
-                                ).catch(() => reject());
-                            }
-                        );
-                    },
-                    5000,
-                    3
-                ).then(
-                    () => {
-                        setAlreadyReceivedCount(p_previous => p_previous + 1);
-                    }
-                ).catch(() => { });
+                    await promiseHelper.retryOperation(
+                        () => {
+                            return new Promise(
+                                (resolve: any, reject: any) => {
+                                    api.sendMessage(globals.user.publicKey, holder, encryptedMessage).then(
+                                        async p_response => {
+                                            const transactionHex = p_response.TransactionHex;
+                                            const signedTransactionHex = await signing.signTransaction(transactionHex);
+                                            await api.submitTransaction(signedTransactionHex as string);
+                                            resolve();
+                                        }
+                                    ).catch(() => reject());
+                                }
+                            );
+                        },
+                        5000,
+                        3
+                    ).then(
+                        () => {
+                            setAlreadyReceivedCount(p_previous => p_previous + 1);
+                        }
+                    ).catch(() => { });
+                }
+                catch { }
             }
 
         } catch {

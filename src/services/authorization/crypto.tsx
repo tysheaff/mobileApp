@@ -56,6 +56,15 @@ function mnemonicToSeedHex(seedPhrase: string, extraText?: string, nonStandard?:
     return seedHex;
 }
 
+function publicKeyToECBuffer(publicKey: string): Buffer {
+    const decoded = bs58check.decode(publicKey);
+    const payload = Uint8Array.from(decoded).slice(3);
+    const ec = new EC('secp256k1');
+    const publicKeyEC = ec.keyFromPublic(payload, 'array');
+
+    return new Buffer(publicKeyEC.getPublic('array'));
+}
+
 const ecies = require("./ecies");
 
 export const crypto = {
@@ -67,5 +76,6 @@ export const crypto = {
     privateKeyToBitCloutPublicKey,
     mnemonicToSeedHex,
     aesEncrypt: (counter: Buffer, key: Buffer, data: Buffer): string => ecies.aesCtrEncrypt(counter, key, data),
-    aesDecrypt: (counter: Buffer, key: Buffer, data: Buffer): string => ecies.aesCtrDecrypt(counter, key, data)
+    aesDecrypt: (counter: Buffer, key: Buffer, data: Buffer): string => ecies.aesCtrDecrypt(counter, key, data),
+    publicKeyToECBuffer
 };

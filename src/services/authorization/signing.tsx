@@ -96,8 +96,43 @@ const decryptData = async (encryptedHex: string): Promise<string> => {
     return decryptedHex;
 }
 
+const encryptShared = async (publicKey: string, data: string): Promise<string> => {
+    const seedHex = await getSeedHex();
+
+    const privateKey = crypto.seedHexToPrivateKey(seedHex);
+    const privateKeyBuffer = privateKey.getPrivate().toArrayLike(Buffer);
+    const publicKeyBytes = crypto.publicKeyToECBuffer(publicKey);
+
+    const encryptedHex = ecies.encryptShared(
+        privateKeyBuffer,
+        publicKeyBytes,
+        data
+    );
+
+    return encryptedHex.toString('hex');
+}
+
+const decryptShared = async (publicKey: string, encryptedHex: string): Promise<string> => {
+    const seedHex = await getSeedHex();
+
+    const privateKey = crypto.seedHexToPrivateKey(seedHex);
+    const privateKeyBuffer = privateKey.getPrivate().toArrayLike(Buffer);
+    const encryptedBytes = new Buffer(encryptedHex, 'hex');
+    const publicKeyBytes = crypto.publicKeyToECBuffer(publicKey);
+
+    const decryptedHex = ecies.decryptShared(
+        privateKeyBuffer,
+        publicKeyBytes,
+        encryptedBytes
+    );
+
+    return decryptedHex;
+}
+
 export const signing = {
     signTransaction,
     decryptData,
-    signJWT
+    signJWT,
+    encryptShared,
+    decryptShared
 };

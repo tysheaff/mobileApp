@@ -7,13 +7,14 @@
  * - Remove PARITY_DEFAULT_HMAC
  * - Use const instead of var/let
  * - Use node: crypto instead of subtle
- * - User pure javascript libraries to support react-native expo
+ * - Use pure javascript libraries to support react-native expo
  */
 
+import randomBytes from 'randombytes-pure';
 const EC = require("elliptic").ec;
 const ec = new EC("secp256k1");
 const jsSHA = require("jssha");
-var aesjs = require('aes-js');
+const aesjs = require('aes-js');
 
 function assert(condition, message) {
   if (!condition) {
@@ -43,7 +44,7 @@ const kdf = function (secret, outputLength) {
 const convertUtf8 = (function () {
   function utf8ByteToUnicodeStr(utf8Bytes) {
     var unicodeStr = "";
-    for (var pos = 0; pos < utf8Bytes.length; ) {
+    for (var pos = 0; pos < utf8Bytes.length;) {
       var flag = utf8Bytes[pos];
       var unicode = 0;
       if (flag >>> 7 === 0) {
@@ -121,9 +122,14 @@ const convertUtf8 = (function () {
 
 // AES-128-CTR is used in the Parity implementation
 // Get the AES-128-CTR browser implementation
-export const aesCtrEncrypt = function (counter, key, data) {
+export const aesCtrEncrypt = function (counter, key, data, convertToString = true) {
   var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(counter));
   var encryptedBytes = aesCtr.encrypt(data);
+
+  if (!convertToString) {
+    return encryptedBytes;
+  }
+
   var encryptedText = aesjs.utils.hex.fromBytes(encryptedBytes);
   return encryptedText;
 }
@@ -173,8 +179,8 @@ export const encrypt = function (publicKeyTo, msg, opts) {
   const shaObj = new jsSHA("SHA-256", "UINT8ARRAY", { encoding: "UTF8" });
   shaObj.update(hash.slice(16));
   const macKey = new Buffer(shaObj.getHash("UINT8ARRAY"));
-
-  const ciphertext = aesCtrEncrypt(iv, encryptionKey, msg);
+  const msgBuffer = new Buffer(msg);
+  const ciphertext = aesCtrEncrypt(iv, encryptionKey, msgBuffer, false);
   const dataToMac = Buffer.from([...iv, ...ciphertext]);
   const HMAC = hmacSha256Sign(macKey, dataToMac);
 
@@ -210,3 +216,25 @@ export const decrypt = function (privateKey, encrypted) {
   const decrypted = aesCtrDecrypt(iv, encryptionKey, ciphertext);
   return decrypted;
 };
+
+export const getPublic = function (privateKey) {
+  assert(privateKey.length === 32, "Bad private key");
+  return new Buffer(ec.keyFromPrivate(privateKey).getPublic("arr"));
+};
+
+export const encryptShared = function (privateKeySender, publicKeyRecipient, msg, opts) {
+  opts = opts || {};
+  const sharedPx = derive(privateKeySender, publicKeyRecipient)
+  const sharedPrivateKey = kdf(sharedPx, 32);
+  const sharedPublicKey = getPublic(sharedPrivateKey);
+
+  return encrypt(sharedPublicKey, msg, opts);
+}
+
+export const decryptShared = function (privateKeyRecipient, publicKeySender, encrypted, opts) {
+  opts = opts || {};
+  const sharedPx = derive(privateKeyRecipient, publicKeySender);
+  const sharedPrivateKey = kdf(sharedPx, 32);
+
+  return decrypt(sharedPrivateKey, encrypted, opts);
+}

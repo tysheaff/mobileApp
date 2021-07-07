@@ -443,15 +443,10 @@ function sendMessage(p_senderPublicKey: string, p_recipientPublicKey: string, p_
     return post(
         route,
         {
-            Broadcast: true,
-            MessageText: p_message,
+            EncryptedMessageText: p_message,
             MinFeeRateNanosPerKB: 1000,
-            Password: '',
             RecipientPublicKeyBase58Check: p_recipientPublicKey,
-            SeedInfo: null,
             SenderPublicKeyBase58Check: p_senderPublicKey,
-            Sign: true,
-            Validate: true,
         }
     );
 }

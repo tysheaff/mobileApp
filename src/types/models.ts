@@ -156,6 +156,7 @@ export interface Message {
     SenderPublicKeyBase58Check: string;
     TstampNanos: number;
     LastOfGroup?: boolean;
+    V2: boolean;
 }
 
 export interface DiamondSender {
