@@ -18,6 +18,7 @@ import { parseVideoLinkAsync } from '@services/videoLinkParser';
 import { CloutTagSuggestionList } from './cloutTagSuggestionList.component';
 import CloutFeedVideoComponent from './post/cloutFeedVideo.component';
 import { eventManager } from '@globals/injector';
+import { wait } from '@services/promiseHelper';
 
 export function CreatePostComponent(
     { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }:
@@ -66,6 +67,8 @@ export function CreatePostComponent(
                             return;
                         }
                     }
+
+                    await wait(250);
                     result = await ImagePicker.launchCameraAsync(
                         {
                             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -81,6 +84,8 @@ export function CreatePostComponent(
                             return;
                         }
                     }
+
+                    await wait(250);
                     result = await ImagePicker.launchImageLibraryAsync(
                         {
                             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -101,7 +106,6 @@ export function CreatePostComponent(
                     alert('We just support images at the moment.');
                 }
             }
-
         };
 
         eventManager.dispatchEvent(

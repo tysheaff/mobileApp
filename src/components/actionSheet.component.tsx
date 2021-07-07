@@ -15,9 +15,9 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
         return () => { _isMounted = false };
     }, [])
 
-    function onOptionClick(p_optionIndex: number) {
-        props.config?.callback(p_optionIndex);
+    async function onOptionClick(p_optionIndex: number) {
         close();
+        props.config?.callback(p_optionIndex);
     }
 
     function close() {
