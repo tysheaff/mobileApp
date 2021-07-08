@@ -115,7 +115,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                     }
                 );
                 const promotions: CloutCastPromotion[] = responses[2].data;
-                this._allPromotions = promotions;
+                this._allPromotions = promotions.sort((p1, p2) => p2.header.rate - p1.header.rate);
                 this._blackList = responses[3];
                 this.loadPosts(false);
             }
