@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View, StyleSheet, FlatList, Linking } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { themeStyles } from '@styles';
@@ -12,7 +12,13 @@ interface Settings {
 }
 
 export function SettingsScreen({ navigation }: any) {
+
     const settings: Settings[] = [
+        {
+            title: 'Notifications',
+            icon: <Ionicons name="md-notifications-outline" size={28} color={themeStyles.fontColorMain.color} />,
+            action: () => navigation.navigate('NotificationsSettings')
+        },
         {
             title: 'Haptics',
             icon: <MaterialCommunityIcons name="vibrate" size={24} color={themeStyles.fontColorMain.color} />,
@@ -20,17 +26,17 @@ export function SettingsScreen({ navigation }: any) {
         },
         {
             title: 'Feed',
-            icon: <MaterialCommunityIcons style={{ marginRight: -4 }} name="lightning-bolt-outline" size={28} color={themeStyles.fontColorMain.color} />,
+            icon: <MaterialCommunityIcons name="lightning-bolt-outline" size={24} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('FeedSettings')
         },
         {
             title: 'Saved Posts',
-            icon: <Feather name="bookmark" size={22} color={themeStyles.fontColorMain.color} />,
+            icon: <Feather name="bookmark" size={24} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('SavedPosts')
         },
         {
             title: 'Blocked Users',
-            icon: <Entypo name="block" size={22} color={themeStyles.fontColorMain.color} />,
+            icon: <Entypo name="block" size={24} color={themeStyles.fontColorMain.color} />,
             action: () => navigation.navigate('BlockedUsers')
         },
         {
@@ -55,12 +61,21 @@ export function SettingsScreen({ navigation }: any) {
         },
         {
             title: 'CloutFeed v 1.4.4',
-            icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={18} color={themeStyles.fontColorMain.color} />,
+            icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={24} color={themeStyles.fontColorMain.color} />,
             action: () => { }
         },
     ];
 
-    const keyExtractor = (item: any, index: number) => item.toString() + index.toString();
+    const appearance: Settings = {
+        title: 'Appearance',
+        icon: <Ionicons name="ios-color-palette" size={24} color={themeStyles.fontColorMain.color} />,
+        action: () => navigation.navigate('Appearance'),
+
+    }
+
+    globals.followerFeatures && settings.unshift(appearance);
+
+    const keyExtractor = (item: Settings, index: number) => `${item.title}_${index.toString()}`;
 
     const renderItem = (p_item: Settings) => {
         return <TouchableOpacity
@@ -74,16 +89,6 @@ export function SettingsScreen({ navigation }: any) {
 
     return (
         <View style={[styles.container, themeStyles.containerColorSub]}>
-            {
-                globals.followerFeatures &&
-                <TouchableOpacity
-                    style={[styles.buttonContainer, themeStyles.containerColorMain, themeStyles.borderColor]}
-                    onPress={() => navigation.navigate('Appearance')}
-                    activeOpacity={1}>
-                    <Ionicons name="ios-color-palette" size={24} color={themeStyles.fontColorMain.color} />
-                    <Text style={[styles.buttonText, themeStyles.fontColorMain]}>Appearance</Text>
-                </TouchableOpacity>
-            }
             <FlatList
                 data={settings}
                 renderItem={({ item }) => renderItem(item)}

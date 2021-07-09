@@ -22,6 +22,7 @@ import { SavedPostsScreen } from '@screens/savedPosts/savedPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
 import HapticsScreen from '@screens/settings/haptics.screen';
+import NotificationsSettingsScreen from '@screens/settings/notificationsSettings.screen';
 
 const ProfileStack = createStackNavigator();
 
@@ -151,6 +152,14 @@ export default function ProfileStackScreen() {
                 }}
                 name="HapticsSettings"
                 component={HapticsScreen}
+            />
+            <ProfileStack.Screen
+                options={{
+                    headerTitle: 'Notifications',
+                    headerBackTitle: ' ',
+                }}
+                name="NotificationsSettings"
+                component={NotificationsSettingsScreen}
             />
             <ProfileStack.Screen
                 options={

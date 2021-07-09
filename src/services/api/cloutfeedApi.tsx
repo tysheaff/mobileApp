@@ -95,6 +95,27 @@ const getNotificationSubscriptions = (p_publicKey: string, p_jwt: string, p_subs
     );
 }
 
+const getNotificationsSettings = (publicKey: string, jwt: string) => {
+    const route = 'notifications/get-settings';
+    return post(
+        route,
+        { publicKey, jwt }
+    );
+}
+
+const updateNotificationsSettings = (publicKey: string, jwt: string, notificationSetting: string, active: boolean) => {
+    const route = 'notifications/settings/update';
+    return put(
+        route,
+        {
+            publicKey,
+            jwt,
+            notificationSetting,
+            active
+        }
+    );
+}
+
 const subscribeNotifications = (p_publicKey: string, p_jwt: string, p_subscribedPublicKey: string, p_notificationType: string) => {
     const route = 'notifications/subscribe';
 
@@ -130,5 +151,7 @@ export const cloutFeedApi = {
     unregisterNotificationsPushToken,
     getNotificationSubscriptions,
     subscribeNotifications,
-    unSubscribeNotifications
+    unSubscribeNotifications,
+    getNotificationsSettings,
+    updateNotificationsSettings
 };
