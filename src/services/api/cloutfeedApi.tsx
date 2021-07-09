@@ -5,11 +5,18 @@ const headers = {
 
 const host = 'https://cloutfeedapi.azurewebsites.net/';
 
-function handleResponse(p_response: Response) {
+async function handleResponse(p_response: Response) {
     if (p_response.ok) {
         return p_response.json();
     } else {
-        const error = new Error(JSON.stringify(p_response));
+        let json = undefined;
+        try {
+            json = await p_response.json();
+        } catch {
+        }
+        const error = new Error();
+        (error as any).response = p_response;
+        (error as any).json = json;
         (error as any).status = p_response.status;
         throw error;
     }

@@ -63,19 +63,18 @@ export function SettingsScreen({ navigation }: any) {
             title: 'CloutFeed v 1.4.4',
             icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={24} color={themeStyles.fontColorMain.color} />,
             action: () => { }
-        },
+        }
     ];
 
     const appearance: Settings = {
         title: 'Appearance',
         icon: <Ionicons name="ios-color-palette" size={24} color={themeStyles.fontColorMain.color} />,
-        action: () => navigation.navigate('Appearance'),
-
+        action: () => navigation.navigate('Appearance')
     }
 
     globals.followerFeatures && settings.unshift(appearance);
 
-    const keyExtractor = (item: Settings, index: number) => `${item.title}_${index.toString()}`;
+    const keyExtractor = (item: Settings, index: number) => item.toString() + index.toString();
 
     const renderItem = (p_item: Settings) => {
         return <TouchableOpacity
@@ -88,9 +87,10 @@ export function SettingsScreen({ navigation }: any) {
     };
 
     return (
-        <View style={[styles.container, themeStyles.containerColorSub]}>
+        <View style={[styles.container, themeStyles.containerColorMain]}>
             <FlatList
                 data={settings}
+                initialNumToRender={11}
                 renderItem={({ item }) => renderItem(item)}
                 keyExtractor={keyExtractor}
             />

@@ -7,14 +7,14 @@ import { globals } from '@globals/globals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 enum NotificationSetting {
-    Active = 'General',
+    Active = 'Active',
     Like = 'Like',
     Follow = 'Follow',
     Comment = 'Comment',
     Mention = 'Mention',
     Reclout = 'Reclout',
-    Monetary = 'Monetary',
-    Diamond = 'Diamond'
+    Diamond = 'Diamond',
+    Monetary = 'Monetary'
 }
 
 type NotificationSettings = {
@@ -26,9 +26,11 @@ interface Props { }
 interface State {
     isLoading: boolean;
     notificationSettings: NotificationSettings;
+    permissionDenied: boolean;
 }
 
 interface Option {
+    key: NotificationSetting;
     title: string;
     state: boolean;
 }
@@ -45,15 +47,16 @@ export default class NotificationsSettingsScreen extends React.Component<Props, 
         this.state = {
             isLoading: true,
             notificationSettings: {
-                General: false,
+                Active: false,
                 Like: false,
                 Follow: false,
                 Comment: false,
                 Mention: false,
                 Reclout: false,
-                Monetary: false,
-                Diamond: false
-            }
+                Diamond: false,
+                Monetary: false
+            },
+            permissionDenied: false
         };
 
         this.updateSettings = this.updateSettings.bind(this);
@@ -86,55 +89,39 @@ export default class NotificationsSettingsScreen extends React.Component<Props, 
             if (this._isMounted) {
                 this.setState(
                     {
-                        notificationSettings:
-                        {
-                            General: response.active,
+                        notificationSettings: {
+                            Active: response.active,
                             Like: response.like,
                             Follow: response.follow,
                             Comment: response.comment,
                             Mention: response.mention,
                             Reclout: response.reclout,
-                            Monetary: response.monetary,
-                            Diamond: response.diamond
-                        }
+                            Diamond: response.diamond,
+                            Monetary: response.monetary
+                        },
+                        isLoading: false
                     }
                 );
             }
         }
         catch (error) {
-            globals.defaultHandleError(error);
-        } finally {
-            if (this._isMounted) {
-                this.setState({ isLoading: false });
+            if (error.json.errorId === 1) {
+                if (this._isMounted) {
+                    this.setState(
+                        {
+                            permissionDenied: true,
+                            isLoading: false
+                        }
+                    );
+                }
+            } else {
+                globals.defaultHandleError(error);
             }
         }
     }
 
     private async updateSettings(type: NotificationSetting, isActive: boolean) {
-        if (type !== NotificationSetting.Active) {
-            try {
-                if (this._isMounted) {
-                    this.setState(
-                        prevState => {
-                            const settings = prevState.notificationSettings;
-                            (settings as any)[type] = !(settings as any)[type];
-                            return { notificationSettings: settings };
-                        }
-                    );
-                }
-                await cloutFeedApi.updateNotificationsSettings(globals.user.publicKey, this._jwt, type, isActive);
-            } catch (error) {
-                if (this._isMounted) {
-                    this.setState(
-                        prevState => {
-                            const settings = prevState.notificationSettings;
-                            (settings as any)[type] = !(settings as any)[type];
-                            return { notificationSettings: settings };
-                        }
-                    );
-                }
-            }
-        } else {
+        try {
             if (this._isMounted) {
                 this.setState(
                     prevState => {
@@ -143,22 +130,17 @@ export default class NotificationsSettingsScreen extends React.Component<Props, 
                         return { notificationSettings: settings };
                     }
                 );
-                try {
-                    if (this.state.notificationSettings.General) {
-                        await cloutFeedApi.unregisterNotificationsPushToken(globals.user.publicKey, this._jwt);
-                    } else {
-                        await notificationsService.registerPushToken();
+            }
+            await cloutFeedApi.updateNotificationsSettings(globals.user.publicKey, this._jwt, type, isActive);
+        } catch (error) {
+            if (this._isMounted) {
+                this.setState(
+                    prevState => {
+                        const settings = prevState.notificationSettings;
+                        (settings as any)[type] = !(settings as any)[type];
+                        return { notificationSettings: settings };
                     }
-                } catch (error) {
-                    this.setState(
-                        prevState => {
-                            const settings = prevState.notificationSettings;
-                            (settings as any)[type] = !(settings as any)[type];
-                            return { notificationSettings: settings };
-                        }
-                    );
-                    globals.defaultHandleError(error);
-                }
+                );
             }
         }
     }
@@ -169,26 +151,45 @@ export default class NotificationsSettingsScreen extends React.Component<Props, 
             return <CloutFeedLoader />;
         }
 
-        const options: Option[] = Object.keys(this.state.notificationSettings).map(
-            (key: string) => {
-                return {
-                    title: key,
-                    state: (this.state.notificationSettings as any)[key]
-                };
-            }
-        );
+        if (this.state.permissionDenied) {
+            return <View style={[styles.permissionDeniedContainer, themeStyles.containerColorMain]}>
+                <Text style={[themeStyles.fontColorMain, styles.permissionDeniedText]}>
+                    Notifications permission not permitted. Please activate the notifications from the device settings and reload the application. 
+                </Text>
+            </View>
+        }
 
-        const thumbColor: any = !this.state.notificationSettings.General ? themeStyles.buttonDisabledColor.backgroundColor : "white";
+        const options: Option[] = [
+            {
+                key: NotificationSetting.Active,
+                title: 'Allow Notifications',
+                state: this.state.notificationSettings.Active
+            }
+        ];
+
+        if (this.state.notificationSettings.Active) {
+            options.push(
+                ...Object.keys(this.state.notificationSettings).slice(1).map(
+                    (key: string) => {
+                        return {
+                            key: key as NotificationSetting,
+                            title: key,
+                            state: (this.state.notificationSettings as any)[key]
+                        };
+                    }
+                )
+            );
+        }
+
         const keyExtractor = (item: Option, index: number) => `${item}_${index.toString()}`;
         const renderItem = (item: Option) => <View style={[styles.row, themeStyles.containerColorMain, themeStyles.borderColor]}>
             <Text style={[styles.rowText, themeStyles.fontColorMain]}>{item.title}</Text>
             <Switch
                 trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
-                thumbColor={thumbColor}
+                thumbColor={'white'}
                 ios_backgroundColor={themeStyles.switchColor.color}
-                onValueChange={(newState) => this.updateSettings(item.title as NotificationSetting, newState)}
+                onValueChange={(newState) => this.updateSettings(item.key, newState)}
                 value={item.state}
-                disabled={item.title !== 'General' && !this.state.notificationSettings.General}
             />
         </View >;
 
@@ -216,6 +217,17 @@ const styles = StyleSheet.create(
         },
         rowText: {
             fontWeight: '600'
+        },
+        permissionDeniedContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20
+        },
+        permissionDeniedText: {
+            fontSize: 16,
+            textAlign: 'center',
+            marginBottom: '20%'
         }
     }
 );
