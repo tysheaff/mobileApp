@@ -9,6 +9,8 @@ export interface CloutCastPromotion {
     events: CloutCastPromotionEvent;
     promoters: CloutCastPromotionClient[];
     post?: Post;
+    requirementsMet?: boolean;
+    alreadyPromoted?: boolean;
 }
 
 export interface CloutCastPromotionClient {

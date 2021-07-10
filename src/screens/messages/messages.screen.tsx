@@ -204,8 +204,7 @@ export class MessagesScreen extends React.Component<Props, State>{
                 this.setState({ messagesFilter: p_filter, messagesSort: p_sort, isFilterShown: false });
                 this.loadMessages(p_filter, p_sort);
             }
-        }
-        catch {
+        } catch {
 
         }
     }
@@ -251,11 +250,9 @@ export class MessagesScreen extends React.Component<Props, State>{
                 <MessageSettingsComponent
                     filter={this.state.messagesFilter}
                     sort={this.state.messagesSort}
-                    toggleMessagesFilter={this.toggleMessagesFilter}
                     isFilterShown={this.state.isFilterShown}
                     onSettingsChange={this.onMessageSettingChange}
                 />
-
             }
         </View>
     }

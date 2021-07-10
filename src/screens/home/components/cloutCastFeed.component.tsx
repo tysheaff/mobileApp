@@ -5,11 +5,13 @@ import { signing } from "@services/authorization/signing";
 import { themeStyles } from "@styles/globalColors";
 import { CloutCastPromotion, Post } from "@types";
 import React from "react";
-import { ActivityIndicator, FlatList, RefreshControl, View, Text, StyleSheet, Linking } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, View, Text, StyleSheet, Linking, Image, TouchableOpacity } from "react-native";
 import { CloutCastPostComponent } from "./cloutCastPost.component";
 import * as SecureStore from 'expo-secure-store';
 import { CloutCastIntroductionComponent } from "./cloutCastIntroduction.component";
 import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { Ionicons } from '@expo/vector-icons';
+import { CloutCastFeedFilter, CloutCastFeedSettingsComponent, CloutCastFeedSort } from "./cloutCastFeedSettings.component";
 
 interface Props {
     navigation: NavigationProp<any> | any;
@@ -17,13 +19,14 @@ interface Props {
 }
 
 interface State {
+    isFilterShown: boolean;
     introduction: boolean;
     isLoading: boolean;
     promotions: CloutCastPromotion[];
     isLoadingMore: boolean;
     isRefreshing: boolean;
-    followersCount: number;
-    coinPrice: number;
+    filter: CloutCastFeedFilter;
+    sort: CloutCastFeedSort;
 }
 
 export class CloutCastFeedComponent extends React.Component<Props, State>{
@@ -41,13 +44,14 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         super(props);
 
         this.state = {
+            isFilterShown: false,
             isLoading: true,
             promotions: [],
             isLoadingMore: false,
             isRefreshing: false,
-            coinPrice: 0,
-            followersCount: 0,
-            introduction: false
+            introduction: false,
+            filter: CloutCastFeedFilter.ForMe,
+            sort: CloutCastFeedSort.HighestPayout
         };
 
         this._flatListRef = React.createRef();
@@ -63,6 +67,8 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         this.loadData = this.loadData.bind(this);
         this.finishIntroduction = this.finishIntroduction.bind(this);
         this.goToCloutCast = this.goToCloutCast.bind(this);
+        this.openSettings = this.openSettings.bind(this);
+        this.onSettingsChange = this.onSettingsChange.bind(this);
     }
 
     componentDidMount() {
@@ -93,6 +99,14 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                 this.setState({ promotions: [], isLoading: true });
             }
 
+            const filterKey = globals.user.publicKey + constants.localStorage_cloutCastFeedFilter;
+            const filterString = await SecureStore.getItemAsync(filterKey);
+            const filter = filterString ? filterString as CloutCastFeedFilter : CloutCastFeedFilter.ForMe;
+
+            const sortKey = globals.user.publicKey + constants.localStorage_cloutCastFeedSort;
+            const sortString = await SecureStore.getItemAsync(sortKey);
+            const sort = sortString ? sortString as CloutCastFeedSort : CloutCastFeedSort.HighestPayout;
+
             const jwt = await signing.signJWT();
             const response = await cloutCastApi.authenticate(globals.user.publicKey, globals.user.username, jwt);
 
@@ -110,18 +124,69 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
             if (this._isMounted) {
                 this.setState(
                     {
-                        coinPrice: responses[0].ProfileEntryResponse?.CoinPriceBitCloutNanos,
-                        followersCount: responses[1].NumFollowers
+                        filter,
+                        sort
                     }
                 );
+                const coinPrice = responses[0].ProfileEntryResponse?.CoinPriceBitCloutNanos;
+                const followersCount = responses[1].NumFollowers;
                 const promotions: CloutCastPromotion[] = responses[2].data;
-                this._allPromotions = promotions.sort((p1, p2) => p2.header.rate - p1.header.rate);
+                this._allPromotions = this.preProcessPromotions(promotions, filter, sort, coinPrice, followersCount);
                 this._blackList = responses[3];
                 this.loadPosts(false);
             }
         } catch {
             // TODO show error
         }
+    }
+
+    private preProcessPromotions(
+        promotions: CloutCastPromotion[],
+        filter: CloutCastFeedFilter,
+        sort: CloutCastFeedSort,
+        coinPrice: number,
+        followersCount: number) {
+        let returnValue = promotions;
+
+        for (const promotion of promotions) {
+            promotion.requirementsMet = this.checkRequirements(promotion, coinPrice, followersCount);
+            promotion.alreadyPromoted = !!promotion.promoters?.find(
+                promotion => promotion.publicKey === globals.user.publicKey
+            );
+        }
+
+        if (filter === CloutCastFeedFilter.ForMe) {
+            returnValue = returnValue.filter(promotion => promotion.requirementsMet && !promotion.alreadyPromoted);
+        }
+
+        if (sort === CloutCastFeedSort.HighestPayout) {
+            returnValue = returnValue.sort((p1, p2) => p2.header.rate - p1.header.rate);
+        } else if (sort === CloutCastFeedSort.LowestPayout) {
+            returnValue = returnValue.sort((p1, p2) => p1.header.rate - p2.header.rate);
+        }
+
+        return returnValue
+    }
+
+    private checkRequirements(promotion: CloutCastPromotion, coinPrice: number, followersCount: number): boolean {
+        let valid = false;
+
+        const criteria = promotion?.criteria;
+
+        const minFollowers: number | undefined = criteria?.minFollowerCount;
+        valid = minFollowers != null && minFollowers > 0 && followersCount >= minFollowers;
+
+        if (valid) {
+            const minCoinPrice: number | undefined = criteria.minCoinPrice;
+            valid = minCoinPrice != null && minCoinPrice > 0 && coinPrice >= minCoinPrice;
+        }
+
+        if (!valid) {
+            const allowedUsers = criteria.allowedUsers;
+            valid = allowedUsers?.length > 0 && allowedUsers.indexOf(globals.user.publicKey) !== -1;
+        }
+
+        return valid;
     }
 
     private async loadPosts(p_loadMore: boolean) {
@@ -208,6 +273,32 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         Linking.openURL('https://cloutcast.io/')
     }
 
+    private openSettings() {
+        this.setState({ isFilterShown: true });
+    }
+
+    private async onSettingsChange(filter: CloutCastFeedFilter, sort: CloutCastFeedSort) {
+        try {
+            if (filter === this.state.filter && sort === this.state.sort) {
+                this.setState({ isFilterShown: false });
+                return;
+            }
+
+            const filterKey = globals.user.publicKey + constants.localStorage_cloutCastFeedFilter;
+            await SecureStore.setItemAsync(filterKey, filter);
+
+            const sortKey = globals.user.publicKey + constants.localStorage_cloutCastFeedSort;
+            await SecureStore.setItemAsync(sortKey, sort);
+
+            if (this._isMounted) {
+                this.setState({ filter, sort, isFilterShown: false });
+                this.loadData();
+            }
+        } catch {
+
+        }
+    }
+
     render() {
         if (this.state.introduction) {
             return <CloutCastIntroductionComponent close={this.finishIntroduction}></CloutCastIntroductionComponent>;
@@ -218,47 +309,73 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         }
 
         const keyExtractor = (item: CloutCastPromotion, index: number) => (item.post as Post).PostHashHex + index;
-        const renderItem = (item: CloutCastPromotion) => {
-            return <CloutCastPostComponent
-                route={this.props.route}
-                navigation={this.props.navigation}
-                promotion={item}
-                followersCount={this.state.followersCount}
-                coinPrice={this.state.coinPrice} />
-        };
+        const renderItem = this.state.promotions.length > 0 ?
+            (item: CloutCastPromotion) => {
+                return <CloutCastPostComponent
+                    route={this.props.route}
+                    navigation={this.props.navigation}
+                    promotion={item} />
+            } :
+            () => < Text
+                style={[
+                    styles.NoPromotionsText,
+                    themeStyles.fontColorSub
+                ]}>No promotions found</Text>;
 
         const renderHeader = <View style={[styles.header, themeStyles.containerColorMain]}>
-            <Text style={[themeStyles.fontColorMain]} onPress={this.goToCloutCast}>Powered by
-                <Text style={[styles.headerLink, themeStyles.linkColor]}> CloutCast</Text>
+            <Image
+                style={styles.cloutCastLogo}
+                source={require('../../../../assets/cloutCastLogo.png')}
+            ></Image>
+            <Text style={[themeStyles.fontColorMain]} onPress={this.goToCloutCast}>
+                <Text style={[styles.headerLink, themeStyles.linkColor]} onPress={this.goToCloutCast}>Powered by CloutCast</Text>
             </Text>
+
+            <TouchableOpacity
+                style={styles.filterButton}
+                onPress={this.openSettings}
+            >
+                <Ionicons name="ios-filter" size={24} color={themeStyles.fontColorMain.color} />
+            </TouchableOpacity>
         </View>;
 
         const renderFooter = this.state.isLoadingMore && !this.state.isLoading ?
             <ActivityIndicator color={themeStyles.fontColorMain.color} /> : undefined;
 
-        return <FlatList
-            ref={this._flatListRef}
-            onMomentumScrollEnd={(p_event: any) => this._currentScrollPosition = p_event.nativeEvent.contentOffset.y}
-            data={this.state.promotions}
-            showsVerticalScrollIndicator={true}
-            keyExtractor={keyExtractor}
-            renderItem={({ item }) => renderItem(item)}
-            onEndReached={() => this.loadPosts(true)}
-            initialNumToRender={3}
-            onEndReachedThreshold={3}
-            maxToRenderPerBatch={5}
-            windowSize={8}
-            stickyHeaderIndices={[0]}
-            refreshControl={<RefreshControl
-                tintColor={themeStyles.fontColorMain.color}
-                titleColor={themeStyles.fontColorMain.color}
-                refreshing={this.state.isRefreshing}
-                onRefresh={this.loadData}
+        return <>
+            <FlatList
+                ref={this._flatListRef}
+                onMomentumScrollEnd={(p_event: any) => this._currentScrollPosition = p_event.nativeEvent.contentOffset.y}
+                data={this.state.promotions.length > 0 ? this.state.promotions : [{ post: { PostHashHex: 'Empty' } }] as any[]}
+                showsVerticalScrollIndicator={true}
+                keyExtractor={keyExtractor}
+                renderItem={({ item }) => renderItem(item)}
+                onEndReached={() => this.loadPosts(true)}
+                initialNumToRender={3}
+                onEndReachedThreshold={3}
+                maxToRenderPerBatch={5}
+                windowSize={8}
+                stickyHeaderIndices={[0]}
+                refreshControl={<RefreshControl
+                    tintColor={themeStyles.fontColorMain.color}
+                    titleColor={themeStyles.fontColorMain.color}
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={this.loadData}
+                />
+                }
+                ListHeaderComponent={renderHeader}
+                ListFooterComponent={renderFooter}
             />
+            {
+                this.state.isFilterShown &&
+                <CloutCastFeedSettingsComponent
+                    filter={this.state.filter}
+                    sort={this.state.sort}
+                    isFilterShown={this.state.isFilterShown}
+                    onSettingsChange={this.onSettingsChange}
+                />
             }
-            ListHeaderComponent={renderHeader}
-            ListFooterComponent={renderFooter}
-        />
+        </>;
     }
 }
 
@@ -266,9 +383,29 @@ const styles = StyleSheet.create(
     {
         header: {
             paddingLeft: 10,
-            paddingBottom: 5
+            paddingBottom: 5,
+            flexDirection: 'row',
+            alignItems: 'center'
         },
         headerLink: {
+            fontWeight: '600'
+        },
+        cloutCastLogo: {
+            height: 25,
+            width: 25,
+            marginRight: 5,
+            borderRadius: 4
+        },
+        filterButton: {
+            marginLeft: 'auto',
+            marginRight: 8,
+            paddingRight: 4,
+            paddingLeft: 4
+        },
+        NoPromotionsText: {
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginTop: 30,
             fontWeight: '500'
         }
     }

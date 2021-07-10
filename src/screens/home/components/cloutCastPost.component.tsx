@@ -11,8 +11,6 @@ interface Props {
     navigation: NavigationProp<any> | any;
     route: any;
     promotion: CloutCastPromotion;
-    followersCount: number;
-    coinPrice: number;
 }
 
 export class CloutCastPostComponent extends React.Component<Props> {
@@ -38,8 +36,6 @@ export class CloutCastPostComponent extends React.Component<Props> {
                 route={this.props.route}
                 navigation={this.props.navigation}
                 promotion={this.props.promotion}
-                followersCount={this.props.followersCount}
-                coinPrice={this.props.coinPrice}
             ></CloutCastPostActionsComponent>
         </View>;
     }

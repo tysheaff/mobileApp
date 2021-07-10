@@ -13,8 +13,6 @@ interface Props {
     navigation: NavigationProp<any> | any;
     route: any;
     promotion: CloutCastPromotion;
-    followersCount: number;
-    coinPrice: number;
 }
 
 interface State {
@@ -23,8 +21,6 @@ interface State {
 
 export class CloutCastPostActionsComponent extends React.Component<Props, State> {
 
-    private _meetRequirements = false;
-    private _alreadyPromoted = false;
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -34,8 +30,6 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
             working: false
         };
 
-        this.checkRequirements();
-        this.checkAlreadyPromoted();
         this.onActionClick = this.onActionClick.bind(this);
         this.onVerifyClick = this.onVerifyClick.bind(this);
     }
@@ -53,39 +47,12 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
             p_nextState.working !== this.state.working;
     }
 
-    private checkRequirements() {
-        let valid = false;
-
-        const criteria = this.props.promotion?.criteria;
-
-        const minFollowers: number | undefined = criteria?.minFollowerCount;
-        valid = minFollowers != null && minFollowers > 0 && this.props.followersCount >= minFollowers;
-
-        if (valid) {
-            const minCoinPrice: number | undefined = criteria.minCoinPrice;
-            valid = minCoinPrice != null && minCoinPrice > 0 && this.props.coinPrice >= minCoinPrice;
-        }
-
-        if (!valid) {
-            const allowedUsers = criteria.allowedUsers;
-            valid = allowedUsers?.length > 0 && allowedUsers.indexOf(globals.user.publicKey) !== -1;
-        }
-
-        this._meetRequirements = valid;
-    }
-
-    private checkAlreadyPromoted() {
-        this._alreadyPromoted = !!this.props.promotion.promoters?.find(
-            p_promotion => p_promotion.publicKey === globals.user.publicKey
-        );
-    }
-
     private onActionClick() {
         if (this.state.working) {
             return;
         }
 
-        if (!this._meetRequirements) {
+        if (!this.props.promotion.requirementsMet) {
             Alert.alert('Sorry', 'You don\'t meet the requirements to promote this post.');
             return;
         }
@@ -131,7 +98,7 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
         try {
             const jwt = await signing.signJWT();
             await cloutCastApi.proofOfWork(this.props.promotion.id, globals.user.publicKey, jwt, globals.cloutCastToken);
-            this._alreadyPromoted = true;
+            this.props.promotion.alreadyPromoted = true;
             const rate = this.props.promotion.header.rate;
             const formattedRate = calculateAndFormatBitCloutInUsd(rate);
 
@@ -153,14 +120,14 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
     }
 
     render() {
-        if (!this._meetRequirements) {
+        if (!this.props.promotion.requirementsMet) {
             return <View style={[styles.requirementsNotMetContainer, themeStyles.modalBackgroundColor]}>
                 <Entypo style={{ marginRight: 4 }} name="emoji-sad" size={18} color={themeStyles.fontColorSub.color} />
                 <Text style={[styles.actionText, themeStyles.fontColorMain]}>Requirements not met</Text>
             </View>;
         }
 
-        if (this._alreadyPromoted) {
+        if (this.props.promotion.alreadyPromoted) {
             return <View style={[styles.requirementsNotMetContainer, themeStyles.modalBackgroundColor]}>
                 <Entypo style={{ marginRight: 4 }} name="emoji-happy" size={18} color={themeStyles.fontColorSub.color} />
                 <Text style={[styles.actionText, themeStyles.fontColorMain]}>Already promoted</Text>

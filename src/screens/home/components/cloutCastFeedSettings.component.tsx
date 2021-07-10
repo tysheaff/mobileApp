@@ -1,42 +1,39 @@
 import { SelectListControl } from "@controls/selectList.control";
 import { themeStyles } from "@styles/globalColors";
 import React from "react";
-import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView, Platform } from "react-native";
+import { View, StyleSheet, Text, ScrollView } from "react-native";
 import Modal from 'react-native-modal'
 
-export enum MessageFilter {
-    Holders = 'Holders',
-    Holding = 'Holding',
-    Followers = 'Followers',
-    Following = 'Following'
+export enum CloutCastFeedFilter {
+    None = 'None',
+    ForMe = 'ForMe'
 }
 
-export enum MessageSort {
-    MostRecent = 'time',
-    MostFollowed = 'followers',
-    MostClout = 'clout',
-    LargestHolder = 'holders',
+export enum CloutCastFeedSort {
+    None = 'None',
+    HighestPayout = 'HighestPayout',
+    LowestPayout = 'LowestPayout'
 }
 
 interface Props {
-    filter: MessageFilter[];
-    sort: MessageSort;
-    onSettingsChange: (p_filter: MessageFilter[], p_sort: MessageSort) => void;
+    filter: CloutCastFeedFilter;
+    sort: CloutCastFeedSort;
+    onSettingsChange: (p_filter: CloutCastFeedFilter, p_sort: CloutCastFeedSort) => void;
     isFilterShown: boolean;
 }
 
 interface State {
-    filter: MessageFilter[];
-    sort: MessageSort;
+    filter: CloutCastFeedFilter;
+    sort: CloutCastFeedSort;
 }
 
-export class MessageSettingsComponent extends React.Component<Props, State> {
+export class CloutCastFeedSettingsComponent extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            filter: this.props.filter.slice(0),
+            filter: this.props.filter,
             sort: this.props.sort,
         }
 
@@ -45,11 +42,11 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
         this.onDone = this.onDone.bind(this);
     }
 
-    onFilterValueChange(p_value: MessageFilter[]) {
+    onFilterValueChange(p_value: CloutCastFeedFilter) {
         this.setState({ filter: p_value });
     }
 
-    onSortValueChange(p_value: MessageSort) {
+    onSortValueChange(p_value: CloutCastFeedSort) {
         this.setState({ sort: p_value });
     }
 
@@ -76,25 +73,16 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
                     style={[styles.selectList]}
                     options={[
                         {
-                            name: 'Holders',
-                            value: MessageFilter.Holders
+                            name: 'None',
+                            value: CloutCastFeedFilter.None
                         },
                         {
-                            name: 'Holding',
-                            value: MessageFilter.Holding
-                        },
-                        {
-                            name: 'Followers',
-                            value: MessageFilter.Followers
-                        },
-                        {
-                            name: 'Following',
-                            value: MessageFilter.Following
+                            name: 'For me',
+                            value: CloutCastFeedFilter.ForMe
                         }
                     ]}
                     value={this.state.filter}
                     onValueChange={this.onFilterValueChange}
-                    multiple={true}
                 >
                 </SelectListControl>
                 <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
@@ -104,21 +92,17 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
                     style={[styles.selectList]}
                     options={[
                         {
-                            name: 'Most Recent',
-                            value: MessageSort.MostRecent
+                            name: 'None',
+                            value: CloutCastFeedSort.None
                         },
                         {
-                            name: 'Largest Holder',
-                            value: MessageSort.LargestHolder
+                            name: 'Highest Payout',
+                            value: CloutCastFeedSort.HighestPayout
                         },
                         {
-                            name: 'Most Clout',
-                            value: MessageSort.MostClout
-                        },
-                        {
-                            name: 'Most Followed',
-                            value: MessageSort.MostFollowed
-                        },
+                            name: 'Lowest Payout',
+                            value: CloutCastFeedSort.LowestPayout
+                        }
                     ]}
                     value={this.state.sort}
                     onValueChange={this.onSortValueChange}
@@ -126,7 +110,6 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
                 </SelectListControl>
             </ScrollView>
         </Modal>
-
     }
 }
 
@@ -139,7 +122,7 @@ const styles = StyleSheet.create(
         },
         container: {
             height: '75%',
-            maxHeight: 525,
+            maxHeight: 400,
             marginTop: 'auto',
             borderTopRightRadius: 20,
             borderTopLeftRadius: 20,
