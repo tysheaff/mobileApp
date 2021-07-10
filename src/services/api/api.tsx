@@ -144,13 +144,13 @@ function likePost(p_userKey: string, p_postHash: string, isUnlike: boolean) {
     );
 }
 
-function sendDiamonds(p_userPublicKey: string, p_receiverPublicKey: string, p_postHashHex: string) {
+function sendDiamonds(p_userPublicKey: string, p_receiverPublicKey: string, p_postHashHex: string, p_diamondLevel: number) {
     const route = 'send-diamonds';
 
     return post(
         route,
         {
-            DiamondLevel: 1,
+            DiamondLevel: p_diamondLevel,
             DiamondPostHashHex: p_postHashHex,
             MinFeeRateNanosPerKB: 1000,
             ReceiverPublicKeyBase58Check: p_receiverPublicKey,

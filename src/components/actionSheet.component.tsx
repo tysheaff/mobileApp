@@ -38,6 +38,15 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
         style={styles.container}>
         <View style={[styles.optionsContainer, themeStyles.modalBackgroundColor]}>
             {
+                props.config.headerDescription &&
+                <View style={{ borderBottomWidth: 1, borderColor: settingsGlobals.darkMode ? '#2b2b2b' : '#e0e0e0' }}>
+                    <Text style={[
+                        styles.headerDescription,
+                        themeStyles.fontColorSub]}
+                    >{props.config.headerDescription}</Text>
+                </View>
+            }
+            {
                 props.config.options.slice(0, -1).map(
                     (p_option: string, p_index: number) =>
                         <TouchableOpacity
@@ -50,7 +59,7 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
                         >
                             <Text style={[
                                 styles.optionText,
-                                themeStyles.fontColorMain, props.config.destructiveButtonIndex.includes(p_index) && { color: '#f53636' }
+                                themeStyles.fontColorMain, props.config.destructiveButtonIndex?.includes(p_index) && { color: '#f53636' }
                             ]}>{p_option}</Text>
                         </TouchableOpacity>
                 )
@@ -66,7 +75,7 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
             </TouchableOpacity>
 
         </View>
-    </Modal>
+    </Modal >
 }
 const styles = StyleSheet.create(
     {
@@ -91,6 +100,13 @@ const styles = StyleSheet.create(
         optionText: {
             fontSize: 16,
             fontWeight: '500'
+        },
+        headerDescription: {
+            textAlign: 'center',
+            paddingLeft: '10%',
+            paddingRight: '10%',
+            paddingTop: 15,
+            paddingBottom: 10
         }
     }
 );

@@ -2,13 +2,13 @@ import React from "react";
 import { View, StyleSheet, Text, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons, Fontisto, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationProp } from "@react-navigation/native";
-import { Post } from '@types';
+import { EventType, Post } from '@types';
 import { globals } from "@globals/globals";
 import { diamondAnimation } from "@services/diamondAnimation";
-import { api } from "@services";
+import { api, calculateAndFormatBitCloutInUsd } from "@services";
 import { signing } from "@services/authorization/signing";
 import { themeStyles } from "@styles/globalColors";
-import { hapticsManager } from "@globals/injector";
+import { eventManager, hapticsManager } from "@globals/injector";
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -110,7 +110,7 @@ export class PostActionsRow extends React.Component<Props, State> {
     private async onSendDiamonds() {
         const post = this.props.post;
 
-        if (this.props.actionsDisabled || !post.PostEntryReaderState || post.PostEntryReaderState.DiamondLevelBestowed > 0) {
+        if (this.props.actionsDisabled || !post.PostEntryReaderState) {
             return;
         }
 
@@ -118,27 +118,95 @@ export class PostActionsRow extends React.Component<Props, State> {
             Alert.alert('Error', 'You cannot diamond your own posts.');
             return;
         }
+
+        if (post.PostEntryReaderState.DiamondLevelBestowed === 0) {
+            this.sendDiamonds(1);
+        } else {
+            const calculateDiamondsWorth = (count: number): string => {
+                const nanos = 5000 * Math.pow(10, count);
+                const usd = calculateAndFormatBitCloutInUsd(nanos);
+                return '💎 ' + count + ' ($' + usd + ')';
+            };
+
+            const options: string[] = [];
+            for (var i = post.PostEntryReaderState.DiamondLevelBestowed + 1; i < 7; i++) {
+                const usd = calculateDiamondsWorth(i);
+                options.push(usd);
+            }
+
+            options.push('Cancel');
+
+            const callback = async (p_optionIndex: number) => {
+                const diamondLevel = post.PostEntryReaderState.DiamondLevelBestowed + 1 + p_optionIndex;
+                if (diamondLevel < 4) {
+                    setTimeout(() => this.sendDiamonds(diamondLevel), 100);
+                } else {
+                    const username = this.props.post.ProfileEntryResponse.Username;
+                    setTimeout(
+                        () => {
+                            Alert.alert(
+                                'Send Diamonds',
+                                `Are you sure you want to send ${options[p_optionIndex]} to @${username}?`,
+                                [
+                                    {
+                                        text: 'No',
+                                    },
+                                    {
+                                        text: 'Yes',
+                                        onPress: () => {
+                                            this.sendDiamonds(diamondLevel);
+                                        }
+                                    }
+                                ]
+                            );
+                        },
+                        200
+                    );
+                }
+            };
+
+            const headerDescription = options.length > 1 ?
+                'Diamonds are a way to reward great content by sending an amount of your creator coin' :
+                'You have sent the maximum possible amount of diamonds to this post';
+            eventManager.dispatchEvent(
+                EventType.ToggleActionSheet,
+                {
+                    visible: true,
+                    config: {
+                        options,
+                        callback,
+                        headerDescription
+                    }
+                }
+            );
+        }
+    }
+
+    private async sendDiamonds(diamondLevel: number) {
+        const post = this.props.post;
+
         diamondAnimation.show();
 
-        post.PostEntryReaderState.DiamondLevelBestowed = 1;
-        post.DiamondCount++;
+        const diamondDiff = diamondLevel - post.PostEntryReaderState.DiamondLevelBestowed;
+        post.PostEntryReaderState.DiamondLevelBestowed = diamondLevel;
+        post.DiamondCount += diamondDiff;
 
-        this.setState({ diamondLevel: 1 });
+        this.setState({ diamondLevel: diamondLevel });
 
         try {
             hapticsManager.lightImpact();
-            const response = await api.sendDiamonds(globals.user.publicKey, post.ProfileEntryResponse.PublicKeyBase58Check, post.PostHashHex);
+            const response = await api.sendDiamonds(globals.user.publicKey, post.ProfileEntryResponse.PublicKeyBase58Check, post.PostHashHex, diamondLevel);
             const transactionHex = response.TransactionHex;
 
             const signedTransactionHex = await signing.signTransaction(transactionHex);
             await api.submitTransaction(signedTransactionHex as string);
 
         } catch {
-            post.PostEntryReaderState.DiamondLevelBestowed = 0;
-            post.DiamondCount--;
+            post.PostEntryReaderState.DiamondLevelBestowed -= diamondDiff;
+            post.DiamondCount -= diamondDiff;
 
             if (this._isMounted) {
-                this.setState({ diamondLevel: 0 });
+                this.setState({ diamondLevel: post.PostEntryReaderState.DiamondLevelBestowed });
             }
         }
     }
