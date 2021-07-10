@@ -12,7 +12,6 @@ import { themeStyles } from '@styles';
 import { PostOptionsComponent } from './postOptions.components';
 import { PostActionsRow } from './postActionsRow.component';
 import CloutFeedVideoComponent from '@components/post/cloutFeedVideo.component';
-import * as Haptics from 'expo-haptics';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -58,6 +57,10 @@ export class PostComponent extends React.Component<Props, State> {
             profilePic: api.getSingleProfileImage(this.props.post.ProfileEntryResponse.PublicKeyBase58Check),
             isHeartShowed: false
         };
+
+        if (this.props.post.ImageURLs?.length > 0) {
+            this.props.post.ImageURLs = this.props.post.ImageURLs.filter(image => image.startsWith('https://images.bitclout.com/'));
+        }
 
         this.goToProfile = this.goToProfile.bind(this);
         this.goToStats = this.goToStats.bind(this);
