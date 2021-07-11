@@ -59,5 +59,6 @@
         "./.env"
       ]
     }
-  }
+  },
+  "extends": "expo/tsconfig.base"
 }
