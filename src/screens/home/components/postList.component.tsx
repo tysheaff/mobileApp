@@ -9,7 +9,8 @@ import { api, cloutFeedApi, loadTickersAndExchangeRate, cache } from "@services"
 import { navigatorGlobals } from "@globals/navigatorGlobals";
 import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
-enum HomeScreenTab {
+export enum HomeScreenTab {
+    Hot = 'Hot',
     Global = 'Global',
     Following = 'Following',
     Recent = 'Recent',

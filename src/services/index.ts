@@ -1,6 +1,7 @@
 export * from './api/api';
 export * from './api/cloutfeedApi';
 export * from './api/cloutCastApi';
+export * from './api/searchCloutApi';
 export * from './dataCaching';
 export * from './actionSheet';
 export * from './bitCloutCalculator';

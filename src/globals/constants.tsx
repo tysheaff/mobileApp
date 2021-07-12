@@ -10,6 +10,7 @@ export const constants = {
     localStorage_messagesSort: '_messagesSort',
     localStorage_cloutCastFeedFilter: '_cloutCastFeedFilter',
     localStorage_cloutCastFeedSort: '_cloutCastFeedSort',
+    localStorage_hotFeedFilter: '_hotFeedFilter',
     localStorage_defaultFeed: '_defaultFeed',
     localStorage_cloutCastFeedEnabled: '_cloutCastFeedEnabled',
     localStorage_cloutFeedHapticsEnabled: '_cloutFeedHapticsEnabled',

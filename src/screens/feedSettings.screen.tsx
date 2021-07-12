@@ -9,6 +9,7 @@ import { eventManager } from '@globals/injector';
 import { EventType, ToggleCloutCastFeedEvent } from '@types';
 
 enum FeedType {
+    Hot = 'Hot',
     Global = 'Global',
     Following = 'Following',
     Recent = 'Recent',
@@ -102,6 +103,10 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
                 <SelectListControl
                     style={[styles.selectList, themeStyles.borderColor]}
                     options={[
+                        {
+                            name: 'Hot',
+                            value: FeedType.Hot
+                        },
                         {
                             name: 'Global',
                             value: FeedType.Global

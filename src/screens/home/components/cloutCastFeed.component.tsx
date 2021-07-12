@@ -328,7 +328,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                 source={require('../../../../assets/cloutCastLogo.png')}
             ></Image>
             <Text style={[themeStyles.fontColorMain]} onPress={this.goToCloutCast}>
-                <Text style={[styles.headerLink, themeStyles.linkColor]} onPress={this.goToCloutCast}>Powered by CloutCast</Text>
+                <Text style={[styles.headerLink, themeStyles.linkColor]}>Powered by CloutCast</Text>
             </Text>
 
             <TouchableOpacity

@@ -6,16 +6,10 @@ import { constants, eventManager, globals } from '@globals';
 import { EventType, NavigationEvent, Post, ToggleCloutCastFeedEvent } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { PostListComponent } from './components/postList.component';
+import { HomeScreenTab, PostListComponent } from './components/postList.component';
 import * as SecureStore from 'expo-secure-store'
 import { CloutCastFeedComponent } from './components/cloutCastFeed.component';
-
-enum HomeScreenTab {
-    Global = 'Global',
-    Following = 'Following',
-    Recent = 'Recent',
-    Cast = 'Cast'
-};
+import { HotFeedComponent } from './components/hotFeed.component';
 
 type RouteParams = {
     Home: {
@@ -40,6 +34,7 @@ export class HomeScreen extends React.Component<Props, State> {
 
     private _postListComponent = React.createRef<PostListComponent>();
     private _cloutCastFeedComponent = React.createRef<CloutCastFeedComponent>();
+    private _hotFeedComponent = React.createRef<HotFeedComponent>();
     private _unsubscribeNavigationEvent: any;
     private _unsubscribeCloutCastEvent: any;
 
@@ -77,6 +72,9 @@ export class HomeScreen extends React.Component<Props, State> {
 
     async configureTabs() {
         const newTabs: TabConfig[] = [
+            {
+                name: HomeScreenTab.Hot
+            },
             {
                 name: HomeScreenTab.Global
             },
@@ -162,6 +160,8 @@ export class HomeScreen extends React.Component<Props, State> {
 
         if (p_tabName === HomeScreenTab.Cast) {
             this._cloutCastFeedComponent?.current?.loadData();
+        } else if (p_tabName === HomeScreenTab.Hot) {
+            this._hotFeedComponent?.current?.refresh();
         } else {
             this._postListComponent?.current?.refresh();
         }
@@ -170,6 +170,13 @@ export class HomeScreen extends React.Component<Props, State> {
     render() {
         const renderTab = () => {
             switch (this.state.selectedTab) {
+                case HomeScreenTab.Hot:
+                    return <HotFeedComponent
+                        route={this.props.route}
+                        ref={this._hotFeedComponent}
+                        navigation={this.props.navigation}
+                    />;
+
                 case HomeScreenTab.Global:
                     return <PostListComponent
                         route={this.props.route}
