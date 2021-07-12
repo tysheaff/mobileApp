@@ -6,7 +6,7 @@ import { globals } from "@globals/globals";
 import { signing } from "@services/authorization/signing";
 import { api, cache } from "@services";
 import { eventManager } from "@globals/injector";
-import Clipboard from 'expo-clipboard';
+import * as Clipboard from 'expo-clipboard';
 import { snackbar } from "@services/snackbar";
 import { NavigationProp } from "@react-navigation/native";
 import { cloutApi } from "@services/api/cloutApi";

@@ -6,7 +6,7 @@ import { themeStyles } from '@styles/globalColors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
 import { snackbar } from '@services/snackbar';
-import Clipboard from 'expo-clipboard';
+import * as Clipboard from 'expo-clipboard';
 import { eventManager } from '@globals/injector';
 import { EventType } from '@types';
 

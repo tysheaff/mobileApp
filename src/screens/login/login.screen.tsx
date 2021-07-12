@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Text, Image, Keyboard, Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import Clipboard from 'expo-clipboard';
+import * as Clipboard from 'expo-clipboard';
 import { constants, globals } from '@globals';
 import { api } from '@services';
 import { Profile } from '@types';

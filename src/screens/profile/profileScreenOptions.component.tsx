@@ -7,7 +7,7 @@ import { api, cache, snackbar } from '@services';
 import { ChangeFollowersEvent, EventType, User } from '@types';
 import { eventManager, globals } from '@globals';
 import { themeStyles } from '@styles';
-import Clipboard from 'expo-clipboard';
+import * as Clipboard from 'expo-clipboard';
 import { signing } from '@services/authorization/signing';
 import NotificationSubscriptionComponent from '@screens/profile/notificationSubscription.component';
 import CloudFeedButton from '@components/cloutfeedButton.component'
