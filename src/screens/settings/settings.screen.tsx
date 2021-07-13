@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Text, View, StyleSheet, FlatList, Linking } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { themeStyles } from '@styles';
@@ -14,6 +14,11 @@ interface Settings {
 export function SettingsScreen({ navigation }: any) {
 
     const settings: Settings[] = [
+        {
+            title: 'Appearance',
+            icon: <Ionicons name="ios-color-palette" size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => navigation.navigate('Appearance')
+        },
         {
             title: 'Notifications',
             icon: <Ionicons name="md-notifications-outline" size={28} color={themeStyles.fontColorMain.color} />,
@@ -65,14 +70,6 @@ export function SettingsScreen({ navigation }: any) {
             action: () => { }
         }
     ];
-
-    const appearance: Settings = {
-        title: 'Appearance',
-        icon: <Ionicons name="ios-color-palette" size={24} color={themeStyles.fontColorMain.color} />,
-        action: () => navigation.navigate('Appearance')
-    }
-
-    globals.followerFeatures && settings.unshift(appearance);
 
     const keyExtractor = (item: Settings, index: number) => item.toString() + index.toString();
 
