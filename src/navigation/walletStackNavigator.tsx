@@ -17,6 +17,7 @@ import { LogoHeaderComponent } from '@components/logoHeader.component';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 const WalletStack = createStackNavigator();
 
@@ -128,14 +129,11 @@ export default function WalletStackScreen() {
                             headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
                                 (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
                             headerBackTitle: 'Cancel',
-                            headerRight: () => (
-                                <TouchableOpacity
-                                    style={[styles.postButton, themeStyles.buttonBorderColor]}
-                                    onPress={() => globals.createPost()}
-                                >
-                                    <Text style={styles.postButtonText}>Post</Text>
-                                </TouchableOpacity>
-                            )
+                            headerRight: () => <CloutFeedButton
+                                title={'Post'}
+                                onPress={() => globals.createPost()}
+                                styles={styles.postButton}
+                            />
                         }
                     )}
                 name="CreatePost"
@@ -156,21 +154,7 @@ export default function WalletStackScreen() {
 const styles = StyleSheet.create(
     {
         postButton: {
-            backgroundColor: 'black',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
             marginRight: 10,
-            paddingRight: 12,
-            paddingLeft: 12,
-            paddingTop: 6,
-            paddingBottom: 6,
-            borderRadius: 4,
-            borderWidth: 1
         },
-        postButtonText: {
-            color: 'white'
-        }
     }
 )

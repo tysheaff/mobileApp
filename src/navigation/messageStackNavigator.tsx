@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { StyleSheet, Text, Platform } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { ChatScreen } from '@screens/chatScreen';
@@ -21,6 +21,7 @@ import { CreatePostScreen } from '@screens/createPost.screen';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 const MessageStack = createStackNavigator();
 
@@ -61,15 +62,11 @@ export default function MessageStackScreen() {
                 options={{
                     headerTitle: 'Broadcast',
                     headerBackTitle: ' ',
-                    headerRight: () =>
-                    (
-                        <TouchableOpacity
-                            style={[styles.postButton, themeStyles.buttonBorderColor]}
-                            onPress={() => navigatorGlobals.broadcastMessage()}
-                        >
-                            <Text style={styles.postButtonText}>Send</Text>
-                        </TouchableOpacity>
-                    )
+                    headerRight: () => <CloutFeedButton
+                        title={'Send'}
+                        onPress={navigatorGlobals.broadcastMessage}
+                        styles={styles.postButton}
+                    />
                 }}
                 name="MessageTopHoldersInput"
                 component={MessageTopHoldersInputScreen}
@@ -142,14 +139,10 @@ export default function MessageStackScreen() {
                             headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
                                 (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
                             headerBackTitle: 'Cancel',
-                            headerRight: () => (
-                                <TouchableOpacity
-                                    style={[styles.postButton, themeStyles.buttonBorderColor]}
-                                    onPress={() => globals.createPost()}
-                                >
-                                    <Text style={styles.postButtonText}>Post</Text>
-                                </TouchableOpacity>
-                            )
+                            headerRight: () => <CloutFeedButton
+                                title={'Post'}
+                                onPress={globals.createPost}
+                                styles={styles.postButton} />
                         }
                     )}
                 name="CreatePost"
@@ -203,21 +196,7 @@ export default function MessageStackScreen() {
 const styles = StyleSheet.create(
     {
         postButton: {
-            backgroundColor: 'black',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
             marginRight: 10,
-            paddingRight: 12,
-            paddingLeft: 12,
-            paddingTop: 6,
-            paddingBottom: 6,
-            borderRadius: 4,
-            borderWidth: 1
-        },
-        postButtonText: {
-            color: 'white'
         },
         identity: {
             backgroundColor: '#121212',

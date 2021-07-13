@@ -7,10 +7,10 @@ interface Props {
     title: string;
     onPress: () => void;
     styles?: any;
-    disabled: boolean;
+    disabled?: boolean;
 }
 
-export default class CloutfeedButtonComponent extends React.Component<Props> {
+export default class CloutFeedButton extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props);
@@ -22,14 +22,15 @@ export default class CloutfeedButtonComponent extends React.Component<Props> {
             this.props.title !== p_nextProps.title;
     }
 
-    onPress(){
+    onPress() {
+        if (this.props.disabled) {
+            return;
+        }
         this.props.onPress();
     }
-
     render() {
         return (
             <TouchableOpacity
-                disabled={this.props.disabled}
                 activeOpacity={1}
                 onPress={this.onPress}
                 style={[

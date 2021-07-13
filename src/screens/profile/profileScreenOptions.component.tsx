@@ -10,7 +10,7 @@ import { themeStyles } from '@styles';
 import * as Clipboard from 'expo-clipboard';
 import { signing } from '@services/authorization/signing';
 import NotificationSubscriptionComponent from '@screens/profile/notificationSubscription.component';
-import CloudFeedButton from '@components/cloutfeedButton.component'
+import CloutFeedButton from '@components/cloutfeedButton.component'
 
 export function ProfileScreenOptionsComponent(
     { publicKey, goToChat, username }: { publicKey: string, goToChat: () => void, username: string }
@@ -142,14 +142,13 @@ export function ProfileScreenOptionsComponent(
 
     return <View style={styles.container}>
         <NotificationSubscriptionComponent publicKey={publicKey} />
-        <CloudFeedButton
+        <CloutFeedButton
             disabled={followButtonColor !== 'black'}
             title={isFollowed ? 'Unfollow' : 'Follow'}
             onPress={onFollowButtonClick}
             styles={styles.followButton}
         />
-        <CloudFeedButton
-            disabled={false}
+        <CloutFeedButton
             title={'Message'}
             onPress={goToChat}
             styles={styles.followButton}
@@ -171,7 +170,8 @@ const styles = StyleSheet.create(
             marginBottom: 8,
         },
         followButton: {
-            marginRight: 10
+            marginRight: 10,
+            width: 90
         }
     }
 );

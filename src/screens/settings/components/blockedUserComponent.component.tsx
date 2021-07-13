@@ -1,9 +1,9 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { Profile } from '@types'
 import { themeStyles } from '@styles/globalColors';
 import { NavigationProp } from "@react-navigation/native";
-import { settingsGlobals } from '@globals/settingsGlobals';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 interface Props {
     profile: Profile;
@@ -23,7 +23,7 @@ export default class BlockedUserComponent extends React.Component<Props, State> 
         super(props);
 
         this.state = {
-            isWorking: true
+            isWorking: false
         }
 
         this.handleBlock = this.handleBlock.bind(this);
@@ -53,10 +53,10 @@ export default class BlockedUserComponent extends React.Component<Props, State> 
     }
 
     async handleBlock(p_publicKey: string) {
-        this.setState({ isWorking: false });
+        this.setState({ isWorking: true });
         await this.props.unblockUser(p_publicKey);
         if (this._isMounted) {
-            this.setState({ isWorking: true });
+            this.setState({ isWorking: false });
         }
     }
 
@@ -71,15 +71,12 @@ export default class BlockedUserComponent extends React.Component<Props, State> 
                     />
                     <Text style={themeStyles.fontColorMain}>{this.props.profile.Username}</Text>
                 </View>
-                <TouchableOpacity
-                    onPress={() => this.state.isWorking ? this.handleBlock(publicKey) : undefined}
-                    style={[
-                        styles.unblockBtn,
-                        { backgroundColor: this.state.isWorking ? 'black' : themeStyles.buttonDisabledColor.backgroundColor },
-                        themeStyles.buttonBorderColor,
-                        { borderWidth: settingsGlobals.darkMode ? 1 : 0 }]}>
-                    <Text style={styles.unblockText}>Unblock</Text>
-                </TouchableOpacity>
+
+                <CloutFeedButton
+                    disabled={this.state.isWorking}
+                    title={'Unblock'}
+                    onPress={() => this.state.isWorking ? undefined : this.handleBlock(publicKey)}
+                />
             </TouchableOpacity>
         )
     }
@@ -104,12 +101,4 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         marginRight: 12
     },
-    unblockBtn: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 4,
-    },
-    unblockText: {
-        color: 'white'
-    }
 })

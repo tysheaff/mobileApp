@@ -10,6 +10,7 @@ import { NavigationProp } from '@react-navigation/core';
 import { settingsGlobals } from '@globals/settingsGlobals';
 import { signing } from '@services/authorization/signing';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 interface Props {
     navigation: NavigationProp<any>
@@ -54,17 +55,12 @@ export class EditProfileScreen extends Component<Props, State> {
 
     updateNavigation = () => {
         this.props.navigation.setOptions({
-            headerRight: () => (
-                <TouchableOpacity
-                    style={[
-                        styles.button,
-                        themeStyles.buttonBorderColor,
-                        { borderWidth: settingsGlobals.darkMode ? 1 : 0, marginTop: 4 }
-                    ]}
-                    onPress={this.updateProfile}>
-                    <Text style={styles.uploadButtonText}>Save</Text>
-                </TouchableOpacity>
-            ),
+            headerRight: () => <CloutFeedButton
+                title={'Save'}
+                onPress={this.updateProfile}
+                styles={styles.button}
+            />
+            ,
             headerTitleStyle: {
                 color: themeStyles.fontColorMain.color,
                 alignSelf: 'center'
@@ -157,7 +153,6 @@ export class EditProfileScreen extends Component<Props, State> {
                 base64: true
             }
         );
-
         if (!result.cancelled && result.type === 'image') {
             const base64Image = 'data:image/jpeg;base64,' + (result as ImageInfo).base64 as string;
 
@@ -217,16 +212,10 @@ export class EditProfileScreen extends Component<Props, State> {
                             source={{ uri: this.state.profilePic ? this.state.profilePic : 'https://i.imgur.com/vZ2mB1W.png' }}>
                         </Image>
                     </View>
-                    <TouchableOpacity
-                        style={[
-                            styles.
-                                button,
-                            themeStyles.buttonBorderColor,
-                            { borderWidth: settingsGlobals.darkMode ? 1 : 0 }
-                        ]}
-                        onPress={this.pickImage}>
-                        <Text style={styles.uploadButtonText}>Change Image</Text>
-                    </TouchableOpacity>
+                    <CloutFeedButton
+                        title={'Change Image'}
+                        onPress={this.pickImage}
+                        styles={styles.button} />
                     <View style={[styles.inputContainer]}>
                         <Text style={[themeStyles.fontColorSub]}>Username</Text>
                         <TextInput
@@ -286,21 +275,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
     },
     button: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
         marginRight: 10,
-        paddingRight: 12,
-        paddingLeft: 12,
-        paddingTop: 6,
-        paddingBottom: 6,
-        borderRadius: 4,
-        marginBottom: 8,
-        backgroundColor: 'black'
-    },
-    uploadButtonText: {
-        color: 'white'
     },
     inputContainer: {
         width: '96%',

@@ -4,9 +4,10 @@ import { Profile } from '../types';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { themeStyles } from '@styles';
-import { globals, settingsGlobals } from '@globals';
+import { globals } from '@globals';
 import { api, cache, calculateAndFormatBitCloutInUsd } from '@services';
 import { signing } from '@services/authorization/signing';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 export function ProfileListCardComponent({ profile, isFollowing }:
     { profile: Profile, isFollowing: boolean }) {
@@ -24,7 +25,7 @@ export function ProfileListCardComponent({ profile, isFollowing }:
         () => {
             const coinPrice = calculateAndFormatBitCloutInUsd(profile.CoinPriceBitCloutNanos);
 
-            if(profile && !profile.ProfilePic){
+            if (profile && !profile.ProfilePic) {
                 profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
             }
 
@@ -103,18 +104,12 @@ export function ProfileListCardComponent({ profile, isFollowing }:
             {
                 showFollowButton && !globals.readonly ?
                     <View style={styles.followButtonContainer}>
-                        <TouchableOpacity
-                            style={[
-                                styles.followButton,
-                                themeStyles.buttonBorderColor,
-                                {
-                                    backgroundColor: working ? themeStyles.buttonDisabledColor.backgroundColor : 'black',
-                                    borderWidth: settingsGlobals.darkMode ? 1 : 0
-                                }
-                            ]}
-                            onPress={onFollowButtonClick}>
-                            <Text style={styles.followButtonText}>{following ? 'Unfollow' : 'Follow'}</Text>
-                        </TouchableOpacity>
+                        <CloutFeedButton
+                            disabled={working}
+                            styles={styles.followBtn}
+                            title={following ? 'Unfollow' : 'Follow'}
+                            onPress={onFollowButtonClick}
+                        />
                     </View> : undefined
             }
         </View>
@@ -124,12 +119,9 @@ export function ProfileListCardComponent({ profile, isFollowing }:
 const styles = StyleSheet.create(
     {
         profileListCard: {
-            display: 'flex',
             flexDirection: 'row',
-            paddingTop: 16,
-            paddingBottom: 16,
-            paddingLeft: 10,
-            paddingRight: 10,
+            paddingVertical: 16,
+            paddingHorizontal: 10,
             width: Dimensions.get('window').width,
             alignItems: 'center'
         },
@@ -140,7 +132,6 @@ const styles = StyleSheet.create(
             marginRight: 12
         },
         usernameContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center'
         },
@@ -151,8 +142,7 @@ const styles = StyleSheet.create(
         },
         profileCoinPriceContainer: {
             borderRadius: 12,
-            paddingRight: 10,
-            paddingLeft: 10,
+            paddingHorizontal: 10,
             justifyContent: 'center',
             height: 20,
             alignSelf: 'flex-start',
@@ -162,26 +152,12 @@ const styles = StyleSheet.create(
             fontSize: 10,
             fontWeight: '600'
         },
+        followBtn: {
+            width: 90
+        },
         followButtonContainer: {
             marginLeft: 'auto',
             marginTop: 6
         },
-        followButton: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: 10,
-            paddingRight: 12,
-            paddingLeft: 12,
-            paddingTop: 6,
-            paddingBottom: 6,
-            borderRadius: 4,
-            marginBottom: 8,
-            width: 85
-        },
-        followButtonText: {
-            color: 'white'
-        }
     }
 );

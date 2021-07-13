@@ -19,6 +19,7 @@ import { CloutTagSuggestionList } from './cloutTagSuggestionList.component';
 import CloutFeedVideoComponent from './post/cloutFeedVideo.component';
 import { eventManager } from '@globals/injector';
 import { wait } from '@services/promiseHelper';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 export function CreatePostComponent(
     { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }:
@@ -136,7 +137,6 @@ export function CreatePostComponent(
 
     async function onPasteVideoLink() {
         const videoLink = await Clipboard.getStringAsync();
-
         if (!videoLink) {
             Alert.alert('Clipboard is empty!', 'Please make sure you copied the link correctly.');
             return;
@@ -225,24 +225,18 @@ export function CreatePostComponent(
 
         {
             insertVideo && !internalVideoLink ?
-                <TouchableOpacity onPress={onPasteVideoLink}>
-                    <View style={styles.insertVideoContainer}>
+                <View style={styles.insertVideoContainer}>
+                    <TouchableOpacity style={styles.videoIconTextContainer} onPress={onPasteVideoLink} >
                         <Ionicons name="md-videocam-outline" size={60} color={themeStyles.fontColorMain.color} />
                         <Text style={[styles.insertVideoText, themeStyles.fontColorMain]}>Click here to paste your video URL</Text>
                         <Text style={[styles.insertVideoText, themeStyles.fontColorMain]}>YouTube, TikTok, Vimeo, Spotify, SoundCloud and GIPHY links are supported</Text>
-                        <TouchableOpacity
-                            style={[
-                                styles.cancelVideoButton,
-                                themeStyles.buttonBorderColor,
-                                { borderWidth: settingsGlobals.darkMode ? 1 : 0 }
-                            ]}
-                            activeOpacity={1}
-                            onPress={() => setInsertVideo(false)}
-                        >
-                            <Text style={styles.cancelVideoButtonText}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
+                    </TouchableOpacity>
+                    <CloutFeedButton
+                        styles={styles.cancelBtn}
+                        title={'Cancel'}
+                        onPress={() => setInsertVideo(false)}
+                    />
+                </View>
                 : undefined
         }
 
@@ -366,26 +360,14 @@ const styles = StyleSheet.create(
             marginLeft: 'auto',
             marginRight: 'auto'
         },
+        videoIconTextContainer: {
+            alignItems: 'center'
+        },
         insertVideoText: {
             textAlign: 'center'
         },
-        cancelVideoButton: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: 10,
-            paddingRight: 12,
-            paddingLeft: 12,
-            paddingTop: 6,
-            paddingBottom: 6,
-            borderRadius: 4,
-            marginBottom: 8,
-            backgroundColor: 'black',
-            marginTop: 12
-        },
-        cancelVideoButtonText: {
-            color: 'white'
+        cancelBtn: {
+            marginTop: 10
         },
         recloutedPostContainer: {
             marginLeft: 10,

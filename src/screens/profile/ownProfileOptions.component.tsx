@@ -1,6 +1,5 @@
 import React from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
-import { settingsGlobals } from '@globals/settingsGlobals';
+import { Linking, StyleSheet, View } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { themeStyles } from '@styles/globalColors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -9,6 +8,7 @@ import { snackbar } from '@services/snackbar';
 import * as Clipboard from 'expo-clipboard';
 import { eventManager } from '@globals/injector';
 import { EventType } from '@types';
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -67,20 +67,11 @@ export default class OwnProfileOptionsComponent extends React.Component<Props> {
     render() {
         return (
             <View style={styles.container}>
-                <TouchableOpacity
-                    disabled={false}
-                    style={[
-                        styles.optionButton,
-                        themeStyles.buttonBorderColor,
-                        { borderWidth: settingsGlobals.darkMode ? 1 : 0 }
-                    ]}
-                    activeOpacity={1}
+                <CloutFeedButton
+                    title={'Edit Profile'}
                     onPress={this.handleEditButtonPress}
-                >
-                    <Text
-                        style={styles.optionButtonText}
-                    >Edit Profile</Text>
-                </TouchableOpacity>
+                    styles={styles.optionButton}
+                />
                 <TouchableOpacity
                     activeOpacity={1}
                     onPress={this.onOwnProfileOptionsClick}
@@ -99,16 +90,6 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     optionButton: {
-        maxWidth: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
         marginHorizontal: 10,
-        borderRadius: 4,
-        backgroundColor: 'black',
     },
-    optionButtonText: {
-        color: 'white'
-    }
 })
