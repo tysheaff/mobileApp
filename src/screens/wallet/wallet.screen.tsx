@@ -9,7 +9,6 @@ import { TabConfig, TabsComponent } from "@components/tabs.component";
 import { CreatorCoinHODLerComponent } from "@components/creatorCoinHODLer.component";
 import { formatNumber } from "@services/helpers";
 import { navigatorGlobals } from "@globals/navigatorGlobals";
-import { api } from "@services";
 import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
 
 enum WalletTab {
@@ -190,17 +189,12 @@ export class WalletScreen extends React.Component<Props, State> {
 
         const filteredUsersYouHODL = this.filterUsersYouHODL(p_usersYouHODL, p_purchased);
         if (filteredUsersYouHODL?.length > 0) {
-            for (const user of filteredUsersYouHODL) {
-                if (user.ProfileEntryResponse) {
-                    user.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(user.CreatorPublicKeyBase58Check);
-                }
-            }
-
             sections.push(
                 {
                     header: false,
                     data: filteredUsersYouHODL,
                     renderItem: ({ item }: any) => <CreatorCoinHODLerComponent
+                        isHolder={false}
                         creatorCoinPrice={(item as CreatorCoinHODLer).ProfileEntryResponse?.CoinPriceUSD}
                         userWhoHODL={item}></CreatorCoinHODLerComponent>
                 }

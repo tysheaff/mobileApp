@@ -230,6 +230,7 @@ export function ProfileScreen({ navigation, route }: any) {
             if (p_profile.UsersThatHODL) {
                 tabData = p_profile.UsersThatHODL;
                 renderItem = ({ item }: any) => <CreatorCoinHODLerComponent
+                    isHolder={true}
                     creatorCoinPrice={coinPrice}
                     userWhoHODL={item}></CreatorCoinHODLerComponent>
             } else {
@@ -342,13 +343,6 @@ export function ProfileScreen({ navigation, route }: any) {
         ).then(
             p_response => {
                 const holders = p_response.Hodlers as CreatorCoinHODLer[] ?? [];
-
-                for (const holder of holders) {
-                    if (holder.ProfileEntryResponse) {
-                        holder.ProfileEntryResponse.ProfilePic = api.getSingleProfileImage(holder.HODLerPublicKeyBase58Check);
-                    }
-                }
-
                 profile.UsersThatHODL = holders;
             }
         ).catch(p_error => globals.defaultHandleError(p_error));

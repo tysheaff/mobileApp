@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { calculateAndFormatBitCloutInUsd, formatNumber, getAnonymousProfile } from '@services';
 import { CreatorCoinHODLer } from '@types';
 import { themeStyles } from '@styles';
+import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
 
 export function CreatorCoinHODLerComponent({
-    creatorCoinPrice, userWhoHODL: userWhoHODL }: { creatorCoinPrice: undefined | number, userWhoHODL: CreatorCoinHODLer }
+    creatorCoinPrice, userWhoHODL: userWhoHODL, isHolder }: { creatorCoinPrice: undefined | number, userWhoHODL: CreatorCoinHODLer, isHolder: boolean }
 ) {
     const navigation = useNavigation();
 
@@ -62,16 +63,10 @@ export function CreatorCoinHODLerComponent({
 
     return <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
         <View style={[styles.userWhoHODLCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
-            <Image style={styles.profileImage}
-                source={{ uri: userWhoHODL.ProfileEntryResponse?.ProfilePic }}></Image>
-
-            <View>
-                <Text style={[styles.username, themeStyles.fontColorMain]}>{userWhoHODL.ProfileEntryResponse?.Username}</Text>
-                <View style={[styles.hodlerCoinPriceContainer, themeStyles.chipColor]}>
-                    <Text style={[styles.HODLerCoinPriceText, themeStyles.fontColorMain]}>~${hodlerCoinPriceUSD}</Text>
-                </View>
-            </View>
-
+            <ProfileInfoCardComponent
+                publicKey={isHolder ? userWhoHODL.HODLerPublicKeyBase58Check : userWhoHODL.CreatorPublicKeyBase58Check}
+                username={userWhoHODL.ProfileEntryResponse?.Username}
+                coinPrice={hodlerCoinPriceUSD} />
             <View style={styles.HODLerAmountContainer}>
                 <Text style={[styles.hodlerAmountCoins, themeStyles.fontColorMain]}>{hodlerAmountCoins}</Text>
                 <Text style={[styles.hodlerAmountUSD, themeStyles.fontColorMain]}>~${hodlerAmountUSD}</Text>
@@ -83,12 +78,9 @@ export function CreatorCoinHODLerComponent({
 const styles = StyleSheet.create(
     {
         userWhoHODLCard: {
-            display: 'flex',
             flexDirection: 'row',
-            paddingTop: 16,
-            paddingBottom: 16,
-            paddingLeft: 10,
-            paddingRight: 10,
+            paddingVertical: 16,
+            paddingHorizontal: 10,
             borderBottomWidth: 1,
             width: Dimensions.get('window').width
 
@@ -105,8 +97,7 @@ const styles = StyleSheet.create(
         },
         hodlerCoinPriceContainer: {
             borderRadius: 12,
-            paddingRight: 10,
-            paddingLeft: 10,
+            paddingHorizontal: 10,
             justifyContent: 'center',
             height: 20,
             alignSelf: 'flex-start',
