@@ -5,28 +5,27 @@ import { themeStyles } from "@styles/globalColors";
 
 export default function CloutFeedLoader() {
 
-    const spin = useRef(new Animated.Value(0)).current;
-    const scale = useRef(new Animated.Value(0)).current;
-    let isMounted = useRef<Boolean>(false).current;
+    const spin = useRef(new Animated.Value(0));
+    const scale = useRef(new Animated.Value(0));
+    let isMounted = useRef<Boolean>(true);
 
     const animationTiming: number = 600;
 
-    let spinValue = spin.interpolate({
+    let spinValue = spin.current.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
     });
 
-    const scaleValue = scale.interpolate({
+    const scaleValue = scale.current.interpolate({
         inputRange: [0, 1],
         outputRange: [1, 1.75]
     });
 
     useEffect(
         () => {
-            isMounted = true;
             animate();
             return () => {
-                isMounted = false
+                isMounted.current = false
             };
         },
         []
@@ -34,10 +33,10 @@ export default function CloutFeedLoader() {
 
     function animate() {
         if (isMounted) {
-            spin.setValue(0);
+            spin.current.setValue(0);
             Animated.sequence([
                 Animated.timing(
-                    scale,
+                    scale.current,
                     {
                         toValue: 0.5,
                         easing: Easing.linear,
@@ -46,7 +45,7 @@ export default function CloutFeedLoader() {
                     }
                 ),
                 Animated.timing(
-                    spin,
+                    spin.current,
                     {
                         toValue: 1,
                         duration: animationTiming,
@@ -55,7 +54,7 @@ export default function CloutFeedLoader() {
                     }
                 ),
                 Animated.timing(
-                    scale,
+                    scale.current,
                     {
                         toValue: 0,
                         duration: animationTiming,
