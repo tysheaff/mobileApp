@@ -156,7 +156,7 @@ export class TextWithLinks extends React.Component<Props, State>{
     render() {
 
         const dollarMatches = {
-            pattern: /\$\w+[^ :/@/w]/g,
+            pattern: /\$+[_A-Za-z]+[0-9]*[^ :/@/w]/g,
             type: 'dollar',
             getLinkText: (replacerArgs: String[]) => `${replacerArgs[0]}`
         };
