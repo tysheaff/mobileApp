@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/core';
 import { Feather } from '@expo/vector-icons';
 import { api, cache, snackbar } from '@services';
 import { ChangeFollowersEvent, EventType, User } from '@types';
-import { eventManager, globals } from '@globals';
+import { constants, eventManager, globals } from '@globals';
 import { themeStyles } from '@styles';
 import * as Clipboard from 'expo-clipboard';
 import { signing } from '@services/authorization/signing';
@@ -54,6 +54,10 @@ export function ProfileScreenOptionsComponent(
         api.createFollow(globals.user.publicKey, publicKey, isFollowed).then(
             async p_response => {
                 const transactionHex = p_response.TransactionHex;
+
+                if (publicKey === constants.cloutfeed_publicKey) {
+                    globals.followerFeatures = !isFollowed;
+                }
 
                 const signedTransactionHex = await signing.signTransaction(transactionHex);
                 await api.submitTransaction(signedTransactionHex as string);

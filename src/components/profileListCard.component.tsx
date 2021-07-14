@@ -4,7 +4,7 @@ import { Profile } from '../types';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { themeStyles } from '@styles';
-import { globals } from '@globals';
+import { constants, globals } from '@globals';
 import { api, cache, calculateAndFormatBitCloutInUsd } from '@services';
 import { signing } from '@services/authorization/signing';
 import CloutFeedButton from '@components/cloutfeedButton.component';
@@ -47,6 +47,10 @@ export function ProfileListCardComponent({ profile, isFollowing }:
         api.createFollow(globals.user.publicKey, profile.PublicKeyBase58Check, following).then(
             async p_response => {
                 const transactionHex = p_response.TransactionHex;
+
+                if (profile.PublicKeyBase58Check === constants.cloutfeed_publicKey) {
+                    globals.followerFeatures = !following;
+                }
 
                 const signedTransactionHex = await signing.signTransaction(transactionHex);
                 await api.submitTransaction(signedTransactionHex as string);
