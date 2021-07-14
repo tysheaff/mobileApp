@@ -4,6 +4,7 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesome } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import ImageModal from './imageModal.component';
+import { themeStyles } from '@styles/globalColors';
 
 export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemove, selectedImageIndex }: any) {
     let mount = true;
@@ -83,7 +84,7 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
                         horizontal
                         renderItem={({ item, index }) => (
                             <FontAwesome
-                                style={[styles.dot, internalIndex === index ? styles.selectedDot : styles.notSelectedDot]}
+                                style={[styles.dot, internalIndex === index ? themeStyles.fontColorMain : themeStyles.switchColor]}
                                 name="circle"
                                 size={8}
                                 color="black" />
@@ -128,12 +129,6 @@ const styles = StyleSheet.create({
     },
     dot: {
         marginRight: 4
-    },
-    selectedDot: {
-        color: '#363636'
-    },
-    notSelectedDot: {
-        color: '#d1d1d1'
     },
     removeButtonContainer: {
         backgroundColor: '#c42326',
