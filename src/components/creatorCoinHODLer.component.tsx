@@ -64,6 +64,7 @@ export function CreatorCoinHODLerComponent({
     return <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
         <View style={[styles.userWhoHODLCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
             <ProfileInfoCardComponent
+                verified={userWhoHODL.ProfileEntryResponse?.IsVerified}
                 publicKey={isHolder ? userWhoHODL.HODLerPublicKeyBase58Check : userWhoHODL.CreatorPublicKeyBase58Check}
                 username={userWhoHODL.ProfileEntryResponse?.Username}
                 coinPrice={hodlerCoinPriceUSD} />

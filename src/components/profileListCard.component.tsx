@@ -157,7 +157,8 @@ const styles = StyleSheet.create(
         },
         followButtonContainer: {
             marginLeft: 'auto',
-            marginTop: 6
+            marginTop: 6,
+            marginRight: 5
         },
     }
 );

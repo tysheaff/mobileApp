@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
+import { View, StyleSheet, Text, Image, Dimensions } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { constants, eventManager, globals, settingsGlobals } from '@globals';
 import { themeStyles, updateThemeStyles } from '@styles';
@@ -128,10 +128,11 @@ export function AppearanceScreen({ navigation }: any) {
                             to unlock the dark mode now!
                         </Text>
                     </View>
-                    <View style={styles.followBtn}>
+                    <View style={styles.followBtnContainer}>
                         {
                             !globals.readonly && <CloutFeedButton
                                 disabled={isWorking}
+                                styles={styles.followBtn}
                                 title={'Follow'}
                                 onPress={onFollowPress}
                             />
@@ -165,8 +166,9 @@ const styles = StyleSheet.create(
             fontSize: 18,
             textAlign: 'center',
         },
-        followBtn: {
-            marginHorizontal: 120,
+        followBtnContainer: {
+            marginLeft: 'auto',
+            marginRight: 'auto'
         },
         btnText: {
             color: 'white',
@@ -174,6 +176,10 @@ const styles = StyleSheet.create(
         lockImage: {
             width: 200,
             height: 200,
+        },
+        followBtn: {
+            paddingVertical: 10,
+            width: Dimensions.get('screen').width * 0.4
         }
     }
 );

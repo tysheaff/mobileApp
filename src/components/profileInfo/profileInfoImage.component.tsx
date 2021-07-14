@@ -44,9 +44,9 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
         } catch {
             imageUri = 'https://i.imgur.com/vZ2mB1W.png';
         } finally {
-        }
-        if (this._isMounted) {
-            this.setState({ imageUri });
+            if (this._isMounted) {
+                this.setState({ imageUri });
+            }
         }
     }
 

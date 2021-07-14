@@ -9,6 +9,7 @@ interface Props {
     publicKey: string;
     username: string;
     coinPrice: string;
+    verified: boolean;
 }
 
 export default class ProfileInfoCardComponent extends React.Component<Props> {
@@ -26,7 +27,7 @@ export default class ProfileInfoCardComponent extends React.Component<Props> {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             <ProfileInfoImageComponent publicKey={this.props.publicKey} />
             <View>
-                <ProfileInfoUsernameComponent verified username={this.props.username} />
+                <ProfileInfoUsernameComponent verified={this.props.verified} username={this.props.username} />
                 <CoinPriceComponent price={this.props.coinPrice} />
             </View>
         </View>;
