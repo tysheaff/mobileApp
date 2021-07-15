@@ -156,7 +156,9 @@ export default function App() {
   }
 
   globals.onLogout = async () => {
-    setLoading(true);
+    if (mount) {
+      setLoading(true);
+    }
     await SecureStore.deleteItemAsync(constants.localStorage_publicKey);
     await SecureStore.deleteItemAsync(constants.localStorage_readonly);
 

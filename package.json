@@ -40,7 +40,6 @@
     "jssha": "^3.2.0",
     "key-encoder": "^2.0.3",
     "mime": "^2.5.2",
-    "randombytes-pure": "git+https://github.com/RobertFischer/randombytes-pure.git",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
@@ -61,7 +60,8 @@
     "react-native-webview": "11.6.2",
     "sha256": "^0.2.0",
     "victory-native": "^35.3.3",
-    "react-native-pager-view": "5.0.12"
+    "react-native-pager-view": "5.0.12",
+    "expo-random": "~11.2.0"
   },
   "devDependencies": {
     "@babel/core": "~7.14.6",

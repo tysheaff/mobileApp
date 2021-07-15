@@ -1,5 +1,5 @@
 import { crypto } from './crypto';
-import randomBytes from 'randombytes-pure';
+import * as Random from 'expo-random';
 import { AuthenticatedUser, AuthenticatedUserEncryptionKey, AuthenticatedUserTypes, SecureStoreAuthenticatedUserEncryptionKey, SecureStoreAuthenticatedUser } from '@types';
 import * as SecureStore from 'expo-secure-store';
 import { constants } from '@globals/constants';
@@ -47,8 +47,8 @@ function generateUserCredentials(keychain: any): { authenticatedUser: Authentica
     const privateKey = crypto.seedHexToPrivateKey(seedHex);
     const publicKey = crypto.privateKeyToBitCloutPublicKey(privateKey);
 
-    const randomKey = randomBytes(32);
-    const iv = randomBytes(16);
+    const randomKey = new Buffer(Random.getRandomBytes(32));
+    const iv = new Buffer(Random.getRandomBytes(16));
     const seedHexBuffer = new Buffer(seedHex);
     const encryptedSeedHex = crypto.aesEncrypt(iv, randomKey, seedHexBuffer);
 

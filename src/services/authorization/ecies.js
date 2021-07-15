@@ -10,7 +10,7 @@
  * - Use pure javascript libraries to support react-native expo
  */
 
-import randomBytes from 'randombytes-pure';
+import * as Random from 'expo-random';
 const EC = require("elliptic").ec;
 const ec = new EC("secp256k1");
 const jsSHA = require("jssha");
@@ -167,12 +167,12 @@ const derive = function (privateKeyA, publicKeyB) {
 // Serialization: <ephemPubKey><IV><CipherText><HMAC>
 export const encrypt = function (publicKeyTo, msg, opts) {
   opts = opts || {};
-  const ephemPrivateKey = opts.ephemPrivateKey || randomBytes(32);
+  const ephemPrivateKey = opts.ephemPrivateKey || new Buffer(Random.getRandomBytes(32));
   const ephemPublicKey = getPublic(ephemPrivateKey);
 
   const sharedPx = derive(ephemPrivateKey, publicKeyTo);
   const hash = kdf(sharedPx, 32);
-  const iv = opts.iv || randomBytes(16);
+  const iv = opts.iv || new Buffer(Random.getRandomBytes(16));
   const encryptionKey = hash.slice(0, 16);
 
   // Generate hmac
