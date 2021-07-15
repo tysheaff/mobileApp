@@ -67,7 +67,8 @@ export function CreatorCoinHODLerComponent({
                 verified={userWhoHODL.ProfileEntryResponse?.IsVerified}
                 publicKey={isHolder ? userWhoHODL.HODLerPublicKeyBase58Check : userWhoHODL.CreatorPublicKeyBase58Check}
                 username={userWhoHODL.ProfileEntryResponse?.Username}
-                coinPrice={hodlerCoinPriceUSD} />
+                coinPrice={hodlerCoinPriceUSD}
+            />
             <View style={styles.HODLerAmountContainer}>
                 <Text style={[styles.hodlerAmountCoins, themeStyles.fontColorMain]}>{hodlerAmountCoins}</Text>
                 <Text style={[styles.hodlerAmountUSD, themeStyles.fontColorMain]}>~${hodlerAmountUSD}</Text>

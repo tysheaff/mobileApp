@@ -4,6 +4,7 @@ import { themeStyles } from '@styles/globalColors';
 
 interface Props {
     price: string;
+    isProfileManager?: boolean;
 }
 
 export default class CoinPriceComponent extends React.Component<Props> {
@@ -17,7 +18,7 @@ export default class CoinPriceComponent extends React.Component<Props> {
     }
 
     render() {
-        return <View style={[styles.container, themeStyles.chipColor]}>
+        return <View style={[styles.container, this.props.isProfileManager ? themeStyles.coinPriceContainer : themeStyles.chipColor]}>
             <Text style={[styles.price, themeStyles.fontColorMain]}>~${this.props.price}</Text>
         </View>;
     }

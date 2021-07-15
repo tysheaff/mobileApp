@@ -8,6 +8,7 @@ import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { NavigationProp } from '@react-navigation/native';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
 
 interface DiamondSender {
     DiamondLevel: number;
@@ -66,7 +67,6 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
             let newDiamondSenders = this.state.diamondSenders;
             if (diamondSenders?.length > 0) {
                 for (const diamondSender of diamondSenders) {
-                    diamondSender.DiamondSenderProfile.ProfilePic = api.getSingleProfileImage(diamondSender.DiamondSenderProfile.PublicKeyBase58Check);
                     diamondSender.DiamondSenderProfile.FormattedCoinPriceUSD = calculateAndFormatBitCloutInUsd(
                         diamondSender.DiamondSenderProfile.CoinPriceBitCloutNanos
                     );
@@ -103,16 +103,12 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
         const keyExtractor = (item: DiamondSender, index: number) => item.DiamondSenderProfile.PublicKeyBase58Check + index;
         const renderItem = ({ item }: { item: DiamondSender }) => <TouchableOpacity onPress={() => this.goToProfile(item.DiamondSenderProfile)} activeOpacity={1}>
             <View style={[styles.diamondSenderCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
-                <Image style={styles.profileImage}
-                    source={{ uri: item.DiamondSenderProfile.ProfilePic }}></Image>
-
-                <View>
-                    <Text style={[styles.username, themeStyles.fontColorMain]}>{item.DiamondSenderProfile.Username}</Text>
-                    <View style={[styles.diamondSenderCoinPriceContainer, themeStyles.chipColor]}>
-                        <Text style={[styles.diamondSenderCoinPriceText, themeStyles.fontColorMain]}>~${item.DiamondSenderProfile.FormattedCoinPriceUSD}</Text>
-                    </View>
-                </View>
-
+                <ProfileInfoCardComponent
+                    publicKey={item.DiamondSenderProfile.PublicKeyBase58Check}
+                    username={item.DiamondSenderProfile.Username}
+                    coinPrice={item.DiamondSenderProfile.FormattedCoinPriceUSD as string}
+                    verified={item.DiamondSenderProfile?.IsVerified}
+                />
                 <View style={styles.diamondsContainer}>
                     {
                         Array(item.DiamondLevel).fill(0).map(
@@ -145,7 +141,7 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
                             ListFooterComponent={renderFooter}
                         />
             }
-        </View>
+        </View>;
     }
 }
 
