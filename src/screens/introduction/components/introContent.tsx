@@ -6,14 +6,19 @@ export const introduction = [
     {
         title: 'Welcome!',
         imageUri: require('../../../../assets/intro1.png'),
-        description: <Text>BitClout is a new type of social network that mixes speculation and social media, and it’s built from the ground up as its own custom blockchain. Its architecture is similar to Bitcoin.
-            {'\n'}For more info, check
+        description: <Text>BitClout is a new type of social network that mixes speculation and social media, and it’s built from the ground up as its own custom blockchain. Its architecture is similar to Bitcoin.{'\n'}{'\n'}Like Bitcoin, BitClout is a fully open-source project and there is no company behind it; it’s just coins and code.
+            For more info, check
             {' '}<Text
                 onPress={() => Linking.openURL('https://docs.bitclout.com/')}
                 style={[{ fontWeight: '500' }, , themeStyles.linkColor]}>
                 Bitclout docs
             </Text>
-            {' '}</Text>,
+        </Text>,
+    },
+    {
+        title: 'What are Creator Coins?',
+        imageUri: require('../../../../assets/intro6.png'),
+        description: `Every profile on the platform gets its own coin that anybody can buy and sell. We call these coins “creator coins,” and you can have your own coin too simply by creating a profile. The price of each coin goes up when people buy and goes down when people sell.`
     },
     {
         title: 'What is CloutFeed?',
@@ -23,17 +28,19 @@ export const introduction = [
     {
         title: 'Why CloutFeed?',
         imageUri: require('../../../../assets/intro3.png'),
-        description: `With BitClout, people who own a certain amount of their coin can message them, or they could simply rank and prioritize messages from the largest holders of their coin.`,
-    },
-    {
-        title: 'What can you do in Cloutfeed?',
-        imageUri: require('../../../../assets/intro4.png'),
-        description: `Express yourself, share ideas and post what is on your mind, message your investors or direct message your favorite creators, you can also analyze profiles with accurate user-friendly tools`,
+        description: <Text>
+            CloutFeed is the first BitClout mobile application. It is
+            {' '}<Text
+                onPress={() => Linking.openURL('https://github.com/CloutFeed/mobileApp')}
+                style={[{ fontWeight: '500' }, , themeStyles.linkColor]}>
+                open-source
+            </Text> and has been vetted multiple times.{'\n'}{'\n'}CloutFeed maximizes your BitClout experience with countless exclusive features that are just available for CloutFeed's users like CloutTags, post notifications and much more.
+        </Text>
     },
     {
         title: `Let's go!`,
         imageUri: require('../../../../assets/intro5.png'),
-        description: <Text>What are you waiting for? Start earning Bitclouts and socializing with your friends now! Stay updated with the latest news with push notifications.{'\n '} Don't have an account?
+        description: <Text>What are you waiting for? Start earning BitClouts and socializing with your friends now! Stay updated with the latest news with native notifications.{'\n '} Don't have an account?
             {' '}<Text
                 onPress={() => Linking.openURL('https://bitclout.com/')}
                 style={[{ fontWeight: '500' }, , themeStyles.linkColor]}>

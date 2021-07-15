@@ -22,7 +22,7 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
 
     private _isMounted = false;
     private _scrollViewRef: React.RefObject<ScrollView> | any;
-    private _startbuttonOpacity: any = new Animated.Value(0);
+    private _startButtonOpacity: any = new Animated.Value(0);
 
     constructor(props: Props) {
         super(props);
@@ -35,8 +35,6 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
 
         this._scrollViewRef = React.createRef();
         this.goToNext = this.goToNext.bind(this);
-        this.onChangeSlide = this.onChangeSlide.bind(this);
-
     }
 
     componentDidMount() {
@@ -64,12 +62,12 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
             return;
         }
         if (event.nativeEvent && event.nativeEvent.contentOffset) {
-            let currentSlide: any = 1;
+            let currentSlide = 1;
             if (event.nativeEvent.contentOffset.x === 0) {
                 this.setState({ currentSlide });
             } else {
-                const approxCurrentSlide: any = event.nativeEvent.contentOffset.x / screenWidth;
-                currentSlide = parseInt(String(Math.ceil(approxCurrentSlide.toFixed(2)) + 1));
+                const approxCurrentSlide: number = event.nativeEvent.contentOffset.x / screenWidth;
+                currentSlide = parseInt(String(Math.ceil(approxCurrentSlide) + 1));
                 this.setState({ currentSlide });
             }
             this.setNext(this.state.totalSlides > currentSlide);
@@ -92,21 +90,6 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
         }
     }
 
-    // private calculateNextPrev = (totalPages: number, currentPage: number) => {
-    //     this.setNext(totalPages > currentPage)
-    // }
-
-    private onChangeSlide({ nativeEvent }: any) {
-        const slide = Math.round(nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width);
-        if (slide !== this.state.currentSlide && slide >= 0 && slide < introduction.length) {
-            if (this._isMounted) {
-                this.setState({ currentSlide: slide });
-            }
-        } else {
-            this.setState({ isNext: true });
-        }
-    }
-
     render() {
         const keyExtractor = (item: any, index: number) => `${item.toString()}_${index.toString()}`;
         const renderDots = ({ item, index }: any) => <FontAwesome
@@ -116,25 +99,24 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
             color="black" />;
 
         if (this.state.currentSlide === introduction.length) {
-            Animated.timing(this._startbuttonOpacity, {
+            Animated.timing(this._startButtonOpacity, {
                 toValue: 1,
-                duration: 750,
+                duration: 500,
                 useNativeDriver: true,
             }).start();
         }
         else {
-            Animated.timing(this._startbuttonOpacity, {
+            Animated.timing(this._startButtonOpacity, {
                 toValue: 0,
-                duration: 750,
+                duration: 200,
                 useNativeDriver: true,
             }).start();
         }
 
         return <View style={[styles.container, themeStyles.containerColorMain]}>
-            <View style={styles.scrollViewContainer}>
+            <View>
                 <ScrollView
                     ref={(ref) => { this._scrollViewRef = ref }}
-                    contentContainerStyle={styles.scrollViewContainerStyle}
                     horizontal
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
@@ -161,11 +143,14 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
             <View style={styles.buttonContainer}>
 
                 <TouchableOpacity
-                    activeOpacity={1} style={[styles.button, !this.state.isNext && themeStyles.buttonDisabledColor]} onPress={this.goToNext} disabled={!this.state.isNext}>
+                    style={[styles.button, !this.state.isNext && themeStyles.buttonDisabledColor]}
+                    activeOpacity={1}
+                    onPress={this.goToNext}
+                    disabled={!this.state.isNext}>
                     <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
 
-                <Animated.View style={[styles.button, { opacity: this._startbuttonOpacity }]}>
+                <Animated.View style={[styles.button, { opacity: this._startButtonOpacity }]}>
                     <TouchableOpacity activeOpacity={1}>
                         <Text style={styles.buttonText}>Start Clouting!</Text>
                     </TouchableOpacity>
@@ -179,22 +164,14 @@ const styles = StyleSheet.create(
     {
         container: {
             flex: 1,
-            paddingVertical: 20,
-        },
-        scrollViewContainer: {
-            flex: 1,
-            marginTop: 20,
-        },
-        scrollViewContainerStyle: {
-            alignItems: 'center',
-        },
-        slide: {
-            alignItems: 'center',
-            width: screenWidth,
+            paddingVertical: 0,
+            paddingTop: 20
         },
         buttonContainer: {
             alignItems: 'center',
             marginHorizontal: 50,
+            marginBottom: 50,
+            marginTop: 'auto'
         },
         button: {
             padding: 10,
@@ -212,11 +189,7 @@ const styles = StyleSheet.create(
         },
         dotsContainer: {
             justifyContent: 'center',
-            alignItems: 'center',
-            position: 'absolute',
-            bottom: 30,
-            right: 0,
-            left: 0,
+            alignItems: 'center'
         },
         dotsContentContainerStyle: {
             justifyContent: 'center',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, Dimensions, ImageSourcePropType } from 'react-native';
 import { themeStyles } from '@styles/globalColors';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface Props {
     title: string;
@@ -12,27 +13,19 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
 
 export default class introSlideComponent extends React.Component<Props> {
 
-    private _isMounted = false;
-
     constructor(props: Props) {
         super(props);
     }
 
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
-
     render() {
-        return <View style={[styles.container, themeStyles.containerColorMain]}>
+        return <View style={[styles.container]}>
             <Image style={styles.image} source={(this.props.imageUri as ImageSourcePropType)} />
             <Text style={[styles.title, themeStyles.fontColorMain]}>{this.props.title}</Text>
-            <View style={{ height: 100 }}>
+            <ScrollView
+                style={styles.descriptionContainer}
+                bounces={false}>
                 <Text style={[styles.description, themeStyles.fontColorMain]}>{this.props.description}</Text>
-            </View>
+            </ScrollView>
         </View>;
     }
 }
@@ -42,24 +35,27 @@ const styles = StyleSheet.create(
         container: {
             width: screenWidth,
             alignItems: 'center',
-            padding: 20,
-            height: screenHeight * 0.6,
-            justifyContent: 'space-evenly',
+            padding: 20
         },
         image: {
-            width: 200,
-            height: 200,
+            width: 150,
+            height: 150,
+            marginBottom: 20
         },
         title: {
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: 'bold',
-            paddingVertical: 10,
+            marginBottom: 40
         },
         description: {
             textAlign: 'center',
             fontWeight: '600',
             fontSize: 15,
             paddingBottom: 10,
+        },
+        descriptionContainer: {
+            paddingHorizontal: 15,
+            maxHeight: (screenHeight - 150) * 0.7
         }
     }
 );
