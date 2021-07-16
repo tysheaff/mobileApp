@@ -2,7 +2,6 @@ import { NavigationContainer, NavigationProp } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { WelcomeScreen } from './src/screens/welcome.screen';
 import { CreatorCoinHODLer, EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
 import { updateThemeStyles } from './styles/globalColors';
@@ -26,7 +25,8 @@ import MessageStackScreen from './src/navigation/messageStackNavigator';
 import { ActionSheetConfig } from '@services/actionSheet';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { stackConfig } from './src/navigation/stackNavigationConfig';
-
+import CloutFeedIntroduction from '@screens/introduction/cloutFeedIntroduction.screen';
+import TermsConditionsScreen from '@screens/login/termsAndConditions.screen';
 enableScreens();
 
 const Stack = createStackNavigator();
@@ -246,7 +246,13 @@ export default function App() {
                 }}
                 name="LoginNavigator" component={LoginNavigator} />
               :
-              <Stack.Screen name="Welcome" component={WelcomeScreen} />
+              <>
+                <Stack.Screen options={{
+                  headerStyle: { elevation: 0, shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
+                  headerTitleStyle: { alignSelf: 'center', fontSize: 20 }
+                }} name="Introduction" component={CloutFeedIntroduction} />
+                <Stack.Screen options={{ headerShown: false }} name="TermsConditions" component={TermsConditionsScreen} />
+              </>
             :
             <React.Fragment>
               <Stack.Screen

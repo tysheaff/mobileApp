@@ -127,6 +127,7 @@ export class IdentityScreen extends React.Component<Props, State> {
             <ScrollView style={[styles.container]} bounces={false}>
                 <Text style={styles.text}>Enter your seed phrase to load your account</Text>
                 <TextInput
+                    autoCapitalize='none'
                     style={[styles.textInput]}
                     onChangeText={value => this.mnemonic = value}
                     multiline={true}

@@ -35,6 +35,7 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
 
         this._scrollViewRef = React.createRef();
         this.goToNext = this.goToNext.bind(this);
+        this.onNavigate = this.onNavigate.bind(this);
     }
 
     componentDidMount() {
@@ -67,7 +68,8 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
                 this.setState({ currentSlide });
             } else {
                 const approxCurrentSlide: number = event.nativeEvent.contentOffset.x / screenWidth;
-                currentSlide = parseInt(String(Math.ceil(approxCurrentSlide) + 1));
+                const parsedApproxCurrentSlide: number = parseInt(approxCurrentSlide.toFixed(2))
+                currentSlide = parseInt(String(Math.ceil(parsedApproxCurrentSlide) + 1));
                 this.setState({ currentSlide });
             }
             this.setNext(this.state.totalSlides > currentSlide);
@@ -88,6 +90,13 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
         if (status !== this.state.isNext) {
             this.setState({ isNext: status });
         }
+    }
+
+    private onNavigate() {
+        if (this.state.currentSlide !== introduction.length) {
+            return;
+        }
+        this.props.navigation.navigate('TermsConditions');
     }
 
     render() {
@@ -150,8 +159,8 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
                     <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
 
-                <Animated.View style={[styles.button, { opacity: this._startButtonOpacity }]}>
-                    <TouchableOpacity activeOpacity={1}>
+                <Animated.View style={{ opacity: this._startButtonOpacity, width: '100%' }}>
+                    <TouchableOpacity onPress={this.onNavigate} style={styles.button} activeOpacity={1}>
                         <Text style={styles.buttonText}>Start Clouting!</Text>
                     </TouchableOpacity>
                 </Animated.View>
@@ -170,8 +179,6 @@ const styles = StyleSheet.create(
         buttonContainer: {
             alignItems: 'center',
             marginHorizontal: 50,
-            marginBottom: 50,
-            marginTop: 'auto'
         },
         button: {
             padding: 10,
@@ -180,16 +187,15 @@ const styles = StyleSheet.create(
             alignItems: 'center',
             width: '100%',
             borderRadius: 5,
-            margin: 10,
-
+            marginVertical: 10,
         },
         buttonText: {
             color: 'white',
             fontSize: 17,
         },
         dotsContainer: {
-            justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            marginBottom: 15,
         },
         dotsContentContainerStyle: {
             justifyContent: 'center',
