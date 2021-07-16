@@ -17,11 +17,12 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
     constructor(props: Props) {
         super(props);
 
+        const imageUri = api.getSingleProfileImage(this.props.publicKey) + '?' + new Date();
         this.state = {
-            imageUri: ' '
+            imageUri: imageUri
         };
 
-        this.init();
+        this.init(imageUri);
     }
 
     componentDidMount() {
@@ -37,21 +38,21 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
             this.state.imageUri !== nextState.imageUri;
     }
 
-    private async init() {
-        let imageUri = api.getSingleProfileImage(this.props.publicKey);
+    private async init(imageUri: string) {
         try {
             await Image.prefetch(imageUri);
         } catch {
-            imageUri = 'https://i.imgur.com/vZ2mB1W.png';
-        } finally {
             if (this._isMounted) {
-                this.setState({ imageUri });
+                this.setState({ imageUri: 'https://i.imgur.com/vZ2mB1W.png' });
             }
         }
     }
 
     render() {
-        return <Image style={styles.image} source={{ uri: this.state.imageUri + "?" + new Date() }} />;
+        return <Image
+            style={styles.image}
+            source={{ uri: this.state.imageUri }}
+        />;
     }
 }
 
