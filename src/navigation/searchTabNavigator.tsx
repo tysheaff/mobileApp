@@ -18,7 +18,7 @@ export default class SearchTabNavigator extends React.Component<Props> {
         super(props);
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <TopTab.Navigator
                 sceneContainerStyle={themeStyles.containerColorMain}
@@ -27,6 +27,6 @@ export default class SearchTabNavigator extends React.Component<Props> {
                 <TopTab.Screen name="Creators" children={props => <CreatorsSearchScreen {...props} />} />
                 <TopTab.Screen name="CloutTags" children={props => <CloutTagSearchScreen {...props} />} />
             </TopTab.Navigator>
-        )
+        );
     }
 }

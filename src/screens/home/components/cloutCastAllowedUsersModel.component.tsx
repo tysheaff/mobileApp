@@ -1,18 +1,19 @@
-import { api } from "@services";
-import { getAnonymousProfile } from "@services/helpers";
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { TouchableOpacity, View, Image, Text, ActivityIndicator, Dimensions, StyleSheet } from "react-native";
+import { api } from '@services';
+import { getAnonymousProfile } from '@services/helpers';
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { TouchableOpacity, View, Image, Text, ActivityIndicator, Dimensions, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import { MaterialIcons } from '@expo/vector-icons';
-import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
-import { FlatList } from "react-native-gesture-handler";
-import { settingsGlobals } from "@globals/settingsGlobals";
-import { Profile } from "@types";
-import { NavigationProp } from "@react-navigation/native";
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import { FlatList } from 'react-native-gesture-handler';
+import { settingsGlobals } from '@globals/settingsGlobals';
+import { Profile } from '@types';
+import { ParamListBase } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     publicKeys: string[];
     close: () => void;
 }
@@ -38,20 +39,20 @@ export class CloutCastAllowedUsersModelComponent extends React.Component<Props, 
         this.loadData();
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    async loadData() {
+    async loadData(): Promise<void> {
         try {
             const promises: Promise<Profile>[] = [];
             for (const publicKey of this.props.publicKeys) {
                 const promise = new Promise<Profile>(
-                    (p_resolve, _reject) => {
+                    (p_resolve) => {
                         api.getSingleProfile('', publicKey).then(
                             p_response => {
                                 const profile: Profile = p_response.Profile;
@@ -76,18 +77,18 @@ export class CloutCastAllowedUsersModelComponent extends React.Component<Props, 
         }
     }
 
-    close() {
+    close(): void {
         this.props.close();
     }
 
-    render() {
-        const keyExtractor = (item: Profile, index: number) => item.PublicKeyBase58Check + index;
+    render(): JSX.Element {
+        const keyExtractor = (item: Profile, index: number) => item.PublicKeyBase58Check + String(index);
         const renderItem = ({ item, index }: { item: Profile, index: number }) => (
             <TouchableOpacity
                 onPress={
                     () => {
                         this.close();
-                        (this.props.navigation as any).push(
+                        this.props.navigation.push(
                             'UserProfile',
                             {
                                 publicKey: item.PublicKeyBase58Check,
@@ -97,7 +98,7 @@ export class CloutCastAllowedUsersModelComponent extends React.Component<Props, 
                         );
                     }
                 }
-                activeOpacity={0.7} key={item.PublicKeyBase58Check + index}>
+                activeOpacity={0.7} key={item.PublicKeyBase58Check + String(index)}>
                 <View style={[styles.profileListCard, themeStyles.borderColor]}>
                     <Image style={styles.profileImage}
                         source={{ uri: item.ProfilePic }}></Image>
@@ -128,9 +129,9 @@ export class CloutCastAllowedUsersModelComponent extends React.Component<Props, 
             isVisible={true}
             swipeDirection='down'
             animationOutTiming={200}
-            onSwipeComplete={() => { this.close() }}
-            onBackdropPress={() => { this.close() }}
-            onBackButtonPress={() => { this.close() }}
+            onSwipeComplete={() => { this.close(); }}
+            onBackdropPress={() => { this.close(); }}
+            onBackButtonPress={() => { this.close(); }}
             propagateSwipe={this.state.profiles?.length > 5}
         >
             <View style={[styles.container, themeStyles.modalBackgroundColor]}>
@@ -144,8 +145,7 @@ export class CloutCastAllowedUsersModelComponent extends React.Component<Props, 
                                 data={this.state.profiles}
                                 keyExtractor={keyExtractor}
                                 renderItem={renderItem}
-                            >
-                            </FlatList>
+                            />
                         </>
                 }
             </View>

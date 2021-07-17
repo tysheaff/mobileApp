@@ -1,9 +1,9 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { calculateBitCloutInUSD } from '@services';
 import { Profile, Notification } from '@types';
-import { globalStyles } from "@styles/globalStyles";
+import { globalStyles } from '@styles/globalStyles';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
@@ -54,6 +54,6 @@ export class CreatorCoinNotificationComponent extends React.Component<Props> {
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>worth of your coin</Text>
                 </View>
             </TouchableOpacity>
-        )
+        );
     }
-};
+}

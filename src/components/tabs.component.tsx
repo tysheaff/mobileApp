@@ -7,10 +7,14 @@ export interface TabConfig {
     name: string;
 }
 
-export function TabsComponent(
-    { tabs, selectedTab, onTabClick, centerText }:
-        { tabs: TabConfig[], selectedTab: string, onTabClick: (p_tabName: string) => void, centerText?: boolean }
-) {
+interface Props {
+    tabs: TabConfig[];
+    selectedTab: string;
+    onTabClick: (p_tabName: string) => void;
+    centerText?: boolean;
+}
+
+export function TabsComponent({ tabs, selectedTab, onTabClick, centerText }: Props): JSX.Element {
 
     return <View style={[styles.container, themeStyles.containerColorMain]}>
         {
@@ -32,7 +36,7 @@ export function TabsComponent(
                 </TouchableOpacity>
             )
         }
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create(

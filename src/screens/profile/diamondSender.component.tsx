@@ -1,14 +1,15 @@
-import { NavigationProp } from "@react-navigation/core";
-import React from "react";
+import React from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import { TouchableOpacity, View, Text, StyleSheet, Dimensions } from 'react-native';
 import { DiamondSender } from '@types';
 import { themeStyles } from '@styles';
 import { calculateAndFormatBitCloutInUsd, getAnonymousProfile } from '@services';
-import ProfileInfoCardComponent from "@components/profileInfo/profileInfoCard.component";
+import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     diamondSender: DiamondSender;
 }
 
@@ -43,16 +44,19 @@ export class DiamondSenderComponent extends React.Component<Props, State> {
     private goToProfile() {
         if (this.props.diamondSender.ProfileEntryResponse &&
             this.props.diamondSender.ProfileEntryResponse.Username !== 'anonymous') {
-            (this.props.navigation as any).push('UserProfile', {
-                publicKey: this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check,
-                username: this.props.diamondSender.ProfileEntryResponse.Username,
-                key: 'Profile_' + this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check
-            });
+            this.props.navigation.push(
+                'UserProfile',
+                {
+                    publicKey: this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check,
+                    username: this.props.diamondSender.ProfileEntryResponse.Username,
+                    key: 'Profile_' + this.props.diamondSender.ProfileEntryResponse.PublicKeyBase58Check
+                }
+            );
         }
     }
 
     render() {
-        return <TouchableOpacity onPress={this.goToProfile} activeOpacity={1}>
+        return <TouchableOpacity onPress={() => this.goToProfile()} activeOpacity={1}>
 
             <View style={[styles.diamondSenderCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
                 <ProfileInfoCardComponent

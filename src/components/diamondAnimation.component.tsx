@@ -8,26 +8,28 @@ interface Diamond {
     x: number;
     y?: number;
     angle: string;
-    animation: any;
+    animation: Animated.Value;
     color: string;
 }
 
-export function DiamondAnimationComponent() {
+export function DiamondAnimationComponent(): JSX.Element {
     const [showDiamondAnimation, setShowDiamondAnimation] = useState<boolean>(false);
     const [diamonds, setDiamonds] = useState<Diamond[]>([]);
 
     diamondAnimation.show = () => {
-        const { width: screenWidth, height: screenHeight } = Dimensions.get('screen')
+        const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
 
-        const newDiamonds = [...new Array(125)].map((_, i) => {
-            return {
-                x: screenWidth * Math.random(),
-                y: screenHeight * Math.random(),
-                angle: Math.PI * 2 * Math.random() + 'rad',
-                animation: new Animated.Value(0),
-                color: themeStyles.diamondColor.color
+        const newDiamonds = Array(125).fill(0).map(
+            () => {
+                return {
+                    x: screenWidth * Math.random(),
+                    y: screenHeight * Math.random(),
+                    angle: String(Math.PI * 2 * Math.random()) + 'rad',
+                    animation: new Animated.Value(0),
+                    color: themeStyles.diamondColor.color
+                };
             }
-        });
+        );
 
         setDiamonds(newDiamonds);
         setShowDiamondAnimation(true);
@@ -42,7 +44,7 @@ export function DiamondAnimationComponent() {
                             duration: 2000,
                             useNativeDriver: true
                         }
-                    ).start()
+                    ).start();
                 }
             },
             0
@@ -54,7 +56,7 @@ export function DiamondAnimationComponent() {
             },
             2000
         );
-    }
+    };
 
     return showDiamondAnimation ?
         <View style={styles.container}>
@@ -81,7 +83,7 @@ export function DiamondAnimationComponent() {
                 )
             }
         </View>
-        : <View></View>
+        : <View></View>;
 }
 
 const styles = StyleSheet.create(

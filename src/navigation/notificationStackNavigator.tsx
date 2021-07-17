@@ -150,9 +150,8 @@ export default function NotificationStackScreen() {
                 }
                 name="Identity" component={IdentityScreen} />
         </NotificationStack.Navigator>
-    )
-};
-
+    );
+}
 
 const styles = StyleSheet.create(
     {
@@ -160,4 +159,4 @@ const styles = StyleSheet.create(
             marginRight: 10,
         },
     }
-)
+);

@@ -1,10 +1,10 @@
 import { themeStyles } from '@styles/globalColors';
-import React from 'react'
-import { StyleSheet, View, FlatList, ActivityIndicator, RefreshControl } from 'react-native'
+import React from 'react';
+import { StyleSheet, View, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { cloutApi } from '@services/api/cloutApi';
 import { globals } from '@globals/globals';
-import { CloutTag, Post } from '@types'
+import { CloutTag, Post } from '@types';
 import { PostComponent } from '@components/post/post.component';
 import { api, cache } from '@services';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
@@ -29,9 +29,11 @@ interface State {
 
 export default class CloutTagPostsScreen extends React.Component<Props, State> {
 
-    private _isMounted: boolean = false;
-    private _noMoreData: boolean = false;
-    private _lastCloutTagPostIndex: number = 0;
+    private _isMounted = false;
+
+    private _noMoreData = false;
+
+    private _lastCloutTagPostIndex = 0;
 
     constructor(props: Props) {
         super(props);
@@ -146,7 +148,7 @@ export default class CloutTagPostsScreen extends React.Component<Props, State> {
             tintColor={themeStyles.fontColorMain.color}
             titleColor={themeStyles.fontColorMain.color}
             refreshing={this.state.isRefreshing}
-            onRefresh={this.refresh} />
+            onRefresh={this.refresh} />;
 
         return (
             <View style={[styles.container, themeStyles.containerColorMain]}>

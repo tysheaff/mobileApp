@@ -170,7 +170,7 @@ export function CreatePostComponent(
         </View>
 
         <MentionInput
-            inputRef={p_ref => { inputRef = p_ref }}
+            inputRef={p_ref => { inputRef = p_ref; }}
             style={[styles.textInput, themeStyles.fontColorMain]}
             placeholder="Share your ideas with the world..."
             placeholderTextColor={themeStyles.fontColorSub.color}
@@ -244,7 +244,7 @@ export function CreatePostComponent(
             insertVideo && internalVideoLink ?
                 <View>
                     <View style={styles.removeButtonContainer}>
-                        <TouchableOpacity style={styles.removeButton} onPress={() => { setInternalVideoLink(''); setVideoLink(''); setInsertVideo(false) }}>
+                        <TouchableOpacity style={styles.removeButton} onPress={() => { setInternalVideoLink(''); setVideoLink(''); setInsertVideo(false); }}>
                             <Fontisto name="close-a" size={14} color="white" />
                         </TouchableOpacity>
                     </View>
@@ -278,7 +278,7 @@ export function CreatePostComponent(
                             <Text style={[styles.inputAccessoryButtonText, themeStyles.fontColorMain]}>Image</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.inputAccessoryButton} onPress={() => { setInsertVideo(true); scrollViewRef.current?.scrollToEnd({ animated: true }) }}>
+                        <TouchableOpacity style={styles.inputAccessoryButton} onPress={() => { setInsertVideo(true); scrollViewRef.current?.scrollToEnd({ animated: true }); }}>
                             <Ionicons name="md-videocam-outline" size={24} color={themeStyles.fontColorMain.color} />
                             <Text style={[styles.inputAccessoryButtonText, themeStyles.fontColorMain]}>Video</Text>
                         </TouchableOpacity>
@@ -286,7 +286,7 @@ export function CreatePostComponent(
                 </InputAccessoryView>
                 :
                 <KeyboardAvoidingView
-                    behavior={"height"}
+                    behavior={'height'}
                     keyboardVerticalOffset={65}>
                     <View style={[styles.inputAccessory, themeStyles.containerColorMain, themeStyles.recloutBorderColor]}>
                         <TouchableOpacity style={styles.inputAccessoryButton} onPress={pickImage}>
@@ -303,7 +303,7 @@ export function CreatePostComponent(
         }
 
         <View style={{ height: 500 }}></View>
-    </ScrollView>
+    </ScrollView>;
 }
 
 const styles = StyleSheet.create(

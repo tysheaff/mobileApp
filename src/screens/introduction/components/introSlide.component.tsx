@@ -6,7 +6,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 interface Props {
     title: string;
     imageUri: string;
-    description: string;
+    description: JSX.Element | string;
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');

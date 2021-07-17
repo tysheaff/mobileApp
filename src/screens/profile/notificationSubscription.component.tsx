@@ -27,7 +27,7 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
 
     private _isMounted = false;
 
-    constructor(props: any) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -158,9 +158,9 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
                 <Ionicons name="md-notifications-outline" size={26} style={[themeStyles.fontColorMain, styles.notificationIcon]} onPress={() => this.openNotificationModal()} />
                 {
                     this.state.subscribedNotifications?.length > 0 ?
-                    <View style={styles.subscribedCircle}></View>
-                    :
-                    undefined
+                        <View style={styles.subscribedCircle}></View>
+                        :
+                        undefined
                 }
                 <Modal
                     style={[styles.modalStyle]}
@@ -195,7 +195,7 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
                                             }
                                         ]}
                                         value={this.state.subscribedNotifications}
-                                        onValueChange={this.onSubscribedNotificationChange}
+                                        onValueChange={(value: string | string[]) => this.onSubscribedNotificationChange(value as string[])}
                                         multiple={true}
                                     >
                                     </SelectListControl>

@@ -2,20 +2,23 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
 import { ActionSheetConfig } from '@services';
 import { themeStyles } from '@styles';
-import Modal from 'react-native-modal'
+import Modal from 'react-native-modal';
 import { eventManager } from '@globals/injector';
-import { EventType } from "@types";
+import { EventType } from '@types';
 import { settingsGlobals } from '@globals/settingsGlobals';
 
-export function ActionSheet(props: { config: ActionSheetConfig }) {
+export function ActionSheet(props: { config: ActionSheetConfig }): JSX.Element {
 
     let _isMounted = true;
 
-    useEffect(() => {
-        return () => { _isMounted = false };
-    }, [])
+    useEffect(
+        () => {
+            return () => { _isMounted = false; };
+        },
+        []
+    );
 
-    async function onOptionClick(p_optionIndex: number) {
+    function onOptionClick(p_optionIndex: number) {
         close();
         props.config?.callback(p_optionIndex);
     }
@@ -75,7 +78,7 @@ export function ActionSheet(props: { config: ActionSheetConfig }) {
             </TouchableOpacity>
 
         </View>
-    </Modal >
+    </Modal >;
 }
 const styles = StyleSheet.create(
     {

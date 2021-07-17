@@ -1,21 +1,22 @@
-import React from "react";
-import { ActivityIndicator, FlatList, RefreshControl, View, Text, StyleSheet, Linking, Image, TouchableOpacity } from "react-native";
-import { PostComponent } from '@components/post/post.component'
+import React from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, View, Text, StyleSheet, Linking, Image, TouchableOpacity, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { PostComponent } from '@components/post/post.component';
 import { Post } from '@types';
-import { NavigationProp } from "@react-navigation/native";
-import { themeStyles } from "@styles/globalColors";
-import { globals } from "@globals/globals";
-import { api, loadTickersAndExchangeRate, cache, searchCloutApi } from "@services";
-import { navigatorGlobals } from "@globals/navigatorGlobals";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { themeStyles } from '@styles/globalColors';
+import { globals } from '@globals/globals';
+import { api, loadTickersAndExchangeRate, cache, searchCloutApi } from '@services';
+import { navigatorGlobals } from '@globals/navigatorGlobals';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { Ionicons } from '@expo/vector-icons';
-import { HotFeedFilter, HotFeedSettingsComponent } from "./hotFeedSettings.component";
+import { HotFeedFilter, HotFeedSettingsComponent } from './hotFeedSettings.component';
 import * as SecureStore from 'expo-secure-store';
-import { constants } from "@globals/constants";
+import { constants } from '@globals/constants';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any> | any;
-    route: any;
+    navigation: StackNavigationProp<ParamListBase>;
+    route: RouteProp<ParamListBase, string>;
 }
 
 interface State {
@@ -30,9 +31,13 @@ interface State {
 export class HotFeedComponent extends React.Component<Props, State> {
 
     private _flatListRef: React.RefObject<FlatList>;
-    private _currentScrollPosition: number = 0;
+
+    private _currentScrollPosition = 0;
+
     private _page = 0;
+
     private _noMoreData = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -50,7 +55,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
         this._flatListRef = React.createRef();
         navigatorGlobals.refreshHome = () => {
             if (this._currentScrollPosition > 0 || !this._flatListRef.current) {
-                (this._flatListRef.current as any)?.scrollToOffset({ animated: true, offset: 0 });
+                this._flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
             } else {
                 this.refresh(false);
             }
@@ -64,15 +69,15 @@ export class HotFeedComponent extends React.Component<Props, State> {
         this.onSettingsChange = this.onSettingsChange.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    async refresh(p_showLoading = true) {
+    async refresh(p_showLoading = true): Promise<void> {
         if (this._isMounted && p_showLoading) {
             this.setState({ isLoading: true });
         } else if (this._isMounted) {
@@ -85,7 +90,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
 
         await loadTickersAndExchangeRate();
         await this.loadPosts(false);
-    };
+    }
 
     private async loadPosts(p_loadMore: boolean) {
         if (this.state.isLoadingMore || this._noMoreData) {
@@ -109,7 +114,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
             this._noMoreData = this._page >= maxPage;
 
             let allPosts: Post[] = [];
-            let newPosts = await this.fetchPosts(postHashHexes);
+            const newPosts = await this.fetchPosts(postHashHexes);
 
             if (p_loadMore) {
                 allPosts = this.state.posts?.concat(newPosts);
@@ -123,26 +128,26 @@ export class HotFeedComponent extends React.Component<Props, State> {
                 this.setState({ posts: allPosts });
             }
 
-        } catch (p_error: any) {
-            globals.defaultHandleError(p_error)
+        } catch (error) {
+            globals.defaultHandleError(error);
         } finally {
             if (this._isMounted) {
                 this.setState({ isLoadingMore: false, isLoading: false, isRefreshing: false });
             }
         }
-    };
+    }
 
     async fetchPosts(postHashHexes: string[]): Promise<Post[]> {
         const promises: Promise<Post | undefined>[] = [];
 
         for (const postHashHex of postHashHexes) {
             const promise = new Promise<Post | undefined>(
-                (p_resolve, _reject) => {
+                (p_resolve) => {
                     api.getSinglePost(globals.user.publicKey, postHashHex, false, 0, 0).then(
-                        (response: any) => {
+                        response => {
                             p_resolve(response.PostFound);
                         }
-                    ).catch(() => p_resolve(undefined))
+                    ).catch(() => p_resolve(undefined));
                 }
             );
             promises.push(promise);
@@ -171,7 +176,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
     }
 
     private goToSearchClout() {
-        Linking.openURL('https://searchclout.net/')
+        Linking.openURL('https://searchclout.net/');
     }
 
     private openSettings() {
@@ -193,21 +198,21 @@ export class HotFeedComponent extends React.Component<Props, State> {
                 this.refresh();
             }
         } catch {
-
+            return;
         }
     }
 
-    render() {
+    render(): JSX.Element {
         if (this.state.isLoading) {
             return <CloutFeedLoader />;
         }
 
-        const keyExtractor = (item: any, index: number) => item.PostHashHex + index;
+        const keyExtractor = (item: Post, index: number) => item.PostHashHex + String(index);
         const renderItem = (item: Post) => {
             return <PostComponent
                 route={this.props.route}
                 navigation={this.props.navigation}
-                post={item} />
+                post={item} />;
         };
         const renderFooter = this.state.isLoadingMore && !this.state.isLoading
             ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
@@ -217,20 +222,20 @@ export class HotFeedComponent extends React.Component<Props, State> {
             tintColor={themeStyles.fontColorMain.color}
             titleColor={themeStyles.fontColorMain.color}
             refreshing={this.state.isRefreshing}
-            onRefresh={() => this.refresh(false)} />
+            onRefresh={() => this.refresh(false)} />;
 
         const renderHeader = <View style={[styles.header, themeStyles.containerColorMain]}>
             <Image
                 style={styles.searchCloutLogo}
                 source={require('../../../../assets/searchclout.png')}
             ></Image>
-            <Text style={[themeStyles.fontColorMain]} onPress={this.goToSearchClout}>
-                <Text style={[styles.headerLink, themeStyles.linkColor]} onPress={this.goToSearchClout}>Powered by SearchClout</Text>
+            <Text style={[themeStyles.fontColorMain]} onPress={() => this.goToSearchClout()}>
+                <Text style={[styles.headerLink, themeStyles.linkColor]} onPress={() => this.goToSearchClout()}>Powered by SearchClout</Text>
             </Text>
 
             <TouchableOpacity
                 style={styles.filterButton}
-                onPress={this.openSettings}
+                onPress={() => this.openSettings()}
             >
                 <Ionicons name="ios-filter" size={24} color={themeStyles.fontColorMain.color} />
             </TouchableOpacity>
@@ -242,7 +247,8 @@ export class HotFeedComponent extends React.Component<Props, State> {
                     <FlatList
                         ref={this._flatListRef}
                         onMomentumScrollEnd={
-                            (p_event: any) => this._currentScrollPosition = p_event.nativeEvent.contentOffset.y}
+                            (p_event: NativeSyntheticEvent<NativeScrollEvent>) => this._currentScrollPosition = p_event.nativeEvent.contentOffset.y
+                        }
                         data={this.state.posts}
                         showsVerticalScrollIndicator={false}
                         keyExtractor={keyExtractor}
@@ -263,7 +269,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
                     <HotFeedSettingsComponent
                         filter={this.state.filter}
                         isFilterShown={this.state.isFilterShown}
-                        onSettingsChange={this.onSettingsChange}
+                        onSettingsChange={(filter: HotFeedFilter) => this.onSettingsChange(filter)}
                     />
                 }
             </>

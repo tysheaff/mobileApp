@@ -1,6 +1,6 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { View, StyleSheet, Text, StyleProp, ViewStyle, TouchableOpacity } from "react-native";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { View, StyleSheet, Text, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export interface SelectListOption {
@@ -12,7 +12,7 @@ interface Props {
     style?: StyleProp<ViewStyle>;
     options: SelectListOption[];
     value?: string | string[];
-    onValueChange?: (p_value: any) => void;
+    onValueChange?: (p_value: string | string[]) => void;
     multiple?: boolean;
 }
 
@@ -32,15 +32,15 @@ export class SelectListControl extends React.Component<Props, State> {
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    onOptionPress(p_value: string) {
+    onOptionPress(p_value: string): void {
         let newValue: string | string[] | undefined;
 
         if (this.props.multiple) {
@@ -67,7 +67,7 @@ export class SelectListControl extends React.Component<Props, State> {
         }
     }
 
-    getCheckIcon(p_value: string) {
+    getCheckIcon(p_value: string): JSX.Element | false {
         let showIcon = false;
 
         if (this.props.multiple) {
@@ -78,7 +78,7 @@ export class SelectListControl extends React.Component<Props, State> {
         return showIcon && <MaterialIcons style={styles.checkIcon} name="check-circle" size={22} color="#007ef5" />;
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={this.props.style}>
             {
                 this.props.options.map(
@@ -90,7 +90,7 @@ export class SelectListControl extends React.Component<Props, State> {
                     </TouchableOpacity>
                 )
             }
-        </View>
+        </View>;
     }
 }
 

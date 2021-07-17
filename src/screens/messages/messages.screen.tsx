@@ -1,16 +1,16 @@
-import React from "react";
-import { eventManager } from "@globals/injector";
-import { themeStyles } from "@styles/globalColors";
-import { View, StyleSheet, FlatList, RefreshControl, ActivityIndicator, Text } from "react-native";
-import { ContactWithMessages, EventType } from "@types";
-import { MessageFilter, MessageSettingsComponent, MessageSort } from "./components/messageSettings";
+import React from 'react';
+import { eventManager } from '@globals/injector';
+import { themeStyles } from '@styles/globalColors';
+import { View, StyleSheet, FlatList, RefreshControl, ActivityIndicator, Text } from 'react-native';
+import { ContactWithMessages, EventType } from '@types';
+import { MessageFilter, MessageSettingsComponent, MessageSort } from './components/messageSettings';
 import * as SecureStore from 'expo-secure-store';
-import { constants } from "@globals/constants";
-import { globals } from "@globals/globals";
-import { api } from "@services";
-import { getAnonymousProfile } from "@services";
-import { ContactMessagesListCardComponent } from "@screens/messages/components/contactMessagesListCard.component";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { constants } from '@globals/constants';
+import { globals } from '@globals/globals';
+import { api } from '@services';
+import { getAnonymousProfile } from '@services';
+import { ContactMessagesListCardComponent } from '@screens/messages/components/contactMessagesListCard.component';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props { }
 
@@ -28,6 +28,7 @@ interface State {
 export class MessagesScreen extends React.Component<Props, State>{
 
     private _isMounted = false;
+
     private _subscriptions: (() => void)[] = [];
 
     constructor(props: Props) {
@@ -61,7 +62,7 @@ export class MessagesScreen extends React.Component<Props, State>{
         this.loadMessages = this.loadMessages.bind(this);
         this.loadMoreMessages = this.loadMoreMessages.bind(this);
         this.onMessageSettingChange = this.onMessageSettingChange.bind(this);
-        this.toggleMessagesFilter = this.toggleMessagesFilter.bind(this)
+        this.toggleMessagesFilter = this.toggleMessagesFilter.bind(this);
     }
 
     componentDidMount() {
@@ -254,7 +255,7 @@ export class MessagesScreen extends React.Component<Props, State>{
                     onSettingsChange={this.onMessageSettingChange}
                 />
             }
-        </View>
+        </View>;
     }
 }
 

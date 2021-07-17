@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Animated, Platform } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { Post } from '../../types';
 import { Dimensions } from 'react-native';
 import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
 import { globals, hapticsManager } from '@globals';
@@ -12,10 +12,11 @@ import { themeStyles } from '@styles';
 import { PostOptionsComponent } from './postOptions.components';
 import { PostActionsRow } from './postActionsRow.component';
 import CloutFeedVideoComponent from '@components/post/cloutFeedVideo.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
-    route: any;
+    navigation: StackNavigationProp<ParamListBase>;
+    route: RouteProp<ParamListBase, string>;
     post: Post,
     disablePostNavigate?: boolean,
     disableProfileNavigation?: boolean,
@@ -37,8 +38,11 @@ interface State {
 export class PostComponent extends React.Component<Props, State> {
 
     private _animation = new Animated.Value(0);
+
     private _inputRange = [0, 1.3];
+
     private _outputRange = [0, 1.3];
+
     private scale = this._animation.interpolate({
         inputRange: this._inputRange,
         outputRange: this._outputRange
@@ -70,13 +74,13 @@ export class PostComponent extends React.Component<Props, State> {
         this.toggleHeartIcon = this.toggleHeartIcon.bind(this);
     }
 
-    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State): boolean {
         return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex
             || this.state.isHeartShowed !== p_nextState.isHeartShowed;
     }
 
     private goToStats() {
-        (this.props.navigation as any).push(
+        this.props.navigation.push(
             'PostStatsTabNavigator',
             {
                 postHashHex: this.props.post.PostHashHex
@@ -88,7 +92,7 @@ export class PostComponent extends React.Component<Props, State> {
 
     private goToProfile() {
         if (!this.props.disableProfileNavigation) {
-            (this.props.navigation as any).push(
+            this.props.navigation.push(
                 'UserProfile',
                 {
                     publicKey: this.props.post.ProfileEntryResponse.PublicKeyBase58Check,
@@ -101,7 +105,7 @@ export class PostComponent extends React.Component<Props, State> {
 
     private goToPost() {
         if (this.props.disablePostNavigate !== true) {
-            (this.props.navigation as any).push(
+            this.props.navigation.push(
                 'Post',
                 {
                     postHashHex: this.props.post.PostHashHex,
@@ -113,7 +117,7 @@ export class PostComponent extends React.Component<Props, State> {
 
     private goToRecloutedPost() {
         if (this.props.disablePostNavigate !== true) {
-            (this.props.navigation as any).push(
+            this.props.navigation.push(
                 'Post',
                 {
                     postHashHex: this.props.post.RecloutedPostEntryResponse.PostHashHex,
@@ -123,11 +127,11 @@ export class PostComponent extends React.Component<Props, State> {
         }
     }
 
-    public getEmbeddedVideoLink(p_videoLink: string) {
+    public getEmbeddedVideoLink(p_videoLink: string): string {
         const youtubeRegExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
         const youtubeMatch = p_videoLink.match(youtubeRegExp);
         if (youtubeMatch && youtubeMatch[7].length == 11) {
-            const videoId = youtubeMatch[7]
+            const videoId = youtubeMatch[7];
             const videoLink = 'https://www.youtube.com/embed/' + videoId;
             return videoLink;
         }
@@ -135,7 +139,7 @@ export class PostComponent extends React.Component<Props, State> {
         return p_videoLink;
     }
 
-    scaleIn() {
+    private scaleIn(): void {
         this.setState({ isHeartShowed: true });
         Animated.spring(this._animation, {
             toValue: 1,
@@ -143,21 +147,24 @@ export class PostComponent extends React.Component<Props, State> {
         }).start();
     }
 
-    scaleOut() {
+    private scaleOut(): void {
         Animated.spring(this._animation, {
             toValue: 0,
             useNativeDriver: true,
         }).start(() => this.setState({ isHeartShowed: false }));
     }
 
-    toggleHeartIcon() {
-        this.scaleIn()
-        setTimeout(() => {
-            this.scaleOut()
-        }, 750);
+    private toggleHeartIcon(): void {
+        this.scaleIn();
+        setTimeout(
+            () => {
+                this.scaleOut();
+            },
+            750
+        );
     }
 
-    render() {
+    render(): JSX.Element {
         const bodyText = this.props.post.Body?.trimEnd();
 
         return (
@@ -171,7 +178,7 @@ export class PostComponent extends React.Component<Props, State> {
                 {
                     this.props.isParentPost &&
                     <View style={{ flex: 1, paddingLeft: 10 }}>
-                        <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
+                        <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
                             <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
                         </TouchableOpacity>
                         <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
@@ -185,17 +192,17 @@ export class PostComponent extends React.Component<Props, State> {
                             { borderBottomWidth: this.props.hideBottomBorder ? 0 : 1 },
                             themeStyles.borderColor
                         ]}>
-                        <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
+                        <TouchableOpacity onPress={() => this.goToPost()} onLongPress={() => this.goToStats()} activeOpacity={1}>
                             <View style={styles.headerContainer}>
                                 {
                                     !this.props.isParentPost && (
-                                        <TouchableOpacity activeOpacity={1} onPress={this.goToProfile}>
+                                        <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
                                             <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
                                         </TouchableOpacity>
                                     )
                                 }
                                 <View>
-                                    <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={this.goToProfile}>
+                                    <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={() => this.goToProfile()}>
                                         <Text style={[styles.username, themeStyles.fontColorMain]} >{this.props.post.ProfileEntryResponse?.Username}</Text>
                                         {
                                             this.props.post.ProfileEntryResponse?.IsVerified &&
@@ -229,7 +236,7 @@ export class PostComponent extends React.Component<Props, State> {
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={this.goToPost} onLongPress={this.goToStats} activeOpacity={1}>
+                        <TouchableOpacity onPress={() => this.goToPost()} onLongPress={() => this.goToStats()} activeOpacity={1}>
                             <TextWithLinks
                                 navigation={this.props.navigation}
                                 numberOfLines={bodyText?.length > 280 ? 9 : 16}
@@ -240,7 +247,7 @@ export class PostComponent extends React.Component<Props, State> {
 
                         {
                             this.props.post.ImageURLs?.length > 0 &&
-                            <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToStats={this.goToStats} />
+                            <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToStats={() => this.goToStats()} />
                         }
 
                         {
@@ -251,7 +258,7 @@ export class PostComponent extends React.Component<Props, State> {
                         {
                             this.props.post.RecloutedPostEntryResponse && (this.props.recloutedPostIndex == null || this.props.recloutedPostIndex < 2) &&
                             <View style={[styles.recloutedPostContainer, themeStyles.recloutBorderColor]}>
-                                <TouchableOpacity onPress={this.goToRecloutedPost} activeOpacity={1}>
+                                <TouchableOpacity onPress={() => this.goToRecloutedPost()} activeOpacity={1}>
                                     <PostComponent
                                         navigation={this.props.navigation}
                                         route={this.props.route}
@@ -266,7 +273,7 @@ export class PostComponent extends React.Component<Props, State> {
                         {
                             this.props.post.Body || this.props.post.ImageURLs?.length > 0 ?
                                 <PostActionsRow
-                                    toggleHeartIcon={this.toggleHeartIcon}
+                                    toggleHeartIcon={() => this.toggleHeartIcon()}
                                     navigation={this.props.navigation}
                                     post={this.props.post}
                                     actionsDisabled={this.props.actionsDisabled} />

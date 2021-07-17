@@ -1,15 +1,20 @@
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { calculateAndFormatBitCloutInUsd, formatNumber, getAnonymousProfile } from '@services';
 import { CreatorCoinHODLer } from '@types';
 import { themeStyles } from '@styles';
 import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-export function CreatorCoinHODLerComponent({
-    creatorCoinPrice, userWhoHODL: userWhoHODL, isHolder }: { creatorCoinPrice: undefined | number, userWhoHODL: CreatorCoinHODLer, isHolder: boolean }
-) {
-    const navigation = useNavigation();
+interface Props {
+    creatorCoinPrice: undefined | number;
+    userWhoHODL: CreatorCoinHODLer;
+    isHolder: boolean;
+}
+
+export function CreatorCoinHODLerComponent({ creatorCoinPrice, userWhoHODL: userWhoHODL, isHolder }: Props): JSX.Element {
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     let mount = true;
     const [hodlerCoinPriceUSD, setHODLerCoinPrice] = useState('');
@@ -41,11 +46,13 @@ export function CreatorCoinHODLerComponent({
                     setHODLerAmountUSD(formattedHODLerAmountInUSD);
                 }
 
-            } catch { }
+            } catch {
+                return;
+            }
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -53,7 +60,7 @@ export function CreatorCoinHODLerComponent({
     function goToProfile() {
         if (userWhoHODL.ProfileEntryResponse &&
             userWhoHODL.ProfileEntryResponse.Username !== 'anonymous') {
-            (navigation as any).push('UserProfile', {
+            navigation.push('UserProfile', {
                 publicKey: userWhoHODL.ProfileEntryResponse.PublicKeyBase58Check,
                 username: userWhoHODL.ProfileEntryResponse.Username,
                 key: 'Profile_' + userWhoHODL.ProfileEntryResponse.PublicKeyBase58Check
@@ -74,7 +81,7 @@ export function CreatorCoinHODLerComponent({
                 <Text style={[styles.hodlerAmountUSD, themeStyles.fontColorMain]}>~${hodlerAmountUSD}</Text>
             </View>
         </View>
-    </TouchableOpacity>
+    </TouchableOpacity>;
 }
 
 const styles = StyleSheet.create(

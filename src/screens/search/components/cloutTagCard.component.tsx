@@ -3,11 +3,12 @@ import React from 'react';
 import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { CloutTag } from '@types';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
     cloutTag: CloutTag;
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 export default class CloutListCardComponent extends React.Component<Props> {
@@ -31,7 +32,7 @@ export default class CloutListCardComponent extends React.Component<Props> {
             <TouchableOpacity
                 style={[styles.container]}
                 activeOpacity={0.7}
-                onPress={this.navigateToPost}>
+                onPress={() => this.navigateToPost()}>
                 <View style={[styles.cloutTagContainer, themeStyles.lightBorderColor]}>
                     <Feather name="hash" size={22} color={themeStyles.fontColorMain.color} />
                 </View>
@@ -40,7 +41,7 @@ export default class CloutListCardComponent extends React.Component<Props> {
                     <Text style={[themeStyles.fontColorSub, styles.count]}>{this.props.cloutTag.count} posts</Text>
                 </View>
             </TouchableOpacity>
-        )
+        );
     }
 }
 

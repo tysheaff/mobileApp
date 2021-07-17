@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { globals, settingsGlobals } from '@globals';
+import { settingsGlobals } from '@globals';
 
 export let themeStyles = StyleSheet.create(
     {
@@ -22,7 +22,7 @@ export let themeStyles = StyleSheet.create(
         disabledButton: { backgroundColor: '#2b2b2b' },
         likeHeartBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? 'white' : 'black' }
     }
-)
+);
 
 export function updateThemeStyles() {
     themeStyles = StyleSheet.create(
@@ -47,7 +47,5 @@ export function updateThemeStyles() {
             likeHeartBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? 'white' : 'black' }
 
         }
-    )
-
-    globals.setGlobalTheme(settingsGlobals.darkMode ? 'dark' : 'light');
+    );
 }

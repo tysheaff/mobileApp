@@ -1,8 +1,8 @@
-import { SelectListControl } from "@controls/selectList.control";
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView, Platform } from "react-native";
-import Modal from 'react-native-modal'
+import { SelectListControl } from '@controls/selectList.control';
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import Modal from 'react-native-modal';
 
 export enum MessageFilter {
     Holders = 'Holders',
@@ -38,7 +38,7 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
         this.state = {
             filter: this.props.filter.slice(0),
             sort: this.props.sort,
-        }
+        };
 
         this.onFilterValueChange = this.onFilterValueChange.bind(this);
         this.onSortValueChange = this.onSortValueChange.bind(this);
@@ -125,7 +125,7 @@ export class MessageSettingsComponent extends React.Component<Props, State> {
                 >
                 </SelectListControl>
             </ScrollView>
-        </Modal>
+        </Modal>;
 
     }
 }

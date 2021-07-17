@@ -13,11 +13,11 @@ export default class CoinPriceComponent extends React.Component<Props> {
         super(props);
     }
 
-    shouldComponentUpdate(nextProps: Props) {
+    shouldComponentUpdate(nextProps: Props): boolean {
         return this.props.price !== nextProps.price;
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={[styles.container, this.props.isProfileManager ? themeStyles.coinPriceContainer : themeStyles.chipColor]}>
             <Text style={[styles.price, themeStyles.fontColorMain]}>~${this.props.price}</Text>
         </View>;

@@ -10,7 +10,7 @@ import { themeStyles } from '@styles';
 import * as Clipboard from 'expo-clipboard';
 import { signing } from '@services/authorization/signing';
 import NotificationSubscriptionComponent from '@screens/profile/notificationSubscription.component';
-import CloutFeedButton from '@components/cloutfeedButton.component'
+import CloutFeedButton from '@components/cloutfeedButton.component';
 
 export function ProfileScreenOptionsComponent(
     { publicKey, goToChat, username }: { publicKey: string, goToChat: () => void, username: string }
@@ -36,7 +36,7 @@ export function ProfileScreenOptionsComponent(
     );
 
     function checkIsFollowed(p_user: User) {
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser as string[];
+        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
 
         const followed = followedByUserPublicKeys?.indexOf(publicKey);
         if (isMounted) {
@@ -60,7 +60,7 @@ export function ProfileScreenOptionsComponent(
                 }
 
                 const signedTransactionHex = await signing.signTransaction(transactionHex);
-                await api.submitTransaction(signedTransactionHex as string);
+                await api.submitTransaction(signedTransactionHex);
 
                 if (isMounted) {
                     const event: ChangeFollowersEvent = {
@@ -106,10 +106,10 @@ export function ProfileScreenOptionsComponent(
                             text: 'Public key copied to clipboard.'
                         }
                     );
-                    return;
-                case 2:
+                    break;
+                case 2: {
                     const jwt = await signing.signJWT();
-                    api.blockUser(globals.user.publicKey, publicKey, jwt as string, isUserBlocked).then(
+                    api.blockUser(globals.user.publicKey, publicKey, jwt, isUserBlocked).then(
                         async () => {
                             try {
                                 const blockedText = isUserBlocked ? 'unblocked' : 'blocked';
@@ -132,9 +132,10 @@ export function ProfileScreenOptionsComponent(
                             }
                         }
                     ).catch(p_error => globals.defaultHandleError(p_error));
-                    return;
+                    break;
+                }
             }
-        }
+        };
         eventManager.dispatchEvent(
             EventType.ToggleActionSheet,
             {
@@ -163,7 +164,7 @@ export function ProfileScreenOptionsComponent(
         >
             <Feather name="more-horizontal" size={24} color={themeStyles.fontColorMain.color} />
         </TouchableOpacity>
-    </View>
+    </View>;
 }
 const styles = StyleSheet.create(
     {

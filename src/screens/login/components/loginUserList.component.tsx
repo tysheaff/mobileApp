@@ -1,10 +1,10 @@
-import React from "react";
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Image, Text, Dimensions } from "react-native";
-import { User } from "@types";
-import { api } from "@services";
+import React from 'react';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Image, Text, Dimensions } from 'react-native';
+import { User } from '@types';
+import { api } from '@services';
 import { MaterialIcons } from '@expo/vector-icons';
-import { calculateAndFormatBitCloutInUsd, loadTickersAndExchangeRate } from "@services/bitCloutCalculator";
-import { getAnonymousProfile } from "@services/helpers";
+import { calculateAndFormatBitCloutInUsd, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
+import { getAnonymousProfile } from '@services/helpers';
 
 interface Props {
     standardPublicKey: string;
@@ -33,15 +33,15 @@ export class LoginUserListComponent extends React.Component<Props, State> {
         this.loadUsers();
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    async loadUsers() {
+    async loadUsers(): Promise<void> {
         const publicKeys = [this.props.standardPublicKey];
 
         if (this.props.nonStandardPublicKey) {
@@ -83,11 +83,11 @@ export class LoginUserListComponent extends React.Component<Props, State> {
                 );
             }
         } catch {
-
+            return;
         }
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={styles.container}>
             {
                 this.state.loading ?
@@ -99,7 +99,7 @@ export class LoginUserListComponent extends React.Component<Props, State> {
                             this.state.users.map(
                                 (user, index) => <TouchableOpacity
                                     onPress={() => this.props.selectAccount(user.PublicKeyBase58Check)}
-                                    activeOpacity={0.6} key={user.PublicKeyBase58Check + index}>
+                                    activeOpacity={0.6} key={user.PublicKeyBase58Check + String(index)}>
                                     <View style={[styles.profileListCard]}>
                                         <Image style={styles.profileImage}
                                             source={{ uri: user.ProfileEntryResponse?.ProfilePic }}></Image>
@@ -205,4 +205,4 @@ const styles = StyleSheet.create(
             marginTop: 8
         }
     }
-)
+);

@@ -14,12 +14,17 @@ export default class CloutFeedVideoComponent extends React.Component<Props> {
         super(props);
     }
 
-    shouldComponentUpdate(nextProps: Props) {
+    shouldComponentUpdate(nextProps: Props): boolean {
         return nextProps.embeddedVideoLink !== this.props.embeddedVideoLink;
     }
 
-    render() {
-        const parsedVideoLink: any = this.props.embeddedVideoLink && parseVideoLink(this.props.embeddedVideoLink);
+    render(): JSX.Element {
+        const parsedVideoLink: string | undefined = this.props.embeddedVideoLink && parseVideoLink(this.props.embeddedVideoLink);
+
+        if (!parsedVideoLink) {
+            return <> </>;
+        }
+
         const renderLoadingView = () => <ActivityIndicator size='large'
             style={[styles.activityIndicator, themeStyles.containerColorMain]}
             color={themeStyles.fontColorMain.color} />;
@@ -33,7 +38,7 @@ export default class CloutFeedVideoComponent extends React.Component<Props> {
                 javaScriptEnabled={true}
                 domStorageEnabled={true}
             />
-        )
+        );
     }
 }
 

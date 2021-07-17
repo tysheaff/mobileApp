@@ -237,8 +237,8 @@ export default function ProfileStackScreen() {
                 name="Identity" component={IdentityScreen}
             ></ProfileStack.Screen>
         </ProfileStack.Navigator>
-    )
-};
+    );
+}
 
 const styles = StyleSheet.create(
     {
@@ -255,4 +255,4 @@ const styles = StyleSheet.create(
             height: 40
         }
     }
-)
+);

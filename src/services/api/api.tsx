@@ -53,7 +53,7 @@ function login(p_mnemonic: string, p_entropyHex: string, p_seedHex: string) {
             password: ''
         }
     );
-};
+}
 
 function logout(p_userKey: string) {
     const route = 'logout';
@@ -66,7 +66,7 @@ function logout(p_userKey: string) {
             ExtraText: ''
         }
     );
-};
+}
 
 function getGlobalPosts(p_userKey: string, p_count: number, p_lastPostHash = '') {
     const route = 'get-posts-stateless';
@@ -85,7 +85,7 @@ function getGlobalPosts(p_userKey: string, p_count: number, p_lastPostHash = '')
             AddGlobalFeedBool: false
         }
     );
-};
+}
 
 function getFollowingPosts(p_userKey: string, p_count: number, p_lastPostHash = '') {
     const route = 'get-posts-stateless';
@@ -104,7 +104,7 @@ function getFollowingPosts(p_userKey: string, p_count: number, p_lastPostHash = 
             AddGlobalFeedBool: false
         }
     );
-};
+}
 
 function getRecentPosts(p_userKey: string, p_count: number, p_lastPostHash = '') {
     const route = 'get-posts-stateless';
@@ -123,7 +123,7 @@ function getRecentPosts(p_userKey: string, p_count: number, p_lastPostHash = '')
             AddGlobalFeedBool: false
         }
     );
-};
+}
 
 function likePost(p_userKey: string, p_postHash: string, isUnlike: boolean) {
     const route = 'create-like-stateless';
@@ -136,7 +136,7 @@ function likePost(p_userKey: string, p_postHash: string, isUnlike: boolean) {
             IsUnlike: isUnlike,
             MinFeeRateNanosPerKB: 1000,
             SeedInfo: null,
-            Password: "",
+            Password: '',
             Sign: true,
             Validate: true,
             Broadcast: true
@@ -577,7 +577,7 @@ function getAppState() {
 async function uploadImage(p_publicKey: string, p_jwt: string, p_image: any) {
     const route = 'https://bitclout.com/api/v0/upload-image';
 
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append('file', p_image);
     formData.append('JWT', p_jwt);
     formData.append('UserPublicKeyBase58Check', p_publicKey);
@@ -612,7 +612,7 @@ async function uploadImageAndroid(p_publicKey: string, p_jwt: string, p_image: a
                     return;
                 }
                 if (xhr.status === 200) {
-                    p_resolve(JSON.parse(xhr.responseText))
+                    p_resolve(JSON.parse(xhr.responseText));
                 } else {
                     p_error({ error: xhr.responseText });
                 }
@@ -636,10 +636,10 @@ function getTikTokFullVideoId(p_videoId: string) {
 
 function updateProfile(
     p_userKey: string,
-    p_username: string = '',
-    p_description: string = '',
+    p_username = '',
+    p_description = '',
     p_profilePic = '',
-    p_founderRewards: number = 0
+    p_founderRewards = 0
 ) {
     const route = 'update-profile';
 
@@ -656,10 +656,8 @@ function updateProfile(
             IsHidden: false,
             MinFeeRateNanosPerKB: 1000
         }
-    )
+    );
 }
-
-
 
 export const api = {
     login,
@@ -701,4 +699,4 @@ export const api = {
     getRecloutersForPost,
     getDiamondSendersForPost,
     getQuotesForPost
-}
+};

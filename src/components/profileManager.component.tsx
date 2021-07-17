@@ -1,24 +1,24 @@
-import { api } from "@services";
-import { authentication } from "@services/authorization/authentication";
-import { getAnonymousProfile } from "@services/helpers";
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { StyleSheet, TouchableOpacity, View, Text, Dimensions, ActivityIndicator } from "react-native";
+import { api } from '@services';
+import { authentication } from '@services/authorization/authentication';
+import { getAnonymousProfile } from '@services/helpers';
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View, Text, Dimensions, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
-import { Profile } from "@types";
-import { globals } from "@globals/globals";
-import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
+import { Profile } from '@types';
+import { globals } from '@globals/globals';
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { AntDesign } from '@expo/vector-icons';
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
-import { constants } from "@globals/constants";
-import { eventManager } from "@globals/injector";
-import { EventType } from "@types";
-import { FlatList } from "react-native-gesture-handler";
-import ProfileInfoCardComponent from "./profileInfo/profileInfoCard.component";
+import { constants } from '@globals/constants';
+import { eventManager } from '@globals/injector';
+import { EventType } from '@types';
+import { FlatList } from 'react-native-gesture-handler';
+import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: NavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -47,11 +47,11 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
         this.close = this.close.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
@@ -102,17 +102,17 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
         }
 
         const timeout = p_animated ? 1000 : 0;
-        setTimeout(() => eventManager.dispatchEvent(EventType.ToggleProfileManager, { visible: false }), timeout)
+        setTimeout(() => eventManager.dispatchEvent(EventType.ToggleProfileManager, { visible: false }), timeout);
     }
 
-    render() {
+    render(): JSX.Element {
 
         const renderItem = (item: Profile, index: number) =>
             <TouchableOpacity
                 style={[styles.profileListCard, themeStyles.borderColor]}
                 onPress={() => this.selectAccount(item.PublicKeyBase58Check)}
                 activeOpacity={0.7}
-                key={item.PublicKeyBase58Check + index}
+                key={item.PublicKeyBase58Check + String(index)}
             >
                 <ProfileInfoCardComponent
                     publicKey={item.PublicKeyBase58Check}
@@ -131,7 +131,7 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
         const renderFooter = <TouchableOpacity
             style={styles.addAccountButton}
             activeOpacity={0.7}
-            onPress={this.addCount}
+            onPress={() => this.addCount()}
         >
             <AntDesign style={styles.addAccountButtonIcon} name="plus" size={22} color={themeStyles.fontColorMain.color} />
             <Text style={[styles.addAccountButtonText, themeStyles.fontColorMain]}>Add Account</Text>
@@ -145,9 +145,9 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
             isVisible={this.state.visible}
             swipeDirection='down'
             animationOutTiming={200}
-            onSwipeComplete={() => { this.close() }}
-            onBackdropPress={() => { this.close() }}
-            onBackButtonPress={() => { this.close() }}
+            onSwipeComplete={() => { this.close(); }}
+            onBackdropPress={() => { this.close(); }}
+            onBackButtonPress={() => { this.close(); }}
             propagateSwipe={this.state.profiles?.length > 5}
         >
             <View style={[styles.container, themeStyles.modalBackgroundColor]}>
@@ -162,8 +162,7 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
                                 keyExtractor={keyExtractor}
                                 renderItem={({ item, index }) => renderItem(item, index)}
                                 ListFooterComponent={renderFooter}
-                            >
-                            </FlatList>
+                            />
                         </>
                 }
             </View>

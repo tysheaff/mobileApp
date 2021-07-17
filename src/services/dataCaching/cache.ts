@@ -1,9 +1,9 @@
-import { api } from "../api/api";
-import { CacheableObject } from "./cacheableObject";
-import { globals } from "@globals";
-import { User } from "@types";
-import { SavedPostsCache } from "./savedPostsCache";
-import { cloutApi } from "@services/api/cloutApi";
+import { api } from '../api/api';
+import { CacheableObject } from './cacheableObject';
+import { globals } from '@globals';
+import { User } from '@types';
+import { SavedPostsCache } from './savedPostsCache';
+import { cloutApi } from '@services/api/cloutApi';
 
 const loggedInUserCacheableObject = new CacheableObject<User>(
     () => api.getProfile([globals.user.publicKey]),
@@ -33,7 +33,7 @@ const addFollower = async (p_publicKey: string) => {
             }
         }
     }
-}
+};
 
 const removeFollower = async (p_publicKey: string) => {
     const user = await loggedInUserCacheableObject.getData().catch(() => undefined);
@@ -47,7 +47,7 @@ const removeFollower = async (p_publicKey: string) => {
             }
         }
     }
-}
+};
 
 interface Cache {
     user: CacheableObject<User>;

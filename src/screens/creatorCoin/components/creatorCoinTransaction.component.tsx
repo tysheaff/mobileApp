@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import { View, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
-import { CreatorCoinTransaction, Profile } from "@types";
-import { themeStyles } from "@styles/globalColors";
-import { calculateDurationUntilNow, formatNumber, getAnonymousProfile } from "@services/helpers";
+import { CreatorCoinTransaction, Profile } from '@types';
+import { themeStyles } from '@styles/globalColors';
+import { calculateDurationUntilNow, formatNumber, getAnonymousProfile } from '@services/helpers';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { NavigationProp } from "@react-navigation/native";
-import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
-import ProfileInfoCardComponent from "@components/profileInfo/profileInfoCard.component";
+import { NavigationProp } from '@react-navigation/native';
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
 
 interface Props {
     navigation: NavigationProp<any>;

@@ -80,7 +80,7 @@ export function SettingsScreen({ navigation }: any) {
             activeOpacity={1}>
             {p_item.icon}
             <Text style={[styles.buttonText, themeStyles.fontColorMain]}>{p_item.title}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>;
     };
 
     return (

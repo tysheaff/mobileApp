@@ -9,7 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 let lastKeyword;
 
-export function UserSuggestionList({ keyword, onSuggestionPress }: any) {
+export function UserSuggestionList({ keyword, onSuggestionPress }: any): JSX.Element | null {
     const [suggestedMentions, setSuggestedMentions] = useState<Profile[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -18,12 +18,12 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any) {
     useEffect(
         () => {
             if (keyword !== null && keyword !== undefined) {
-                getSuggestions()
+                getSuggestions();
             }
 
             () => {
                 mount = false;
-            }
+            };
         },
         [keyword]
     );
@@ -61,7 +61,7 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any) {
                     try {
                         await Image.prefetch(profile.ProfilePic);
                     } catch {
-                        profile.ProfilePic = 'https://i.imgur.com/vZ2mB1W.png'
+                        profile.ProfilePic = 'https://i.imgur.com/vZ2mB1W.png';
                     }
                 }
             }
@@ -105,36 +105,38 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any) {
             }
         </ScrollView>
     );
-};
+}
 
-const styles = StyleSheet.create({
-    container: {
-        borderTopWidth: 1
-    },
-    activityIndicator: {
-        marginTop: 10
-    },
-    profilePic: {
-        width: 40,
-        height: 40,
-        borderRadius: 8,
-        marginRight: 12
-    },
-    userMentionCard: {
-        padding: 12,
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center'
-    },
-    usernameContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    username: {
-        fontWeight: '700',
-        maxWidth: Dimensions.get('window').width / 2,
-        marginRight: 6
-    },
-})
+const styles = StyleSheet.create(
+    {
+        container: {
+            borderTopWidth: 1
+        },
+        activityIndicator: {
+            marginTop: 10
+        },
+        profilePic: {
+            width: 40,
+            height: 40,
+            borderRadius: 8,
+            marginRight: 12
+        },
+        userMentionCard: {
+            padding: 12,
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center'
+        },
+        usernameContainer: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        },
+        username: {
+            fontWeight: '700',
+            maxWidth: Dimensions.get('window').width / 2,
+            marginRight: 6
+        },
+    }
+);

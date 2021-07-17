@@ -1,13 +1,14 @@
-import React from "react";
+import React from 'react';
 import { FlatList, View, RefreshControl, ActivityIndicator } from 'react-native';
-import { PostComponent } from '@components/post/post.component'
+import { PostComponent } from '@components/post/post.component';
 import { Post, User } from '@types';
-import { NavigationProp, RouteProp } from "@react-navigation/native";
-import { themeStyles } from "@styles/globalColors";
-import { globals } from "@globals/globals";
-import { api, cloutFeedApi, loadTickersAndExchangeRate, cache } from "@services";
-import { navigatorGlobals } from "@globals/navigatorGlobals";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { themeStyles } from '@styles/globalColors';
+import { globals } from '@globals/globals';
+import { api, cloutFeedApi, loadTickersAndExchangeRate, cache } from '@services';
+import { navigatorGlobals } from '@globals/navigatorGlobals';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 export enum HomeScreenTab {
     Hot = 'Hot',
@@ -15,7 +16,7 @@ export enum HomeScreenTab {
     Following = 'Following',
     Recent = 'Recent',
     Cast = 'Cast'
-};
+}
 
 type RouteParams = {
     Home: {
@@ -26,25 +27,29 @@ type RouteParams = {
 };
 
 interface Props {
-    navigation: NavigationProp<any> | any;
+    navigation: StackNavigationProp<ParamListBase>;
+    route: RouteProp<RouteParams, 'Home'>;
     selectedTab: HomeScreenTab;
-    route: RouteProp<RouteParams, 'Home'> | any;
-    api: any;
-};
+    api: (publicKey: string, count: number, lastPostHashHex: string) => Promise<any>;
+}
 
 interface State {
     posts: Post[];
     isLoading: boolean;
     isLoadingMore: boolean;
     isRefreshing: boolean;
-};
+}
 
 export class PostListComponent extends React.Component<Props, State> {
 
     private _flatListRef: React.RefObject<FlatList>;
+
     private _postsCountPerLoad = 10;
-    private _currentScrollPosition: number = 0;
+
+    private _currentScrollPosition = 0;
+
     private _noMoreData = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -59,7 +64,7 @@ export class PostListComponent extends React.Component<Props, State> {
 
         navigatorGlobals.refreshHome = () => {
             if (this._currentScrollPosition > 0 || !this._flatListRef.current) {
-                (this._flatListRef.current as any)?.scrollToOffset({ animated: true, offset: 0 });
+                this._flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
             } else {
                 this.refresh(false);
             }
@@ -74,25 +79,25 @@ export class PostListComponent extends React.Component<Props, State> {
         this.refresh();
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
-    };
+    }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
-    };
+    }
 
-    componentDidUpdate() {
+    componentDidUpdate(): void {
         if (this.props.route.params?.newPost) {
             const newPostFound = this.state.posts?.find((p_post: Post) => p_post.PostHashHex === this.props.route.params.newPost.PostHashHex);
             if (!newPostFound) {
-                let newPosts = [this.props.route.params.newPost].concat(this.state.posts ? this.state.posts : []);
+                const newPosts = [this.props.route.params.newPost].concat(this.state.posts ? this.state.posts : []);
                 if (this._isMounted) {
                     this.setState({ posts: newPosts });
                 }
             }
-            this.props.route.params.newPost = undefined;
-        };
+            this.props.navigation.setParams({ newPost: undefined });
+        }
 
         if (this.props.route.params?.deletedPost) {
             const posts = this.state.posts?.filter(
@@ -101,19 +106,19 @@ export class PostListComponent extends React.Component<Props, State> {
             if (this._isMounted && posts) {
                 this.setState({ posts });
             }
-            this.props.route.params.deletedPost = undefined;
-        };
+            this.props.navigation.setParams({ deletedPost: undefined });
+        }
 
         if (this.props.route.params?.blockedUser) {
             const posts = this.state.posts?.filter(p_post => p_post.ProfileEntryResponse?.PublicKeyBase58Check != this.props.route.params.blockedUser);
             if (this._isMounted && posts) {
                 this.setState({ posts });
             }
-            this.props.route.params.blockedUser = undefined;
-        };
-    };
+            this.props.navigation.setParams({ blockedUser: undefined });
+        }
+    }
 
-    async refresh(p_showLoading = true) {
+    async refresh(p_showLoading = true): Promise<void> {
         if (this._isMounted && p_showLoading) {
             this.setState({ isLoading: true });
         } else if (this._isMounted) {
@@ -124,7 +129,7 @@ export class PostListComponent extends React.Component<Props, State> {
         this._noMoreData = false;
         await loadTickersAndExchangeRate();
         await this.loadPosts(false);
-    };
+    }
 
     private async loadPosts(p_loadMore: boolean) {
         if (this.state.isLoadingMore || this._noMoreData) {
@@ -137,13 +142,13 @@ export class PostListComponent extends React.Component<Props, State> {
 
         const post: Post | undefined = !p_loadMore && this.props.selectedTab === HomeScreenTab.Global ? await this.getPinnedPost() : undefined;
 
-        const callback = this.props.api
+        const callback = this.props.api;
         const lastPosHash = this.state.posts?.length > 0 && p_loadMore ? this.state.posts[this.state.posts.length - 1].PostHashHex : undefined;
 
         try {
-            const response = await callback(globals.user.publicKey, this._postsCountPerLoad, lastPosHash)
+            const response = await callback(globals.user.publicKey, this._postsCountPerLoad, lastPosHash);
             let allPosts: Post[] = [];
-            let newPosts = response.PostsFound as Post[];
+            const newPosts = response.PostsFound as Post[];
 
             this._noMoreData = !newPosts || newPosts.length === 0;
 
@@ -164,13 +169,13 @@ export class PostListComponent extends React.Component<Props, State> {
             }
 
         } catch (p_error: any) {
-            globals.defaultHandleError(p_error)
+            globals.defaultHandleError(p_error);
         } finally {
             if (this._isMounted) {
                 this.setState({ isLoadingMore: false, isLoading: false, isRefreshing: false });
             }
         }
-    };
+    }
 
     private async processPosts(p_posts: Post[]): Promise<Post[]> {
         let posts: Post[] = [];
@@ -186,7 +191,7 @@ export class PostListComponent extends React.Component<Props, State> {
             );
         }
         return posts;
-    };
+    }
 
     private async getPinnedPost(): Promise<Post | undefined> {
         let post: Post | undefined = undefined;
@@ -202,19 +207,19 @@ export class PostListComponent extends React.Component<Props, State> {
         } catch { }
 
         return post;
-    };
+    }
 
-    render() {
+    render(): JSX.Element {
         if (this.state.isLoading) {
             return <CloutFeedLoader />;
         }
 
-        const keyExtractor = (item: any, index: number) => item.PostHashHex + index;
+        const keyExtractor = (item: Post, index: number) => item.PostHashHex + String(index);
         const renderItem = (item: Post) => {
             return <PostComponent
                 route={this.props.route}
                 navigation={this.props.navigation}
-                post={item} />
+                post={item} />;
         };
         const renderFooter = this.state.isLoadingMore && !this.state.isLoading
             ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
@@ -224,7 +229,7 @@ export class PostListComponent extends React.Component<Props, State> {
             tintColor={themeStyles.fontColorMain.color}
             titleColor={themeStyles.fontColorMain.color}
             refreshing={this.state.isRefreshing}
-            onRefresh={() => this.refresh(false)} />
+            onRefresh={() => this.refresh(false)} />;
 
         return (
             <View style={{ flex: 1 }}>
@@ -247,4 +252,4 @@ export class PostListComponent extends React.Component<Props, State> {
             </View>
         );
     }
-};
+}

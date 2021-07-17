@@ -3,8 +3,7 @@ import { Linking, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { globalStyles, themeStyles } from '@styles';
 
-
-export function ProfileNotCompletedComponent() {
+export function ProfileNotCompletedComponent(): JSX.Element {
 
     return <View style={[
         globalStyles.profileNotCompletedContainer,
@@ -20,5 +19,5 @@ export function ProfileNotCompletedComponent() {
             onPress={() => Linking.openURL('https://bitclout.com/')}>
             <Text style={{ color: 'white' }}>Go to Website</Text>
         </TouchableOpacity>
-    </View>
+    </View>;
 }

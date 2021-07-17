@@ -50,7 +50,7 @@ export function ProfileScreen({ navigation, route }: any) {
     const pinnedPostHashHex = useRef('');
 
     let mount = true;
-    let reload = { posts: () => { }, creatorCoin: () => { }, stats: () => { } };
+    const reload = { posts: () => { }, creatorCoin: () => { }, stats: () => { } };
 
     if (route.params?.deletedPost) {
         const newPosts = profile.Posts.filter((p_post: Post) => p_post.PostHashHex !== route.params.deletedPost);
@@ -78,7 +78,7 @@ export function ProfileScreen({ navigation, route }: any) {
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -94,12 +94,12 @@ export function ProfileScreen({ navigation, route }: any) {
                         username = globals.user.username;
                     }
                     loadData();
-                    navigation.setParams({ profileUpdated: false })
+                    navigation.setParams({ profileUpdated: false });
                 }
             },
             [route.params?.profileUpdated]
         )
-    )
+    );
 
     function configureTabs() {
         const newTabs: TabConfig[] = [
@@ -138,7 +138,7 @@ export function ProfileScreen({ navigation, route }: any) {
             if (mount) {
                 setLoading(false);
                 setCanCreateProfile(false);
-                return
+                return;
             }
         }
 
@@ -219,11 +219,11 @@ export function ProfileScreen({ navigation, route }: any) {
                     route={route}
                     navigation={navigation}
                     post={item}
-                    isPinned={item.PostHashHex === pinnedPostHashHex.current}></PostComponent>
+                    isPinned={item.PostHashHex === pinnedPostHashHex.current}></PostComponent>;
             } else {
                 renderItem = ({ item }: any) => <View style={styles.noPostsContainer}>
                     <Text style={[styles.noPostsText, themeStyles.fontColorSub]}>No posts yet</Text>
-                </View>
+                </View>;
             }
 
         } else if (p_selectedTab === ProfileScreenTab.CreatorCoin) {
@@ -232,32 +232,32 @@ export function ProfileScreen({ navigation, route }: any) {
                 renderItem = ({ item }: any) => <CreatorCoinHODLerComponent
                     isHolder={true}
                     creatorCoinPrice={coinPrice}
-                    userWhoHODL={item}></CreatorCoinHODLerComponent>
+                    userWhoHODL={item}></CreatorCoinHODLerComponent>;
             } else {
                 renderItem = () => <ActivityIndicator
                     style={{ marginTop: 100 }}
                     color={themeStyles.fontColorMain.color}
-                ></ActivityIndicator>
+                ></ActivityIndicator>;
             }
         } else if (p_selectedTab === ProfileScreenTab.Stats) {
-            if (!!p_fullProfile) {
+            if (p_fullProfile) {
                 renderItem = () => <ProfileStats
-                    profile={p_fullProfile} followers={[]} reload={reload}></ProfileStats>
+                    profile={p_fullProfile} followers={[]} reload={reload}></ProfileStats>;
             } else {
                 renderItem = () => <ActivityIndicator
                     style={{ marginTop: 100 }}
                     color={themeStyles.fontColorMain.color}
-                ></ActivityIndicator>
+                ></ActivityIndicator>;
             }
         } else if (p_selectedTab === ProfileScreenTab.Diamonds) {
-            if (!!p_diamondSenders) {
+            if (p_diamondSenders) {
                 tabData = p_diamondSenders;
-                renderItem = ({ item }: any) => <DiamondSenderComponent navigation={navigation} diamondSender={item}></DiamondSenderComponent>
+                renderItem = ({ item }: any) => <DiamondSenderComponent navigation={navigation} diamondSender={item}></DiamondSenderComponent>;
             } else {
                 renderItem = () => <ActivityIndicator
                     style={{ marginTop: 100 }}
                     color={themeStyles.fontColorMain.color}
-                ></ActivityIndicator>
+                ></ActivityIndicator>;
             }
         }
 
@@ -503,7 +503,7 @@ export function ProfileScreen({ navigation, route }: any) {
                                     tabs={tabs}
                                     selectedTab={selectedTab}
                                     onTabClick={onTabClick}
-                                ></TabsComponent>
+                                ></TabsComponent>;
                         }
                     }
                     refreshControl={<RefreshControl
@@ -515,7 +515,7 @@ export function ProfileScreen({ navigation, route }: any) {
                 />
             </View>
             :
-            <ProfileNotCompletedComponent></ProfileNotCompletedComponent>
+            <ProfileNotCompletedComponent></ProfileNotCompletedComponent>;
 }
 
 const styles = StyleSheet.create(

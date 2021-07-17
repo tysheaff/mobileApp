@@ -1,17 +1,17 @@
-import { constants, globals, navigatorGlobals } from "@globals";
-import { NavigationProp } from "@react-navigation/native";
-import { api, cache, cloutCastApi } from "@services";
-import { signing } from "@services/authorization/signing";
-import { themeStyles } from "@styles/globalColors";
-import { CloutCastPromotion, Post } from "@types";
-import React from "react";
-import { ActivityIndicator, FlatList, RefreshControl, View, Text, StyleSheet, Linking, Image, TouchableOpacity } from "react-native";
-import { CloutCastPostComponent } from "./cloutCastPost.component";
+import { constants, globals, navigatorGlobals } from '@globals';
+import { NavigationProp } from '@react-navigation/native';
+import { api, cache, cloutCastApi } from '@services';
+import { signing } from '@services/authorization/signing';
+import { themeStyles } from '@styles/globalColors';
+import { CloutCastPromotion, Post } from '@types';
+import React from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, View, Text, StyleSheet, Linking, Image, TouchableOpacity } from 'react-native';
+import { CloutCastPostComponent } from './cloutCastPost.component';
 import * as SecureStore from 'expo-secure-store';
-import { CloutCastIntroductionComponent } from "./cloutCastIntroduction.component";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { CloutCastIntroductionComponent } from './cloutCastIntroduction.component';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { Ionicons } from '@expo/vector-icons';
-import { CloutCastFeedFilter, CloutCastFeedSettingsComponent, CloutCastFeedSort } from "./cloutCastFeedSettings.component";
+import { CloutCastFeedFilter, CloutCastFeedSettingsComponent, CloutCastFeedSort } from './cloutCastFeedSettings.component';
 
 interface Props {
     navigation: NavigationProp<any> | any;
@@ -32,12 +32,17 @@ interface State {
 export class CloutCastFeedComponent extends React.Component<Props, State>{
 
     private _allPromotions: CloutCastPromotion[] = [];
+
     private _flatListRef: React.RefObject<FlatList>;
-    private _currentScrollPosition: number = 0;
+
+    private _currentScrollPosition = 0;
+
     private _blackList: string[] = [];
+
     private _lastEndIndex = 0;
 
     private _noMoreData = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -57,7 +62,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         this._flatListRef = React.createRef();
         navigatorGlobals.refreshHome = () => {
             if (this._currentScrollPosition > 0 || !this._flatListRef.current) {
-                (this._flatListRef.current as any)?.scrollToOffset({ animated: true, offset: 0 });
+                this._flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
             } else {
                 this.loadData();
             }
@@ -71,11 +76,11 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         this.onSettingsChange = this.onSettingsChange.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
@@ -90,7 +95,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
         }
     }
 
-    async loadData() {
+    async loadData(): Promise<void> {
         try {
             this._noMoreData = false;
             this._lastEndIndex = 0;
@@ -165,7 +170,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
             returnValue = returnValue.sort((p1, p2) => p1.header.rate - p2.header.rate);
         }
 
-        return returnValue
+        return returnValue;
     }
 
     private checkRequirements(promotion: CloutCastPromotion, coinPrice: number, followersCount: number): boolean {
@@ -219,7 +224,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
             }
 
         } catch {
-
+            undefined;
         } finally {
             if (this._isMounted) {
                 this.setState({ isLoading: false, isLoadingMore: false, isRefreshing: false });
@@ -232,13 +237,13 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
 
         for (const promotion of p_promotions) {
             const promise = new Promise<boolean>(
-                (p_resolve, _reject) => {
+                (p_resolve) => {
                     api.getSinglePost(globals.user.publicKey, promotion.target.hex, false, 0, 0).then(
                         p_response => {
                             promotion.post = p_response.PostFound;
                             p_resolve(true);
                         }
-                    ).catch(() => p_resolve(false))
+                    ).catch(() => p_resolve(false));
                 }
             );
             promises.push(promise);
@@ -262,15 +267,15 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
             );
         }
         return promotions;
-    };
+    }
 
-    private async finishIntroduction() {
+    private finishIntroduction(): void {
         this.setState({ introduction: false });
         this.loadData();
     }
 
     private goToCloutCast() {
-        Linking.openURL('https://cloutcast.io/')
+        Linking.openURL('https://cloutcast.io/');
     }
 
     private openSettings() {
@@ -295,26 +300,26 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                 this.loadData();
             }
         } catch {
-
+            return;
         }
     }
 
-    render() {
+    render(): JSX.Element {
         if (this.state.introduction) {
-            return <CloutCastIntroductionComponent close={this.finishIntroduction}></CloutCastIntroductionComponent>;
+            return <CloutCastIntroductionComponent close={() => this.finishIntroduction()}></CloutCastIntroductionComponent>;
         }
 
         if (this.state.isLoading) {
             return <CloutFeedLoader />;
         }
 
-        const keyExtractor = (item: CloutCastPromotion, index: number) => (item.post as Post).PostHashHex + index;
+        const keyExtractor = (item: CloutCastPromotion, index: number) => (item.post as Post).PostHashHex + String(index);
         const renderItem = this.state.promotions.length > 0 ?
             (item: CloutCastPromotion) => {
                 return <CloutCastPostComponent
                     route={this.props.route}
                     navigation={this.props.navigation}
-                    promotion={item} />
+                    promotion={item} />;
             } :
             () => < Text
                 style={[
@@ -327,13 +332,13 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                 style={styles.cloutCastLogo}
                 source={require('../../../../assets/cloutCastLogo.png')}
             ></Image>
-            <Text style={[themeStyles.fontColorMain]} onPress={this.goToCloutCast}>
+            <Text style={[themeStyles.fontColorMain]} onPress={() => this.goToCloutCast()}>
                 <Text style={[styles.headerLink, themeStyles.linkColor]}>Powered by CloutCast</Text>
             </Text>
 
             <TouchableOpacity
                 style={styles.filterButton}
-                onPress={this.openSettings}
+                onPress={() => this.openSettings()}
             >
                 <Ionicons name="ios-filter" size={24} color={themeStyles.fontColorMain.color} />
             </TouchableOpacity>
@@ -360,7 +365,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                     tintColor={themeStyles.fontColorMain.color}
                     titleColor={themeStyles.fontColorMain.color}
                     refreshing={this.state.isRefreshing}
-                    onRefresh={this.loadData}
+                    onRefresh={() => this.loadData()}
                 />
                 }
                 ListHeaderComponent={renderHeader}
@@ -372,7 +377,7 @@ export class CloutCastFeedComponent extends React.Component<Props, State>{
                     filter={this.state.filter}
                     sort={this.state.sort}
                     isFilterShown={this.state.isFilterShown}
-                    onSettingsChange={this.onSettingsChange}
+                    onSettingsChange={(filter: CloutCastFeedFilter, sort: CloutCastFeedSort) => this.onSettingsChange(filter, sort)}
                 />
             }
         </>;

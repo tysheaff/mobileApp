@@ -1,8 +1,8 @@
-import { SelectListControl } from "@controls/selectList.control";
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { View, StyleSheet, Text, ScrollView } from "react-native";
-import Modal from 'react-native-modal'
+import { SelectListControl } from '@controls/selectList.control';
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { View, StyleSheet, Text, ScrollView } from 'react-native';
+import Modal from 'react-native-modal';
 
 export enum HotFeedFilter {
     Today = 'day',
@@ -26,28 +26,28 @@ export class HotFeedSettingsComponent extends React.Component<Props, State> {
 
         this.state = {
             filter: this.props.filter
-        }
+        };
 
         this.onFilterValueChange = this.onFilterValueChange.bind(this);
         this.onDone = this.onDone.bind(this);
     }
 
-    onFilterValueChange(p_value: HotFeedFilter) {
+    onFilterValueChange(p_value: HotFeedFilter): void {
         this.setState({ filter: p_value });
     }
 
-    onDone() {
+    onDone(): void {
         this.props.onSettingsChange(this.state.filter);
     }
 
-    render() {
+    render(): JSX.Element {
         return <Modal
             animationIn={'slideInUp'}
             animationOutTiming={500}
             swipeDirection={'down'}
-            onSwipeComplete={this.onDone}
-            onBackdropPress={this.onDone}
-            onBackButtonPress={this.onDone}
+            onSwipeComplete={() => this.onDone()}
+            onBackdropPress={() => this.onDone()}
+            onBackButtonPress={() => this.onDone()}
             isVisible={this.props.isFilterShown}
             propagateSwipe={true}
             style={[styles.modal]}>
@@ -68,7 +68,7 @@ export class HotFeedSettingsComponent extends React.Component<Props, State> {
                         }
                     ]}
                     value={this.state.filter}
-                    onValueChange={this.onFilterValueChange}
+                    onValueChange={(value: string | string[]) => this.onFilterValueChange(value as HotFeedFilter)}
                 >
                 </SelectListControl>
             </ScrollView>

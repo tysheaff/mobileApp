@@ -5,4 +5,4 @@ export const navigatorGlobals = {
     refreshWallet: () => { },
     searchResults: (p_query: string) => { },
     broadcastMessage: () => { }
-}
+};

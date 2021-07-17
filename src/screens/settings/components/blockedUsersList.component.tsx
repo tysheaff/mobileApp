@@ -1,10 +1,10 @@
-import React from 'react'
-import { FlatList, Alert, ActivityIndicator, Text, View, StyleSheet } from 'react-native'
-import BlockedUserComponent from './blockedUserComponent.component'
-import { Profile } from '@types'
+import React from 'react';
+import { FlatList, Alert, ActivityIndicator, Text, View, StyleSheet } from 'react-native';
+import BlockedUserComponent from './blockedUserComponent.component';
+import { Profile } from '@types';
 import { cache } from '@services/dataCaching';
 import { api, snackbar } from '@services';
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp } from '@react-navigation/native';
 import { signing } from '@services/authorization/signing';
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
@@ -23,8 +23,9 @@ interface State {
 
 export default class BlockedUsersListComponent extends React.Component<Props, State> {
 
-    private _isMounted: boolean = false;
-    private _noMoreUsers: boolean = false;
+    private _isMounted = false;
+
+    private _noMoreUsers = false;
 
     constructor(props: Props) {
         super(props);
@@ -107,7 +108,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
     async unblockUser(publicKey: string) {
         const jwt = await signing.signJWT();
         try {
-            await api.blockUser(globals.user.publicKey, publicKey, jwt as string, true);
+            await api.blockUser(globals.user.publicKey, publicKey, jwt , true);
         }
         catch {
             Alert.alert('Error', 'Something went wrong! Please try again.');
@@ -153,7 +154,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
                         windowSize={8}
                         ListFooterComponent={renderFooter}
                     />
-        )
+        );
     }
 }
 const styles = StyleSheet.create(

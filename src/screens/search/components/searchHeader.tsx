@@ -25,7 +25,7 @@ export function SearchHeaderComponent({ route }: any) {
                 keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
             />
         </View>
-    </View>
+    </View>;
 }
 const styles = StyleSheet.create(
     {

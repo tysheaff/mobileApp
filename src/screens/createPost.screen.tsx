@@ -39,14 +39,14 @@ export function CreatePostScreen({ navigation, route }: any) {
 
             let imageUrls: string[] = [];
             if (editPost) {
-                imageUrls = images.filter(p_image => editedPost.ImageURLs.indexOf(p_image) !== -1)
+                imageUrls = images.filter(p_image => editedPost.ImageURLs.indexOf(p_image) !== -1);
                 images = images.filter(p_image => editedPost.ImageURLs.indexOf(p_image) === -1);
             }
 
             const files = images.map(
                 p_image => {
-                    const fileName = p_image.split("/").pop();
-                    const newImageUri = Platform.OS === "android" ? p_image : p_image.replace('file://', '');
+                    const fileName = p_image.split('/').pop();
+                    const newImageUri = Platform.OS === 'android' ? p_image : p_image.replace('file://', '');
                     const imageType = mime.getType(newImageUri);
                     return {
                         name: fileName,
@@ -59,10 +59,10 @@ export function CreatePostScreen({ navigation, route }: any) {
             try {
                 const jwt = await signing.signJWT();
                 if (jwt) {
-                    const promises = files.map(p_file => Platform.OS === "android" ? api.uploadImageAndroid(globals.user.publicKey, jwt, p_file) : api.uploadImage(globals.user.publicKey, jwt, p_file));
+                    const promises = files.map(p_file => Platform.OS === 'android' ? api.uploadImageAndroid(globals.user.publicKey, jwt, p_file) : api.uploadImage(globals.user.publicKey, jwt, p_file));
                     const responses = await Promise.all(promises);
                     imageUrls = imageUrls.concat(responses.map((p_response: any) => p_response.ImageURL));
-                    fnCreatePost(postText, imageUrls)
+                    fnCreatePost(postText, imageUrls);
                 } else {
                     if (mount) {
                         setLoading(false);
@@ -99,7 +99,7 @@ export function CreatePostScreen({ navigation, route }: any) {
                 const transactionHex = p_response.TransactionHex;
                 const signedTransaction = await signing.signTransaction(transactionHex);
 
-                await api.submitTransaction(signedTransaction as string).then(
+                await api.submitTransaction(signedTransaction ).then(
                     p_response => {
                         if (newPost || reclout) {
                             handleNewPostSuccess(p_response);
@@ -216,7 +216,7 @@ export function CreatePostScreen({ navigation, route }: any) {
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -264,4 +264,4 @@ const styles = StyleSheet.create(
             flex: 1
         }
     }
-)
+);

@@ -5,11 +5,12 @@ import { globals, navigatorGlobals } from '@globals';
 import { Profile, User } from '@types';
 import { api, cache, isNumber } from '@services';
 import { themeStyles } from '@styles';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -20,11 +21,16 @@ interface State {
 export class CreatorsSearchScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
+
     private _timer: number | undefined = undefined;
+
     private _leaderBoard: Profile[] = [];
-    private _lastUsernamePrefix: string = '';
-    private _loggedInUserFollowingMap: { [key: string]: Profile } = {};
-    private _focusSubscription: any;
+
+    private _lastUsernamePrefix = '';
+
+    private _loggedInUserFollowingMap: { [key: string]: boolean } = {};
+
+    private _focusSubscription: () => void;
 
     constructor(props: Props) {
         super(props);
@@ -75,24 +81,22 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
                     this.setState({ isLoading: true });
                 }
                 this._timer = window.setTimeout(
-                    async () => {
-                        try {
-                            const usernamePrefixCopy = p_usernamePrefix;
-                            const response = await api.searchProfiles(globals.user.publicKey, p_usernamePrefix);
-                            let foundProfiles = response?.ProfilesFound;
-                            if (!foundProfiles) {
-                                foundProfiles = [];
-                            }
+                    () => {
+                        const usernamePrefixCopy = p_usernamePrefix;
+                        api.searchProfiles(globals.user.publicKey, p_usernamePrefix).then(
+                            response => {
+                                let foundProfiles = response?.ProfilesFound;
+                                if (!foundProfiles) {
+                                    foundProfiles = [];
+                                }
 
-                            if (this._isMounted && this._lastUsernamePrefix === usernamePrefixCopy) {
-                                this.setState({ profiles: foundProfiles, isLoading: false });
-                            }
+                                if (this._isMounted && this._lastUsernamePrefix === usernamePrefixCopy) {
+                                    this.setState({ profiles: foundProfiles, isLoading: false });
+                                }
 
-                            this._timer = undefined;
-                        }
-                        catch (p_error) {
-                            globals.defaultHandleError(p_error);
-                        }
+                                this._timer = undefined;
+                            }
+                        ).catch(error => globals.defaultHandleError(error));
                     },
                     500
                 );
@@ -125,8 +129,8 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
     }
 
     setFollowedByUserMap(p_user: User) {
-        let followedByUserMap: any = {};
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser as string[];
+        const followedByUserMap: { [key: string]: boolean } = {};
+        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
         if (followedByUserPublicKeys?.length > 0) {
             for (let i = 0; i < followedByUserPublicKeys.length; i++) {
                 followedByUserMap[followedByUserPublicKeys[i]] = true;
@@ -158,7 +162,7 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
                         :
                         <Text style={[styles.noProfilesText, themeStyles.fontColorSub]}>No results found</Text>
                 }
-            </View>
+            </View>;
     }
 }
 const styles = StyleSheet.create(

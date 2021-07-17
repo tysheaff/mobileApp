@@ -1,17 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import CloutFeedLoaderLogoComponent from "@components/loader/cloutFeedLoaderLogo.component";
-import { themeStyles } from "@styles/globalColors";
+import CloutFeedLoaderLogoComponent from '@components/loader/cloutFeedLoaderLogo.component';
+import { themeStyles } from '@styles/globalColors';
 
-export default function CloutFeedLoader() {
+export default function CloutFeedLoader(): JSX.Element {
 
     const spin = useRef(new Animated.Value(0));
     const scale = useRef(new Animated.Value(0));
-    let isMounted = useRef<Boolean>(true);
+    const isMounted = useRef<boolean>(true);
 
-    const animationTiming: number = 600;
+    const animationTiming = 600;
 
-    let spinValue = spin.current.interpolate({
+    const spinValue = spin.current.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
     });
@@ -25,7 +25,7 @@ export default function CloutFeedLoader() {
         () => {
             animate();
             return () => {
-                isMounted.current = false
+                isMounted.current = false;
             };
         },
         []
@@ -62,7 +62,7 @@ export default function CloutFeedLoader() {
                         useNativeDriver: true
                     }
                 ),
-            ]).start(animate)
+            ]).start(animate);
         }
     }
 
@@ -82,7 +82,7 @@ export default function CloutFeedLoader() {
                 <CloutFeedLoaderLogoComponent />
             </Animated.View>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create(

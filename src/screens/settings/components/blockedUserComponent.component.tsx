@@ -1,8 +1,8 @@
-import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import { Profile } from '@types'
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Profile } from '@types';
 import { themeStyles } from '@styles/globalColors';
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp } from '@react-navigation/native';
 import CloutFeedButton from '@components/cloutfeedButton.component';
 
 interface Props {
@@ -24,7 +24,7 @@ export default class BlockedUserComponent extends React.Component<Props, State> 
 
         this.state = {
             isWorking: false
-        }
+        };
 
         this.handleBlock = this.handleBlock.bind(this);
     }
@@ -78,7 +78,7 @@ export default class BlockedUserComponent extends React.Component<Props, State> 
                     onPress={() => this.state.isWorking ? undefined : this.handleBlock(publicKey)}
                 />
             </TouchableOpacity>
-        )
+        );
     }
 }
 
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         marginRight: 12
     },
-})
+});

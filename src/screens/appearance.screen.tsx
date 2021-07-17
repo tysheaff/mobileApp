@@ -12,11 +12,11 @@ import { ChangeFollowersEvent, EventType } from '@types';
 export enum CloutFeedTheme {
     Light = 'light',
     Dark = 'dark'
-};
+}
 
 export function AppearanceScreen({ navigation }: any) {
 
-    let isMounted = useRef<boolean>(true);
+    const isMounted = useRef<boolean>(true);
 
     const [isWorking, setIsWorking] = useState<boolean>(false);
     const [selectedTheme, setSelectedTheme] = useState<CloutFeedTheme>();
@@ -24,7 +24,7 @@ export function AppearanceScreen({ navigation }: any) {
     useEffect(
         () => {
             initScreen();
-            return () => { isMounted.current = false; }
+            return () => { isMounted.current = false; };
         },
         []
     );
@@ -56,8 +56,8 @@ export function AppearanceScreen({ navigation }: any) {
 
     function openProfile() {
         const publicKey: string = constants.cloutfeed_publicKey;
-        const username: string = 'cloutfeed';
-        (navigation as any).push(
+        const username = 'cloutfeed';
+        (navigation ).push(
             'UserProfile',
             {
                 publicKey,
@@ -72,7 +72,7 @@ export function AppearanceScreen({ navigation }: any) {
             setIsWorking(true);
         }
         try {
-            const publicKey: string = constants.cloutfeed_publicKey
+            const publicKey: string = constants.cloutfeed_publicKey;
             const response: any = await api.createFollow(globals.user.publicKey, publicKey, false);
 
             const transactionHex: string = response.TransactionHex;

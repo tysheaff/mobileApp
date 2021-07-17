@@ -33,29 +33,29 @@ const post = (p_route: string, p_body: any) => {
     ).then(p_response => handleResponse(p_response));
 };
 
-const getTrendingClouts = (numToFetch: number, offset: number = 0) => {
+const getTrendingClouts = (numToFetch: number, offset = 0) => {
     const route = `clouttags/trending?numToFetch=${numToFetch}&offset=${offset}`;
     return get(route);
-}
+};
 
-const getCloutTagPosts = (term: string, numToFetch: number, offset: number = 0) => {
+const getCloutTagPosts = (term: string, numToFetch: number, offset = 0) => {
     const route = `clouttag/${term}/posts?numToFetch=${numToFetch}&offset=${offset}`;
     return get(route);
-}
+};
 
 const searchCloutTags = (term: string) => {
     const encodedTerm = encodeURIComponent(term);
     const route = `clouttags/search/${encodedTerm}`;
     return get(route);
-}
+};
 
 const getSavedPosts = (publicKey: string, jwt: string) => {
     const route = `saved-posts/${publicKey}?jwt=${jwt}`;
     return get(route);
-}
+};
 
 const savePost = (publicKey: string, jwt: string, postHashHex: string) => {
-    const route = `saved-posts/save`;
+    const route = 'saved-posts/save';
     return post(
         route,
         {
@@ -64,10 +64,10 @@ const savePost = (publicKey: string, jwt: string, postHashHex: string) => {
             postHashHex
         }
     );
-}
+};
 
 const unsavePost = (publicKey: string, jwt: string, postHashHex: string) => {
-    const route = `saved-posts/unsave`;
+    const route = 'saved-posts/unsave';
     return post(
         route,
         {
@@ -76,15 +76,15 @@ const unsavePost = (publicKey: string, jwt: string, postHashHex: string) => {
             postHashHex
         }
     );
-}
+};
 
 const getPinnedPost = (publicKey: string) => {
     const route = `pinned-posts/${publicKey}`;
     return get(route);
-}
+};
 
 const pinPost = (publicKey: string, jwt: string, postHashHex: string) => {
-    const route = `pinned-posts/pin`;
+    const route = 'pinned-posts/pin';
     return post(
         route,
         {
@@ -93,10 +93,10 @@ const pinPost = (publicKey: string, jwt: string, postHashHex: string) => {
             postHashHex
         }
     );
-}
+};
 
 const unpinPost = (publicKey: string, jwt: string, postHashHex: string) => {
-    const route = `pinned-posts/unpin`;
+    const route = 'pinned-posts/unpin';
     return post(
         route,
         {
@@ -105,7 +105,7 @@ const unpinPost = (publicKey: string, jwt: string, postHashHex: string) => {
             postHashHex
         }
     );
-}
+};
 
 export const cloutApi = {
     getTrendingClouts,

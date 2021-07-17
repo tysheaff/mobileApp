@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View, Text } from 'react-native';
-import { Profile, User } from "@types";
-import { api } from "@services";
-import { globals } from "@globals/globals";
+import { Profile, User } from '@types';
+import { api } from '@services';
+import { globals } from '@globals/globals';
 import { cache } from '@services/dataCaching';
 import { ProfileListCardComponent } from '@components/profileListCard.component';
 import { themeStyles } from '@styles/globalColors';
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 interface Props {
     postHashHex: string;
@@ -21,7 +21,9 @@ interface State {
 export class PostLikeStatsComponent extends React.Component<Props, State> {
 
     private _followedByUserMap: any;
+
     private _noMoreData = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -55,9 +57,9 @@ export class PostLikeStatsComponent extends React.Component<Props, State> {
     }
 
     setFollowedByUserMap(p_user: User) {
-        let followedByUserMap: any = {};
+        const followedByUserMap: any = {};
 
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser as string[];
+        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser ;
 
         if (followedByUserPublicKeys?.length > 0) {
             for (let i = 0; i < followedByUserPublicKeys.length; i++) {
@@ -81,7 +83,7 @@ export class PostLikeStatsComponent extends React.Component<Props, State> {
             const response = await api.getLikesForPost(globals.user.publicKey, this.props.postHashHex, 50, this.state.profiles.length);
             const profiles: Profile[] = response.Likers;
 
-            let newProfiles = this.state.profiles;
+            const newProfiles = this.state.profiles;
             if (profiles?.length > 0) {
                 for (const profile of profiles) {
                     profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
@@ -127,7 +129,7 @@ export class PostLikeStatsComponent extends React.Component<Props, State> {
                             ListFooterComponent={renderFooter}
                         />
             }
-        </View>
+        </View>;
     }
 }
 

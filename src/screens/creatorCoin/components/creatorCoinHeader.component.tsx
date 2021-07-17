@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
-import { CreatorCoinTransaction } from "@types";
-import { themeStyles } from "@styles/globalColors";
-import { formatNumber } from "@services/helpers";
+import { CreatorCoinTransaction } from '@types';
+import { themeStyles } from '@styles/globalColors';
+import { formatNumber } from '@services/helpers';
 
 interface Props {
     username: string;
@@ -75,7 +75,7 @@ export class CreatorCoinHeaderComponent extends React.Component<Props, State> {
             </View>
 
             <Image style={styles.profileImage} source={{ uri: this.props.profilePic }}></Image>
-        </View>
+        </View>;
     }
 }
 

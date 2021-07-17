@@ -1,25 +1,29 @@
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
 import { ContactWithMessages } from '@types';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 export function ChatHeaderComponent(
     { contactWithMessages }: { contactWithMessages: ContactWithMessages }
-) {
-    const navigation = useNavigation();
+): JSX.Element {
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     function goToProfile() {
         if (
             contactWithMessages.ProfileEntryResponse &&
             contactWithMessages.ProfileEntryResponse.Username !== 'anonymous') {
-            (navigation as any).push('UserProfile', {
-                publicKey: contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check,
-                username: contactWithMessages.ProfileEntryResponse.Username,
-                Key: 'Profile_' + contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check
-            })
+            navigation.push(
+                'UserProfile',
+                {
+                    publicKey: contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check,
+                    username: contactWithMessages.ProfileEntryResponse.Username,
+                    Key: 'Profile_' + contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check
+                }
+            );
         }
     }
 
@@ -43,7 +47,7 @@ export function ChatHeaderComponent(
                 }
             </View>
         </TouchableOpacity>
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create(

@@ -1,9 +1,9 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { formatNumber } from '@services'
+import { formatNumber } from '@services';
 import { Profile, Post, Notification } from '@types';
-import { globalStyles } from "@styles/globalStyles";
+import { globalStyles } from '@styles/globalStyles';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
@@ -80,6 +80,6 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
                     }
                 </View>
             </TouchableOpacity>
-        )
+        );
     }
-};
+}

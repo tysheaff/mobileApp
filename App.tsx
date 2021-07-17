@@ -1,8 +1,8 @@
-import { NavigationContainer, NavigationProp } from '@react-navigation/native';
+import { NavigationContainer, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { CreatorCoinHODLer, EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
+import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
 import { updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
@@ -31,21 +31,19 @@ enableScreens();
 
 const Stack = createStackNavigator();
 
-export default function App() {
+export default function App(): JSX.Element {
   const [isLoading, setLoading] = useState(true);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [areTermsAccepted, setTermsAccepted] = useState(false);
-  const [theme, setGlobalTheme] = useState('light');
   const [showProfileManager, setShowProfileManager] = useState(false);
   const [showActionSheet, setShowActionSheet] = useState(false);
-  const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>()
-  const [navigation, setNavigation] = useState<NavigationProp<any>>();
+  const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
+  const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
 
   let mount = true;
 
   useEffect(
     () => {
-      checkAuthenticatedUser();
       const unsubscribeProfileManager = eventManager.addEventListener(
         EventType.ToggleProfileManager,
         (event: ToggleProfileManagerEvent) => {
@@ -59,53 +57,56 @@ export default function App() {
         EventType.ToggleActionSheet,
         (event: ToggleActionSheetEvent) => {
           if (mount) {
-            setActionSheetConfig(event.config)
+            setActionSheetConfig(event.config);
             setShowActionSheet(event.visible);
           }
         }
       );
 
+      checkAuthenticatedUser().then(() => undefined).catch(() => undefined);
+
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
+        mount = false;
       };
     },
     []
   );
 
   async function checkAuthenticatedUser() {
-    SecureStore.getItemAsync(constants.localStorage_publicKey).then(
-      async p_publicKey => {
+    try {
+      const publicKey = await SecureStore.getItemAsync(constants.localStorage_publicKey);
+      if (publicKey) {
+        const cloutFeedIdentity = await SecureStore.getItemAsync(constants.localStorage_cloutFeedIdentity);
 
-        if (p_publicKey) {
-          const cloutFeedIdentity = await SecureStore.getItemAsync(constants.localStorage_cloutFeedIdentity);
+        if (cloutFeedIdentity) {
+          globals.user.publicKey = publicKey;
+          await setTheme(true);
 
-          if (cloutFeedIdentity) {
-            globals.user.publicKey = p_publicKey;
-            await setTheme(true);
-
-            const readonlyValue = await SecureStore.getItemAsync(constants.localStorage_readonly);
-            globals.readonly = readonlyValue !== 'false';
-            globals.onLoginSuccess();
-          } else {
-            await SecureStore.deleteItemAsync(constants.localStorage_publicKey);
-            await SecureStore.deleteItemAsync(constants.localStorage_readonly);
-
-            if (mount) {
-              setTermsAccepted(true);
-              setLoading(false);
-            }
-          }
+          const readonlyValue = await SecureStore.getItemAsync(constants.localStorage_readonly);
+          globals.readonly = readonlyValue !== 'false';
+          globals.onLoginSuccess();
         } else {
-          const termsAccepted = await SecureStore.getItemAsync(constants.localStorage_termsAccepted);
+          await SecureStore.deleteItemAsync(constants.localStorage_publicKey);
+          await SecureStore.deleteItemAsync(constants.localStorage_readonly);
 
           if (mount) {
-            setTermsAccepted(termsAccepted === 'true');
+            setTermsAccepted(true);
             setLoading(false);
           }
         }
+      } else {
+        const termsAccepted = await SecureStore.getItemAsync(constants.localStorage_termsAccepted);
+
+        if (mount) {
+          setTermsAccepted(termsAccepted === 'true');
+          setLoading(false);
+        }
       }
-    ).catch(() => { });
+    } catch {
+      return;
+    }
   }
 
   globals.acceptTermsAndConditions = () => {
@@ -114,11 +115,7 @@ export default function App() {
     }
   };
 
-  globals.setGlobalTheme = (p_theme: string) => {
-    setGlobalTheme(p_theme);
-  }
-
-  globals.onLoginSuccess = async () => {
+  globals.onLoginSuccess = () => {
     cache.user.reset();
     if (mount) {
       setLoading(true);
@@ -138,22 +135,21 @@ export default function App() {
         globals.user.username = p_responses[0].ProfileEntryResponse?.Username;
 
         if (globals.readonly === false) {
-          notificationsService.registerPushToken().catch(() => { });
+          notificationsService.registerPushToken().catch(() => undefined);
         }
         await setTheme();
         await hapticsManager.init();
       }
-    ).catch(() => { })
-      .finally(
-        () => {
-          if (mount) {
-            setLoggedIn(true);
-            setTermsAccepted(true);
-            setLoading(false);
-          }
+    ).catch(() => undefined).finally(
+      () => {
+        if (mount) {
+          setLoggedIn(true);
+          setTermsAccepted(true);
+          setLoading(false);
         }
-      );
-  }
+      }
+    );
+  };
 
   globals.onLogout = async () => {
     if (mount) {
@@ -164,7 +160,7 @@ export default function App() {
 
     if (globals.readonly === false) {
       const jwt = await signing.signJWT();
-      cloutFeedApi.unregisterNotificationsPushToken(globals.user.publicKey, jwt).catch(() => { });
+      cloutFeedApi.unregisterNotificationsPushToken(globals.user.publicKey, jwt).catch(() => undefined);
       await authentication.removeAuthenticatedUser(globals.user.publicKey);
 
       const loggedInPublicKeys = await authentication.getAuthenticatedUserPublicKeys();
@@ -196,12 +192,11 @@ export default function App() {
   function setInvestorFeatures(p_user: User) {
     globals.investorFeatures = true;
 
-    const usersYouHODL = p_user.UsersYouHODL as CreatorCoinHODLer[];
+    const usersYouHODL = p_user.UsersYouHODL;
 
     const cloutFeedCoin = usersYouHODL?.find(p_user => p_user.CreatorPublicKeyBase58Check === constants.cloutfeed_publicKey);
 
     if ((cloutFeedCoin && cloutFeedCoin.BalanceNanos > 30000000) || p_user.PublicKeyBase58Check === constants.cloutfeed_publicKey) {
-      cloutFeedCoin?.BalanceNanos
       globals.investorFeatures = true;
     }
   }
@@ -209,7 +204,7 @@ export default function App() {
   function setFollowerFeatures(p_user: User) {
     globals.followerFeatures = globals.user.publicKey === constants.cloutfeed_publicKey;
 
-    const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser as string[];
+    const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
 
     if (followedByUserPublicKeys?.length > 0 && followedByUserPublicKeys.indexOf(constants.cloutfeed_publicKey) !== -1) {
       globals.followerFeatures = true;
@@ -224,7 +219,7 @@ export default function App() {
       const theme = await SecureStore.getItemAsync(key);
       settingsGlobals.darkMode = theme === 'dark';
     } else {
-      await SecureStore.setItemAsync(key, 'light')
+      await SecureStore.setItemAsync(key, 'light');
     }
 
     updateThemeStyles();
@@ -236,7 +231,7 @@ export default function App() {
     <NavigationContainer>
       <StatusBar style={settingsGlobals.darkMode ? 'light' : 'dark'} hidden={false} />
       <Stack.Navigator
-        screenOptions={{ ...stackConfig }}>
+        screenOptions={stackConfig}>
         {
           !isLoggedIn ?
             areTermsAccepted ?
@@ -278,7 +273,7 @@ export default function App() {
       <SnackbarComponent />
       {
         showProfileManager ?
-          <ProfileManagerComponent navigation={navigation as NavigationProp<any>}></ProfileManagerComponent> : undefined
+          <ProfileManagerComponent navigation={navigation as NavigationProp<ParamListBase>}></ProfileManagerComponent> : undefined
       }
     </NavigationContainer >
     ;

@@ -8,7 +8,12 @@ import { Feather } from '@expo/vector-icons';
 
 let lastKeyword;
 
-export function CloutTagSuggestionList({ keyword, onSuggestionPress }: any) {
+interface Props {
+    keyword: string;
+    onSuggestionPress: ({ name }: { name: string }) => void;
+}
+
+export function CloutTagSuggestionList({ keyword, onSuggestionPress }: Props): JSX.Element | null {
     const [suggestedMentions, setSuggestedMentions] = useState<CloutTag[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -17,12 +22,12 @@ export function CloutTagSuggestionList({ keyword, onSuggestionPress }: any) {
     useEffect(
         () => {
             if (keyword !== null && keyword !== undefined) {
-                getSuggestions()
+                getSuggestions();
             }
 
             () => {
                 mount = false;
-            }
+            };
         },
         [keyword]
     );
@@ -91,7 +96,7 @@ export function CloutTagSuggestionList({ keyword, onSuggestionPress }: any) {
             }
         </ScrollView>
     );
-};
+}
 
 const styles = StyleSheet.create(
     {

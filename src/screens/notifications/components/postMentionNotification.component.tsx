@@ -1,8 +1,8 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Profile, Post, Notification } from '@types';
-import { globalStyles } from "@styles/globalStyles";
+import { globalStyles } from '@styles/globalStyles';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface Props {
@@ -52,6 +52,6 @@ export class PostMentionNotificationComponent extends React.Component<Props> {
                     <Text style={[this.props.styles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.Body}</Text>
                 </View>
             </TouchableOpacity>
-        )
+        );
     }
-};
+}

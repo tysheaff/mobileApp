@@ -5,17 +5,15 @@ import { constants } from '@globals/constants';
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 
-interface Props { }
-
 interface State {
     areHapticsEnabled: boolean;
 }
 
-export default class HapticsScreen extends React.Component<Props, State> {
+export default class HapticsScreen extends React.Component<Record<string, never>, State> {
 
-    private _isMounted: boolean = false;
+    private _isMounted = false;
 
-    constructor(props: Props) {
+    constructor(props: Record<string, never>) {
         super(props);
 
         this.state = {
@@ -51,7 +49,7 @@ export default class HapticsScreen extends React.Component<Props, State> {
         globals.hapticsEnabled = newState;
         this.setState({ areHapticsEnabled: newState });
         const hapticsKey = `${globals.user.publicKey}${constants.localStorage_cloutFeedHapticsEnabled}`;
-        SecureStore.setItemAsync(hapticsKey, String(newState)).catch(() => { });
+        SecureStore.setItemAsync(hapticsKey, String(newState)).catch(() => undefined);
     }
 
     render() {
@@ -60,9 +58,9 @@ export default class HapticsScreen extends React.Component<Props, State> {
                 <Text style={[themeStyles.fontColorMain, styles.optionText]}>Haptics Enabled</Text>
                 <Switch
                     trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
-                    thumbColor={"white"}
+                    thumbColor={'white'}
                     ios_backgroundColor={themeStyles.switchColor.color}
-                    onValueChange={this.toggleHaptics}
+                    onValueChange={() => this.toggleHaptics()}
                     value={this.state.areHapticsEnabled}
                 />
             </View>

@@ -1,15 +1,18 @@
 export class CacheableObject<T> {
 
     private _request: () => Promise<T>;
+
     private _mapFunction: (p_response: any) => T;
+
     private _durationInMilliseconds: number;
 
     private _data: T | undefined = undefined;
+
     private _lastFetch: Date | undefined = undefined;
 
     constructor(p_request: () => Promise<T>, p_mapFunction: (p_response: any) => T, p_durationInSeconds: number) {
         this._request = p_request;
-        this._mapFunction = p_mapFunction
+        this._mapFunction = p_mapFunction;
         this._durationInMilliseconds = p_durationInSeconds * 1000;
     }
 

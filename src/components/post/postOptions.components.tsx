@@ -1,19 +1,19 @@
-import React from "react";
-import { Alert, Linking, TouchableOpacity } from "react-native";
+import React from 'react';
+import { Alert, Linking, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { EventType, Post, UnsavePostEvent } from '@types';
-import { globals } from "@globals/globals";
-import { signing } from "@services/authorization/signing";
-import { api, cache } from "@services";
-import { eventManager } from "@globals/injector";
+import { globals } from '@globals/globals';
+import { signing } from '@services/authorization/signing';
+import { api, cache } from '@services';
+import { eventManager } from '@globals/injector';
 import * as Clipboard from 'expo-clipboard';
-import { snackbar } from "@services/snackbar";
-import { NavigationProp } from "@react-navigation/native";
-import { cloutApi } from "@services/api/cloutApi";
+import { snackbar } from '@services/snackbar';
+import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native';
+import { cloutApi } from '@services/api/cloutApi';
 
 interface Props {
-    navigation: NavigationProp<any>;
-    route: any;
+    navigation: NavigationProp<ParamListBase>;
+    route: RouteProp<ParamListBase, string>;
     post: Post;
 }
 
@@ -25,7 +25,7 @@ export class PostOptionsComponent extends React.Component<Props> {
         this.onPostOptionsClick = this.onPostOptionsClick.bind(this);
     }
 
-    shouldComponentUpdate(p_nextProps: Props) {
+    shouldComponentUpdate(p_nextProps: Props): boolean {
         return p_nextProps.post?.PostHashHex !== this.props.post?.PostHashHex;
     }
 
@@ -64,10 +64,10 @@ export class PostOptionsComponent extends React.Component<Props> {
                 case 4:
                     Linking.openURL(`https://report.bitclout.com/?ReporterPublicKey=${globals.user.publicKey}&PostHash=${this.props.post.PostHashHex}`);
                     break;
-                case 5:
+                case 5: {
                     const jwt = await signing.signJWT();
 
-                    api.blockUser(globals.user.publicKey, this.props.post.ProfileEntryResponse.PublicKeyBase58Check, jwt as string, false).then(
+                    api.blockUser(globals.user.publicKey, this.props.post.ProfileEntryResponse.PublicKeyBase58Check, jwt, false).then(
                         () => {
                             this.props.navigation.navigate(
                                 'Home',
@@ -84,6 +84,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                         }
                     ).catch(() => Alert.alert('Error', 'Something went wrong! Please try again.'));
                     break;
+                }
             }
         };
 
@@ -153,7 +154,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                             const transactionHex = p_response.TransactionHex;
 
                             const signedTransactionHex = await signing.signTransaction(transactionHex);
-                            await api.submitTransaction(signedTransactionHex as string);
+                            await api.submitTransaction(signedTransactionHex);
 
                             if (this.props.route.name === 'Home' || this.props.route.name === 'Profile') {
                                 Alert.alert('Success', 'Your post was deleted successfully.');
@@ -171,7 +172,7 @@ export class PostOptionsComponent extends React.Component<Props> {
                     ).catch(p_error => globals.defaultHandleError(p_error));
                     break;
             }
-        }
+        };
 
         eventManager.dispatchEvent(
             EventType.ToggleActionSheet,
@@ -183,8 +184,8 @@ export class PostOptionsComponent extends React.Component<Props> {
     }
 
     private copyToClipBoard(p_isLink: boolean) {
-        let text: string = p_isLink ? 'Link copied to clipboard' : 'Text copied to clipboard';
-        const postLink = p_isLink ? `https://bitclout.com/posts/${this.props.post.PostHashHex}` : this.props.post.Body
+        const text = p_isLink ? 'Link copied to clipboard' : 'Text copied to clipboard';
+        const postLink = p_isLink ? `https://bitclout.com/posts/${this.props.post.PostHashHex}` : this.props.post.Body;
         Clipboard.setString(postLink);
         snackbar.showSnackBar({ text });
     }
@@ -251,9 +252,9 @@ export class PostOptionsComponent extends React.Component<Props> {
         snackbar.showSnackBar({ text: message });
     }
 
-    render() {
-        return <TouchableOpacity activeOpacity={1} onPress={this.onPostOptionsClick}>
-            <Feather name="more-horizontal" size={20} color="#a1a1a1" />
-        </TouchableOpacity>
+    render(): JSX.Element {
+        return <TouchableOpacity activeOpacity={1} onPress={() => this.onPostOptionsClick()}>
+            <Feather name='more-horizontal' size={20} color='#a1a1a1' />
+        </TouchableOpacity>;
     }
 }

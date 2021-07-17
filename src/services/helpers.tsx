@@ -1,4 +1,4 @@
-import { Profile } from "@types";
+import { Profile } from '@types';
 
 export function calculateDurationUntilNow(p_timeStampNanoSeconds: number): string {
     const milliseconds = p_timeStampNanoSeconds / 1000000;
@@ -34,24 +34,24 @@ export function getAnonymousProfile(p_publicKey: string) {
 
 export function checkProfilePicture(p_profile: Profile) {
     if (p_profile.ProfilePic === '/assets/img/default_profile_pic.png') {
-        p_profile.ProfilePic = 'https://i.imgur.com/vZ2mB1W.png'
+        p_profile.ProfilePic = 'https://i.imgur.com/vZ2mB1W.png';
     }
 }
 
-var SYMBOLs = ["", "k", "M", "G", "T", "P", "E"];
+const SYMBOLs = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
 
 export function formatNumber(p_number: number, p_includeDecimalPlaces = true, p_decimalPlaces = 2) {
 
-    var tier = Math.log10(Math.abs(p_number)) / 3 | 0;
+    const tier = Math.log10(Math.abs(p_number)) / 3 | 0;
 
     if (tier <= 0) {
         return p_includeDecimalPlaces ? p_number.toFixed(p_decimalPlaces) : p_number.toString();
-    };
+    }
 
-    var suffix = SYMBOLs[tier];
-    var scale = Math.pow(10, tier * 3);
+    const suffix = SYMBOLs[tier];
+    const scale = Math.pow(10, tier * 3);
 
-    var scaled = p_number / scale;
+    const scaled = p_number / scale;
 
     return scaled.toFixed(1) + suffix;
 }

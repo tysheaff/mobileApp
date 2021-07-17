@@ -43,7 +43,7 @@ const getTrendingPosts = (p_interval: 'day' | 'week', p_page: number) => {
     const route = `trends/posts/${p_interval}/${p_page}?full=0`;
 
     return get(route);
-}
+};
 
 export const searchCloutApi = {
     getTrendingPosts

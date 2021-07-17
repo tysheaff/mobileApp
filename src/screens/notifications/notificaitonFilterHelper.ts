@@ -7,7 +7,7 @@ function checkReplyNotification(p_notification: Notification, p_posts: any): boo
     let parentPost;
     if (parentPostHashHex) {
         parentPost = p_posts[parentPostHashHex];
-        return parentPost && parentPost.ProfileEntryResponse.PublicKeyBase58Check === globals.user.publicKey
+        return parentPost && parentPost.ProfileEntryResponse.PublicKeyBase58Check === globals.user.publicKey;
     }
     return false;
 }

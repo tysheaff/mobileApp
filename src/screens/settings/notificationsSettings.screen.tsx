@@ -38,8 +38,10 @@ interface Option {
 export default class NotificationsSettingsScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
-    private _jwt: string = '';
-    private _interval: number = 0;
+
+    private _jwt = '';
+
+    private _interval = 0;
 
     constructor(props: Props) {
         super(props);
@@ -154,9 +156,9 @@ export default class NotificationsSettingsScreen extends React.Component<Props, 
         if (this.state.permissionDenied) {
             return <View style={[styles.permissionDeniedContainer, themeStyles.containerColorMain]}>
                 <Text style={[themeStyles.fontColorMain, styles.permissionDeniedText]}>
-                    Notifications permission not permitted. Please activate the notifications from the device settings and reload the application. 
+                    Notifications permission not permitted. Please activate the notifications from the device settings and reload the application.
                 </Text>
-            </View>
+            </View>;
         }
 
         const options: Option[] = [

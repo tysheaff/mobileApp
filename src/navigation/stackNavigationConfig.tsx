@@ -1,8 +1,9 @@
-import { Easing, Platform } from "react-native";
-import { CardStyleInterpolators } from "@react-navigation/stack";
+import { Easing, Platform } from 'react-native';
+import { CardStyleInterpolators, StackNavigationOptions } from '@react-navigation/stack';
+import { TransitionSpec } from '@react-navigation/stack/lib/typescript/src/types';
 
-const config = {
-    animation: "spring",
+const config: TransitionSpec = {
+    animation: 'spring',
     config: {
         stiffness: 1000,
         damping: 500,
@@ -13,16 +14,16 @@ const config = {
     },
 };
 
-const closeConfig = {
-    animation: "timing",
+const closeConfig: TransitionSpec = {
+    animation: 'timing',
     config: {
         duration: 150,
         easing: Easing.linear,
     },
 };
 
-export const stackConfig: any = Platform.OS === 'ios' ? undefined : {
-    gestureDirection: "horizontal",
+export const stackConfig: StackNavigationOptions = Platform.OS === 'ios' ? {} : {
+    gestureDirection: 'horizontal',
     gestureEnabled: true,
     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
     transitionSpec: {

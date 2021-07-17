@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, FlatList } from 'react-native';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { CreatorCoinChartComponent } from "./components/creatorCoinChart.component";
-import { themeStyles } from "@styles";
-import { CreatorCoinTransaction, Profile } from "@types";
-import { CreatorCoinHeaderComponent } from "./components/creatorCoinHeader.component";
-import { api, cloutFeedApi } from "@services";
-import { CreatorCoinTransactionComponent } from "./components/creatorCoinTransaction.component";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { CreatorCoinChartComponent } from './components/creatorCoinChart.component';
+import { themeStyles } from '@styles';
+import { CreatorCoinTransaction, Profile } from '@types';
+import { CreatorCoinHeaderComponent } from './components/creatorCoinHeader.component';
+import { api, cloutFeedApi } from '@services';
+import { CreatorCoinTransactionComponent } from './components/creatorCoinTransaction.component';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 type RouteParams = {
     CreatorCoin: {
@@ -37,6 +37,7 @@ interface State {
 export class CreatorCoinScreen extends React.Component<Props, State> {
 
     private readonly _historyBatchSize = 40;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -145,12 +146,11 @@ export class CreatorCoinScreen extends React.Component<Props, State> {
                             }
                             p_resolve(true);
                         }
-                    ).catch(() => p_resolve(false))
+                    ).catch(() => p_resolve(false));
                 }
             );
             promises.push(promise);
         }
-
 
         await Promise.all(promises).then(
             () => { }
@@ -202,7 +202,7 @@ export class CreatorCoinScreen extends React.Component<Props, State> {
                 {
                     this.state.loadingMoreHistory && !this.state.loadingHistory ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined
                 }
-            </View>
+            </View>;
     }
 }
 

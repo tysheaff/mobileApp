@@ -1,9 +1,9 @@
-import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { FlatList } from "react-native-gesture-handler";
-import { themeStyles } from "@styles/globalColors";
-import { settingsGlobals } from "@globals/settingsGlobals";
+import { FlatList } from 'react-native-gesture-handler';
+import { themeStyles } from '@styles/globalColors';
+import { settingsGlobals } from '@globals/settingsGlobals';
 
 declare type filterId = 'follow' | 'like' | 'reply' | 'mention' | 'reclout' | 'purchase' | 'diamond' | 'creatorCoinTransfer';
 interface FilterChip {
@@ -149,7 +149,7 @@ export class NotificationsFilterComponent extends React.Component<Props, State>{
             renderItem={({ item }) => renderChip(item)}
             data={this._chips}
             showsHorizontalScrollIndicator={false}
-        />
+        />;
     }
 }
 

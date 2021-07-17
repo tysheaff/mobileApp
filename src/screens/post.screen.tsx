@@ -45,7 +45,7 @@ export function PostScreen({ route, navigation }: any) {
                     headerPost: false,
                     data: newComments
                 }
-            ]
+            ];
             setSections(sections);
         }
 
@@ -132,7 +132,7 @@ export function PostScreen({ route, navigation }: any) {
                         headerPost: false,
                         data: backendPost.Comments
                     }
-                ]
+                ];
                 setSections(sections);
                 setLoading(false);
             }
@@ -170,7 +170,7 @@ export function PostScreen({ route, navigation }: any) {
                                 headerPost: false,
                                 data: newComments
                             }
-                        ]
+                        ];
 
                         setSections(sections);
                         setCommentIndex(newComments.length);
@@ -197,7 +197,7 @@ export function PostScreen({ route, navigation }: any) {
             <SectionList
                 stickySectionHeadersEnabled={true}
                 sections={sections}
-                keyExtractor={(item, index) => item.PostHashHex + index}
+                keyExtractor={(item, index) => item.PostHashHex + String(index)}
                 renderItem={
                     ({ item, section }) =>
                         <PostComponent
@@ -213,13 +213,13 @@ export function PostScreen({ route, navigation }: any) {
                         return headerPost || parentPost ? <View></View> :
                             <View style={themeStyles.containerColorSub}>
                                 <Text style={[styles.commentsText, themeStyles.fontColorMain]}>Comments</Text>
-                            </View>
+                            </View>;
                     }
                 }
                 onEndReached={loadMoreComments}
                 ListFooterComponent={isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : undefined}
             />
-        </View >
+        </View >;
 
 }
 
@@ -235,4 +235,4 @@ const styles = StyleSheet.create(
             fontWeight: '600'
         }
     }
-)
+);

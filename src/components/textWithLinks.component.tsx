@@ -1,13 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, Linking } from 'react-native';
+import { StyleSheet, Text, Linking, StyleProp, TextStyle } from 'react-native';
 import Autolink from 'react-native-autolink';
 import { themeStyles } from '@styles/globalColors';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     text: string;
-    style?: any[];
+    style?: StyleProp<TextStyle>[];
     numberOfLines?: number;
     isProfile?: boolean;
 }
@@ -21,6 +22,7 @@ interface State {
 export class TextWithLinks extends React.Component<Props, State>{
 
     private _textInit = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -38,35 +40,35 @@ export class TextWithLinks extends React.Component<Props, State>{
         this.onTextLayout = this.onTextLayout.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State): boolean {
         return p_nextProps.text !== this.props.text ||
             p_nextState.textHidden !== this.state.textHidden ||
             p_nextState.showMoreButton !== this.state.showMoreButton;
     }
 
-    private processUsername(username: string): String {
+    private processUsername(username: string): string {
         return username.replace(/[^\w+$]/g, '');
     }
 
-    private onLinkPressed(p_url: string, p_match: any) {
+    private onLinkPressed(p_url: string, p_match: Match) {
         const linkType = p_match.getType();
         switch (linkType) {
-            case 'url':
+            case 'url': {
                 const postLink = 'bitclout.com/posts/';
                 const isPostLink = p_url.includes(postLink);
 
                 if (isPostLink) {
                     const postHashHexStartIndex = p_url.indexOf(postLink) + postLink.length;
                     const postHashHex = p_url.slice(postHashHexStartIndex, postHashHexStartIndex + 64);
-                    (this.props.navigation as any).push(
+                    this.props.navigation.push(
                         'Post',
                         {
                             postHashHex: postHashHex,
@@ -77,12 +79,13 @@ export class TextWithLinks extends React.Component<Props, State>{
                     if (!p_url.startsWith('https://') && !p_url.startsWith('https://')) {
                         p_url = 'https://' + p_url;
                     }
-                    Linking.openURL(p_url).catch(() => { });
+                    Linking.openURL(p_url).catch(() => undefined);
                 }
                 break;
-            case 'mention':
+            }
+            case 'mention': {
                 const mentionUsername = this.processUsername(p_url.slice(1));
-                (this.props.navigation as any).push(
+                this.props.navigation.push(
                     'UserProfile',
                     {
                         username: mentionUsername,
@@ -91,17 +94,19 @@ export class TextWithLinks extends React.Component<Props, State>{
                     }
                 );
                 break;
+            }
             case 'hashtag':
-                return (this.props.navigation as any).push(
+                this.props.navigation.push(
                     'CloutTagPosts',
                     {
                         cloutTag: p_match.hashtag,
                         key: 'CloutTag_' + p_match.hashtag
                     }
                 );
-            case 'dollar':
+                break;
+            case 'dollar': {
                 const dollarUsername = this.processUsername(p_url.slice(1));
-                (this.props.navigation as any).push(
+                this.props.navigation.push(
                     'UserProfile',
                     {
                         username: dollarUsername,
@@ -109,6 +114,8 @@ export class TextWithLinks extends React.Component<Props, State>{
                         key: 'Post_' + dollarUsername
                     }
                 );
+                break;
+            }
         }
     }
 
@@ -153,12 +160,12 @@ export class TextWithLinks extends React.Component<Props, State>{
         }
     }
 
-    render() {
+    render(): JSX.Element {
 
         const dollarMatches = {
             pattern: /\$+[_A-Za-z]+[0-9]*[^ :/@/w]/g,
             type: 'dollar',
-            getLinkText: (replacerArgs: String[]) => `${replacerArgs[0]}`
+            getLinkText: (replacerArgs: string[]) => `${replacerArgs[0]}`
         };
 
         const style = this.props.style ? this.props.style : [];
@@ -167,12 +174,12 @@ export class TextWithLinks extends React.Component<Props, State>{
             <Autolink
                 style={style}
                 text={this.props.text}
-                onTextLayout={this.onTextLayout}
+                onTextLayout={event => this.onTextLayout(event)}
                 mention="twitter"
                 hashtag="twitter"
                 matchers={[dollarMatches]}
                 numberOfLines={this.state.numberOfLines}
-                renderLink={(text, match, index) => (
+                renderLink={(text: string, match: any, index: number) => (
                     <Text
                         style={[styles.link, themeStyles.linkColor]}
                         key={index}
@@ -186,10 +193,10 @@ export class TextWithLinks extends React.Component<Props, State>{
             {
                 this.state.showMoreButton &&
                 <Text
-                    onPress={this.toggleText}
+                    onPress={() => this.toggleText()}
                     style={[themeStyles.linkColor, styles.readMore, this.props.isProfile && styles.isProfile]}
                 >{this.state.textHidden ? 'Read More' : 'Read Less'}</Text>}
-        </>
+        </>;
     }
 }
 

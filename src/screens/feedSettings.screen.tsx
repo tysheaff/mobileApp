@@ -1,8 +1,8 @@
-import React from 'react'
-import { View, StyleSheet, Text, Switch } from 'react-native'
+import React from 'react';
+import { View, StyleSheet, Text, Switch } from 'react-native';
 import { themeStyles } from '@styles';
-import { SelectListControl } from "@controls/selectList.control";
-import * as SecureStore from 'expo-secure-store'
+import { SelectListControl } from '@controls/selectList.control';
+import * as SecureStore from 'expo-secure-store';
 import { constants } from '@globals/constants';
 import { globals } from '@globals/globals';
 import { eventManager } from '@globals/injector';
@@ -15,18 +15,16 @@ enum FeedType {
     Recent = 'Recent',
 }
 
-interface Props { };
-
 interface State {
     isCloutCastEnabled: boolean;
     feed: FeedType;
-};
+}
 
-export class FeedSettingsScreen extends React.Component<Props, State>{
+export class FeedSettingsScreen extends React.Component<Record<string, never>, State>{
 
     private _isMounted = false;
 
-    constructor(props: Props) {
+    constructor(props: Record<string, never>) {
         super(props);
 
         this.state = {
@@ -39,32 +37,32 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
         this.initScreen();
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    toggleCloutCastFeed() {
+    toggleCloutCastFeed(): void {
         const newValue = !this.state.isCloutCastEnabled;
         this.setState({ isCloutCastEnabled: newValue });
 
         const event: ToggleCloutCastFeedEvent = { active: newValue };
         eventManager.dispatchEvent(EventType.ToggleCloutCastFeed, event);
         const key = globals.user.publicKey + constants.localStorage_cloutCastFeedEnabled;
-        SecureStore.setItemAsync(key, String(newValue)).catch(() => { });
+        SecureStore.setItemAsync(key, String(newValue)).catch(() => undefined);
     }
 
-    onFeedTypeChange(p_type: FeedType) {
+    onFeedTypeChange(p_type: FeedType): void {
         this.setState({ feed: p_type });
 
         const key = globals.user.publicKey + constants.localStorage_defaultFeed;
-        SecureStore.setItemAsync(key, String(p_type)).catch(() => { });
+        SecureStore.setItemAsync(key, String(p_type)).catch(() => undefined);
     }
 
-    async initScreen() {
+    async initScreen(): Promise<void> {
         const feedKey = globals.user.publicKey + constants.localStorage_defaultFeed;
         const feed = await SecureStore.getItemAsync(feedKey).catch(() => undefined) as FeedType;
 
@@ -81,7 +79,7 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
         }
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={[styles.container, themeStyles.containerColorMain]} >
             <View style={themeStyles.containerColorMain}>
                 {
@@ -90,9 +88,9 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
                             <Text style={[styles.cloutCastFeedSettingsText, themeStyles.fontColorMain]}>CloutCast Feed</Text>
                             <Switch
                                 trackColor={{ false: themeStyles.switchColor.color, true: '#007ef5' }}
-                                thumbColor={"white"}
+                                thumbColor={'white'}
                                 ios_backgroundColor={themeStyles.switchColor.color}
-                                onValueChange={this.toggleCloutCastFeed}
+                                onValueChange={() => this.toggleCloutCastFeed()}
                                 value={this.state.isCloutCastEnabled}
                             />
                         </View>
@@ -121,7 +119,7 @@ export class FeedSettingsScreen extends React.Component<Props, State>{
                         }
                     ]}
                     value={this.state.feed}
-                    onValueChange={this.onFeedTypeChange}
+                    onValueChange={(value: string | string[]) => this.onFeedTypeChange(value as FeedType)}
                 >
                 </SelectListControl>
             </View>

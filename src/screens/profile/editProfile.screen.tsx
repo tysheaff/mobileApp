@@ -2,7 +2,7 @@ import { globals } from '@globals/globals';
 import { api } from '@services';
 import React, { Component } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { Image, Platform, StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { Image, Platform, StyleSheet, Text, View, TextInput, ScrollView, Alert } from 'react-native';
 import { Profile } from '@types';
 import { themeStyles } from '@styles/globalColors';
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types';
@@ -11,9 +11,10 @@ import { settingsGlobals } from '@globals/settingsGlobals';
 import { signing } from '@services/authorization/signing';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
-    navigation: NavigationProp<any>
+    navigation: NavigationProp<ParamListBase>
 }
 
 interface State {
@@ -35,7 +36,7 @@ export class EditProfileScreen extends Component<Props, State> {
             description: '',
             founderReward: '',
             loading: true,
-        }
+        };
 
         this.pickImage = this.pickImage.bind(this);
         this.updateProfile = this.updateProfile.bind(this);
@@ -65,10 +66,10 @@ export class EditProfileScreen extends Component<Props, State> {
                 color: themeStyles.fontColorMain.color,
                 alignSelf: 'center'
             }
-        })
+        });
     }
 
-    updateProfile = async () => {
+    updateProfile = (): void => {
         if (this.state.loading) {
             return;
         }
@@ -103,7 +104,7 @@ export class EditProfileScreen extends Component<Props, State> {
             async p_response => {
                 const transactionHex = p_response.TransactionHex;
                 const signedTransaction = await signing.signTransaction(transactionHex);
-                await api.submitTransaction(signedTransaction as string).then(
+                await api.submitTransaction(signedTransaction).then(
                     () => {
                         if (this._isMounted) {
                             if (globals.user.username !== this.state.username) {
@@ -134,7 +135,7 @@ export class EditProfileScreen extends Component<Props, State> {
                     }
                 }
             }
-        )
+        );
     }
 
     pickImage = async () => {
@@ -146,7 +147,7 @@ export class EditProfileScreen extends Component<Props, State> {
             }
         }
 
-        let result = await ImagePicker.launchImageLibraryAsync(
+        const result = await ImagePicker.launchImageLibraryAsync(
             {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 quality: 1,
@@ -154,10 +155,11 @@ export class EditProfileScreen extends Component<Props, State> {
             }
         );
         if (!result.cancelled && result.type === 'image') {
-            const base64Image = 'data:image/jpeg;base64,' + (result as ImageInfo).base64 as string;
+            const base64 = (result as ImageInfo).base64 as string;
+            const base64Image = base64;
 
             if (this._isMounted) {
-                this.setState({ profilePic: base64Image })
+                this.setState({ profilePic: base64Image });
             }
         }
     };
@@ -189,7 +191,7 @@ export class EditProfileScreen extends Component<Props, State> {
 
     handleFounderRewardsChange = (p_text: string) => {
         const numberText = p_text.split(',').join('.');
-        const founderRewardNumber = Number(numberText)
+        const founderRewardNumber = Number(numberText);
 
         if (founderRewardNumber >= 0 && founderRewardNumber <= 100) {
             this.setState({ founderReward: p_text });
@@ -219,10 +221,10 @@ export class EditProfileScreen extends Component<Props, State> {
                     <View style={[styles.inputContainer]}>
                         <Text style={[themeStyles.fontColorSub]}>Username</Text>
                         <TextInput
-                            style={[styles.textInput, themeStyles.fontColorMain, , themeStyles.borderColor]}
+                            style={[styles.textInput, themeStyles.fontColorMain, themeStyles.borderColor]}
                             value={this.state.username}
                             onChangeText={(p_text: string) => {
-                                this.setState({ username: p_text })
+                                this.setState({ username: p_text });
                             }}
                             keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
                         />
@@ -252,7 +254,7 @@ export class EditProfileScreen extends Component<Props, State> {
 
                 <View style={{ height: 500 }}></View>
             </ScrollView>
-        )
+        );
     }
 }
 
@@ -288,6 +290,6 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 16
     }
-})
+});
 
-export default EditProfileScreen
+export default EditProfileScreen;

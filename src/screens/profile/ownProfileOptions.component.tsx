@@ -46,7 +46,7 @@ export default class OwnProfileOptionsComponent extends React.Component<Props> {
                     Linking.openURL(`https://bitclout.com/u/${this.props.username}`);
                     break;
                 case 1:
-                    Clipboard.setString(this.props.publicKey as string);
+                    Clipboard.setString(this.props.publicKey);
                     snackbar.showSnackBar(
                         {
                             text: 'Public key copied to clipboard.'
@@ -54,7 +54,7 @@ export default class OwnProfileOptionsComponent extends React.Component<Props> {
                     );
                     break;
             }
-        }
+        };
         eventManager.dispatchEvent(
             EventType.ToggleActionSheet,
             {
@@ -74,22 +74,24 @@ export default class OwnProfileOptionsComponent extends React.Component<Props> {
                 />
                 <TouchableOpacity
                     activeOpacity={1}
-                    onPress={this.onOwnProfileOptionsClick}
+                    onPress={() => this.onOwnProfileOptionsClick()}
                 >
                     <Feather name="more-horizontal" size={24} color={themeStyles.fontColorMain.color} />
                 </TouchableOpacity>
             </View>
-        )
+        );
     }
 }
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    optionButton: {
-        marginHorizontal: 10,
-    },
-})
+const styles = StyleSheet.create(
+    {
+        container: {
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            marginBottom: 8,
+        },
+        optionButton: {
+            marginHorizontal: 10,
+        },
+    }
+);

@@ -30,7 +30,7 @@ async function registerPushToken() {
 
         const token = (await Notifications.getExpoPushTokenAsync()).data;
         const jwt = await signing.signJWT();
-        await cloutFeedApi.registerNotificationsPushToken(globals.user.publicKey, token, jwt as string);
+        await cloutFeedApi.registerNotificationsPushToken(globals.user.publicKey, token, jwt );
     }
 
     if (Platform.OS === 'android') {
@@ -68,7 +68,7 @@ async function registerNotificationHandler() {
             if (trigger?.payload?.body) {
                 body = trigger.payload.body;
             } else if (trigger?.remoteMessage?.data?.body) {
-                body = trigger.remoteMessage.data.body
+                body = trigger.remoteMessage.data.body;
             }
 
             if (body) {
@@ -92,7 +92,6 @@ async function registerNotificationHandler() {
         }
     );
 }
-
 
 function unregisterNotificationHandler() {
     if (notificationHandler) {

@@ -44,7 +44,7 @@ export function ProfileStats(
             loadProfiles();
             return () => {
                 mount = false;
-            }
+            };
         }, []
     );
 
@@ -90,15 +90,15 @@ export function ProfileStats(
                 }
 
                 if (isNumber(post.LikeCount)) {
-                    likesCount += post.LikeCount
+                    likesCount += post.LikeCount;
                 }
 
                 if (isNumber(post.CommentCount)) {
-                    commentsCount += post.CommentCount
+                    commentsCount += post.CommentCount;
                 }
 
                 if (isNumber(post.RecloutCount)) {
-                    recloutsCount += post.RecloutCount
+                    recloutsCount += post.RecloutCount;
                 }
             }
 
@@ -126,7 +126,7 @@ export function ProfileStats(
                 const follower = followers[i];
                 if (follower && isNumber(follower.CoinPriceBitCloutNanos)) {
                     const followerCoinPriceInUSD = calculateBitCloutInUSD(follower.CoinPriceBitCloutNanos);
-                    followersCoinPriceSum += followerCoinPriceInUSD
+                    followersCoinPriceSum += followerCoinPriceInUSD;
                 }
             }
 
@@ -148,7 +148,7 @@ export function ProfileStats(
                 const hodler = usersWhoHODL[i];
                 if (hodler?.ProfileEntryResponse && isNumber(hodler.ProfileEntryResponse.CoinPriceBitCloutNanos)) {
                     const hodlerCoinPriceInUSD = calculateBitCloutInUSD(hodler.ProfileEntryResponse.CoinPriceBitCloutNanos);
-                    hodlersCoinPriceSum += hodlerCoinPriceInUSD
+                    hodlersCoinPriceSum += hodlerCoinPriceInUSD;
                 }
             }
 
@@ -222,7 +222,7 @@ export function ProfileStats(
     }
 
     function getScore(p_value: number, p_max: number, p_step: number) {
-        return Math.min(Math.round(p_value / p_step), p_max)
+        return Math.min(Math.round(p_value / p_step), p_max);
     }
 
     function formatData(p_stats: Stats) {
@@ -283,7 +283,7 @@ export function ProfileStats(
                     <Text style={[styles.creatorCoinStatsCardValue, themeStyles.fontColorMain]}>~${avgCoinPricePerHODLer}</Text>
                 </View>
             </View>
-        </View>
+        </View>;
 }
 
 const styles = StyleSheet.create(

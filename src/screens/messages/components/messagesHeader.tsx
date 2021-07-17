@@ -26,7 +26,7 @@ export function MessagesHeaderComponent() {
             </TouchableOpacity>
             : undefined
         }
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create(

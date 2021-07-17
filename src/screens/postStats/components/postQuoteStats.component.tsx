@@ -1,8 +1,8 @@
 import { ActivityIndicator, FlatList, StyleSheet, View, Text } from 'react-native';
-import React from "react";
-import { Post } from "@types";
-import { api } from "@services";
-import { globals } from "@globals/globals";
+import React from 'react';
+import { Post } from '@types';
+import { api } from '@services';
+import { globals } from '@globals/globals';
 import { cache } from '@services/dataCaching';
 import { themeStyles } from '@styles/globalColors';
 import { PostComponent } from '@components/post/post.component';
@@ -24,7 +24,9 @@ interface State {
 export class PostQuoteStatsComponent extends React.Component<Props, State> {
 
     private _blockPublicKeys: any;
+
     private _noMoreData = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -70,7 +72,7 @@ export class PostQuoteStatsComponent extends React.Component<Props, State> {
             const response = await api.getQuotesForPost(globals.user.publicKey, this.props.postHashHex, 50, this.state.posts.length);
             let quotes: Post[] = response.QuoteReclouts;
 
-            let newQuotes = this.state.posts;
+            const newQuotes = this.state.posts;
             if (quotes?.length > 0) {
                 quotes = quotes.filter(p_quote => !this._blockPublicKeys[p_quote.ProfileEntryResponse.PublicKeyBase58Check]);
                 newQuotes.push(...quotes);
@@ -113,7 +115,7 @@ export class PostQuoteStatsComponent extends React.Component<Props, State> {
                             ListFooterComponent={renderFooter}
                         />
             }
-        </View>
+        </View>;
     }
 }
 const styles = StyleSheet.create(

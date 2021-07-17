@@ -1,6 +1,6 @@
-import { globals } from "../globals/globals";
-import { api } from "./api/api";
-import { formatNumber } from "./helpers";
+import { globals } from '../globals/globals';
+import { api } from './api/api';
+import { formatNumber } from './helpers';
 
 export async function loadTickersAndExchangeRate() {
     await Promise.all(

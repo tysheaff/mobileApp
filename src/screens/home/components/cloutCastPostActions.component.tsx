@@ -1,17 +1,18 @@
-import React from "react";
-import { StyleSheet, View, TouchableOpacity, Text, Alert } from "react-native";
+import React from 'react';
+import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { CloutCastAction, CloutCastPromotion } from '@types';
-import { NavigationProp } from "@react-navigation/native";
-import { themeStyles } from "@styles/globalColors";
-import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
-import { globals } from "@globals/globals";
-import { signing } from "@services/authorization/signing";
-import { cloutCastApi } from "@services";
+import { themeStyles } from '@styles/globalColors';
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import { globals } from '@globals/globals';
+import { signing } from '@services/authorization/signing';
+import { cloutCastApi } from '@services';
 import { Entypo } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 interface Props {
-    navigation: NavigationProp<any> | any;
-    route: any;
+    navigation: StackNavigationProp<ParamListBase>;
+    route: RouteProp<ParamListBase, string>;
     promotion: CloutCastPromotion;
 }
 
@@ -34,15 +35,15 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
         this.onVerifyClick = this.onVerifyClick.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State): boolean {
         return p_nextProps.promotion?.id !== this.props.promotion?.id ||
             p_nextState.working !== this.state.working;
     }
@@ -88,7 +89,7 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
         );
     }
 
-    async onVerifyClick() {
+    private async onVerifyClick(): Promise<void> {
         if (this.state.working) {
             return;
         }
@@ -108,7 +109,7 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
 
             const error = p_exception.json;
             if (error?.error?.reasons?.length > 0) {
-                errorMessage = error.error.reasons[0]
+                errorMessage = error.error.reasons[0];
             }
 
             Alert.alert('Verification Failure', errorMessage);
@@ -119,7 +120,7 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
         }
     }
 
-    render() {
+    render(): JSX.Element {
         if (!this.props.promotion.requirementsMet) {
             return <View style={[styles.requirementsNotMetContainer, themeStyles.modalBackgroundColor]}>
                 <Entypo style={{ marginRight: 4 }} name="emoji-sad" size={18} color={themeStyles.fontColorSub.color} />
@@ -143,14 +144,14 @@ export class CloutCastPostActionsComponent extends React.Component<Props, State>
             <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: this.state.working ? '#8db5a7' : '#029c63' }]}
                 activeOpacity={0.7}
-                onPress={this.onActionClick}
+                onPress={() => this.onActionClick()}
             >
                 <Text style={[styles.actionText, themeStyles.fontColorMain]}>{action} for ~${formattedRate}</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: this.state.working ? '#8db5a7' : '#029c63' }]}
                 activeOpacity={0.7}
-                onPress={this.onVerifyClick}
+                onPress={() => this.onVerifyClick()}
             >
                 <Text style={[styles.actionText, themeStyles.fontColorMain]}>Verify</Text>
             </TouchableOpacity>

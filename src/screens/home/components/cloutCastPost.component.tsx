@@ -1,15 +1,16 @@
-import React from "react";
+import React from 'react';
 import { CloutCastPromotion, Post } from '@types';
-import { StyleSheet, View } from "react-native";
-import { NavigationProp } from "@react-navigation/native";
-import { PostComponent } from "@components/post/post.component";
-import { CloutCastPostRequirementsComponent } from "./cloutCastPostRequirements.component";
-import { CloutCastPostActionsComponent } from "./cloutCastPostActions.component";
-import { themeStyles } from "@styles/globalColors";
+import { StyleSheet, View } from 'react-native';
+import { PostComponent } from '@components/post/post.component';
+import { CloutCastPostRequirementsComponent } from './cloutCastPostRequirements.component';
+import { CloutCastPostActionsComponent } from './cloutCastPostActions.component';
+import { themeStyles } from '@styles/globalColors';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 interface Props {
-    navigation: NavigationProp<any> | any;
-    route: any;
+    navigation: StackNavigationProp<ParamListBase>;
+    route: RouteProp<ParamListBase, string>;
     promotion: CloutCastPromotion;
 }
 
@@ -19,7 +20,7 @@ export class CloutCastPostComponent extends React.Component<Props> {
         super(props);
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={[styles.container, themeStyles.borderColor]}>
             <CloutCastPostRequirementsComponent
                 navigation={this.props.navigation}

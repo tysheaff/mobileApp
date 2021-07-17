@@ -28,14 +28,14 @@ export function ContactMessagesListCardComponent(
             );
             setUnreadMessages(contactWithMessages.UnreadMessages as boolean);
 
-            let lastMessage = contactWithMessages.Messages?.length > 0 ?
+            const lastMessage = contactWithMessages.Messages?.length > 0 ?
                 contactWithMessages.Messages[contactWithMessages.Messages.length - 1] : undefined;
 
             if (lastMessage) {
                 getMessageText(lastMessage).then(
                     p_text => {
                         if (mount) {
-                            setLastMessageText(p_text)
+                            setLastMessageText(p_text);
                         }
                     }
                 ).catch(() => { });
@@ -47,7 +47,7 @@ export function ContactMessagesListCardComponent(
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -58,8 +58,8 @@ export function ContactMessagesListCardComponent(
             try {
                 const jwt = await signing.signJWT();
                 api.markContactMessagesRead(
-                    globals.user.publicKey, contactWithMessages.PublicKeyBase58Check, jwt as string
-                )
+                    globals.user.publicKey, contactWithMessages.PublicKeyBase58Check, jwt
+                );
                 contactWithMessages.UnreadMessages = false;
                 setUnreadMessages(false);
             } catch {
@@ -108,13 +108,13 @@ export function ContactMessagesListCardComponent(
                     undefined
             }
         </View>
-    </TouchableOpacity >
+    </TouchableOpacity >;
 }
 
 const styles = StyleSheet.create(
     {
         touchableContainer: {
-            width: "100%",
+            width: '100%',
             height: 65,
             borderBottomWidth: 1
         },

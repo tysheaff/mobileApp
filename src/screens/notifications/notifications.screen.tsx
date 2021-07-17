@@ -44,8 +44,11 @@ interface State {
 export class NotificationsScreen extends React.Component<Props, State> {
 
     private _flatListRef: React.RefObject<FlatList>;
-    private _currentScrollPosition: number = 0;
-    private _lastLoadMoreId: number = -1;
+
+    private _currentScrollPosition = 0;
+
+    private _lastLoadMoreId = -1;
+
     private _isMounted = false;
 
     private _subscriptions: (() => void)[] = [];
@@ -218,7 +221,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                     username: p_username
                 });
             } catch {
-                alert('Something went wrong! Please try again.')
+                alert('Something went wrong! Please try again.');
             }
         }
     }
@@ -230,7 +233,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                 priorityComment: p_priorityComment
             });
         } catch {
-            alert('Something went wrong! Please try again.')
+            alert('Something went wrong! Please try again.');
         }
     }
 
@@ -283,7 +286,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         goToPost={this.goToPost}
                         styles={styles}
                         postHashHex={postHashHex}
-                    />
+                    />;
                 } else {
                     return this.renderPostMentionNotification(p_notification, true);
                 }
@@ -298,7 +301,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
         let parentPoshHashHex: string;
         let postHashHex: string;
         let post: Post;
-        postHashHex = ''
+        postHashHex = '';
 
         if (p_withParentPost) {
             parentPoshHashHex = p_notification.Metadata.SubmitPostTxindexMetadata?.ParentPostHashHex as string;
@@ -326,20 +329,20 @@ export class NotificationsScreen extends React.Component<Props, State> {
     renderNotification(p_notification: Notification): any {
         if (p_notification?.Metadata) {
 
-            const profile = this.getProfile(p_notification)
+            const profile = this.getProfile(p_notification);
             switch (p_notification.Metadata.TxnType) {
                 case NotificationType.Follow:
                     return <FollowNotificationComponent
                         styles={styles}
                         profile={profile}
                         goToProfile={this.goToProfile}
-                        notification={p_notification} />
+                        notification={p_notification} />;
                 case NotificationType.BasicTransfer:
                     return <BasicTransferNotificationComponent
                         styles={styles}
                         notification={p_notification}
                         goToProfile={this.goToProfile} profile={profile}
-                    />
+                    />;
                 case NotificationType.Like: {
                     const postHashHex = p_notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;
                     return <LikeNotificationComponent
@@ -349,14 +352,14 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         goToPost={this.goToPost}
                         goToProfile={this.goToProfile}
                         profile={profile}
-                    />
+                    />;
                 }
                 case NotificationType.CreatorCoin:
                     return <CreatorCoinNotificationComponent
                         styles={styles}
                         notification={p_notification}
                         goToProfile={this.goToProfile}
-                        profile={profile} />
+                        profile={profile} />;
 
                 case NotificationType.CreatorCoinTransfer:
                     const postHashHex = p_notification.Metadata.CreatorCoinTransferTxindexMetadata?.PostHashHex as string;
@@ -367,7 +370,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         goToPost={this.goToPost}
                         styles={styles}
                         post={this.state.posts[postHashHex]}
-                    />
+                    />;
                 case NotificationType.SubmitPost:
                     return this.renderSubmitPostNotification(p_notification);
                 default:
@@ -484,7 +487,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         ListFooterComponent={() => this.state.isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : <View></View>}
 
                     />
-                </View>
+                </View>;
     }
 }
 
@@ -537,7 +540,7 @@ const styles = StyleSheet.create(
             height: 20,
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: "#000",
+            shadowColor: '#000',
             shadowOffset: {
                 width: 0,
                 height: 2,

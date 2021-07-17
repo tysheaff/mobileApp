@@ -1,6 +1,6 @@
-import { globals } from "@globals/globals";
-import { cloutApi } from "@services/api/cloutApi";
-import { signing } from "@services/authorization/signing";
+import { globals } from '@globals/globals';
+import { cloutApi } from '@services/api/cloutApi';
+import { signing } from '@services/authorization/signing';
 
 export class SavedPostsCache {
 

@@ -1,9 +1,9 @@
 import { View, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Image, Text, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import React from "react";
-import { Profile } from "@types";
-import { api } from "@services";
-import { globals } from "@globals/globals";
+import React from 'react';
+import { Profile } from '@types';
+import { api } from '@services';
+import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { NavigationProp } from '@react-navigation/native';
@@ -29,6 +29,7 @@ interface State {
 export class PostDiamondStatsComponent extends React.Component<Props, State> {
 
     private _noMoreData = false;
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -64,7 +65,7 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
             const response = await api.getDiamondSendersForPost(globals.user.publicKey, this.props.postHashHex, 50, this.state.diamondSenders.length);
             const diamondSenders: DiamondSender[] = response.DiamondSenders;
 
-            let newDiamondSenders = this.state.diamondSenders;
+            const newDiamondSenders = this.state.diamondSenders;
             if (diamondSenders?.length > 0) {
                 for (const diamondSender of diamondSenders) {
                     diamondSender.DiamondSenderProfile.FormattedCoinPriceUSD = calculateAndFormatBitCloutInUsd(

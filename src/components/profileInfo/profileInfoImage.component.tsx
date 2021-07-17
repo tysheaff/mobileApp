@@ -17,7 +17,7 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
     constructor(props: Props) {
         super(props);
 
-        const imageUri = api.getSingleProfileImage(this.props.publicKey) + '?' + new Date();
+        const imageUri = api.getSingleProfileImage(this.props.publicKey) + '?' + new Date().toISOString();
         this.state = {
             imageUri: imageUri
         };
@@ -25,15 +25,15 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
         this.init(imageUri);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(nextProps: Props, nextState: State) {
+    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         return this.props.publicKey !== nextProps.publicKey ||
             this.state.imageUri !== nextState.imageUri;
     }
@@ -48,7 +48,7 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
         }
     }
 
-    render() {
+    render(): JSX.Element {
         return <Image
             style={styles.image}
             source={{ uri: this.state.imageUri }}

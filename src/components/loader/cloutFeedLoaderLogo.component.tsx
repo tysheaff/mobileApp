@@ -1,15 +1,16 @@
-import React from "react";
-import Svg, { Path, G, Defs, ClipPath } from "react-native-svg";
-import { themeStyles } from "@styles/globalColors";
+import React from 'react';
+import Svg, { Path, G, Defs, ClipPath } from 'react-native-svg';
+import { themeStyles } from '@styles/globalColors';
 
-export default function CloutFeedLoaderLogoComponent(props: any) {
-
+export default function CloutFeedLoaderLogoComponent(): JSX.Element {
+    const config = {
+        xmlns: 'http://www.w3.org/2000/svg',
+        width: 38.403,
+        height: 50.51
+    };
     return (
         <Svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={38.403}
-            height={50.51}
-            {...props}
+            {...config}
         >
             <Defs>
                 <ClipPath id="CloutFeedLoader_svg__a">
@@ -44,6 +45,6 @@ export default function CloutFeedLoaderLogoComponent(props: any) {
                     />
                 </G>
             </G>
-        </Svg>
+        </Svg >
     );
 }

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ContactWithMessages, Message } from '@types';
 import { MessageComponent } from '@components/messageComponent';
 import { globals, settingsGlobals } from '@globals';
-import { api, setLocalMessage } from '@services';
+import { api } from '@services';
 import { themeStyles } from '@styles';
 import { signing } from '@services/authorization/signing';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
@@ -17,7 +17,6 @@ export function ChatScreen({ route, navigation }: any) {
     const [textInputHeight, setTextInputHeight] = useState<number>(35);
     const [messageText, setMessageText] = useState('');
     const [paddingTop, setPaddingTop] = useState(0);
-    const [changed, setChanged] = useState(false);
 
     const sectionListRef = useRef(null);
 
@@ -59,13 +58,13 @@ export function ChatScreen({ route, navigation }: any) {
                 setLoading(false);
             }
 
-            Keyboard.addListener("keyboardWillShow", keyboardWillShow);
-            Keyboard.addListener("keyboardWillHide", keyboardWillHide);
+            Keyboard.addListener('keyboardWillShow', keyboardWillShow);
+            Keyboard.addListener('keyboardWillHide', keyboardWillHide);
 
             return () => {
                 mount = false;
-                Keyboard.removeListener("keyboardWillShow", keyboardWillShow);
-                Keyboard.removeListener("keyboardWillHide", keyboardWillHide);
+                Keyboard.removeListener('keyboardWillShow', keyboardWillShow);
+                Keyboard.removeListener('keyboardWillHide', keyboardWillHide);
             };
         },
         []
@@ -132,7 +131,7 @@ export function ChatScreen({ route, navigation }: any) {
                     );
 
                 if (!dayMessagesMap[formattedMessageDate]) {
-                    dayMessagesMap[formattedMessageDate] = []
+                    dayMessagesMap[formattedMessageDate] = [];
                 }
                 dayMessagesMap[formattedMessageDate].push(message);
             }
@@ -145,7 +144,7 @@ export function ChatScreen({ route, navigation }: any) {
         const today = new Date();
         return p_date.getDate() == today.getDate() &&
             p_date.getMonth() == today.getMonth() &&
-            p_date.getFullYear() == today.getFullYear()
+            p_date.getFullYear() == today.getFullYear();
     }
 
     async function onSendMessage() {
@@ -197,11 +196,7 @@ export function ChatScreen({ route, navigation }: any) {
                     async p_response => {
                         const transactionHex = p_response.TransactionHex;
                         const signedTransactionHex = await signing.signTransaction(transactionHex);
-                        await api.submitTransaction(signedTransactionHex as string);
-
-                        if (mount) {
-                            setChanged(true);
-                        }
+                        await api.submitTransaction(signedTransactionHex);
                     }
                 ).catch(p_error => globals.defaultHandleError(p_error));
         } catch (p_exception) {
@@ -217,12 +212,11 @@ export function ChatScreen({ route, navigation }: any) {
         }
     }
 
-
     return isLoading ?
         <CloutFeedLoader />
         :
         <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "position" : "height"}
+            behavior={Platform.OS === 'ios' ? 'position' : 'height'}
             keyboardVerticalOffset={65}>
             <View style={[styles.container, themeStyles.containerColorSub, { paddingTop: paddingTop }]}>
                 <SectionList
@@ -242,7 +236,7 @@ export function ChatScreen({ route, navigation }: any) {
                         ({ section: { date } }) => {
                             return <View style={[styles.dateContainer, themeStyles.chipColor]}>
                                 <Text style={[styles.dateText, themeStyles.fontColorMain]}>{date}</Text>
-                            </View>
+                            </View>;
                         }
                     }
                 />
@@ -278,7 +272,7 @@ export function ChatScreen({ route, navigation }: any) {
                     </TouchableOpacity>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingView>;
 }
 
 const styles = StyleSheet.create(

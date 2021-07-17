@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { CreatorCoinTransaction } from "@types";
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip } from "victory-native";
-import { themeStyles } from "@styles/globalColors";
-import { formatNumber } from "@services/helpers";
-import Svg, { Defs, LinearGradient, Stop } from "react-native-svg"
+import { CreatorCoinTransaction } from '@types';
+import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip } from 'victory-native';
+import { themeStyles } from '@styles/globalColors';
+import { formatNumber } from '@services/helpers';
+import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
 
 interface Props {
     publicKey: string;
@@ -33,7 +33,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
 
         this.state = {
             aggregatedDate: data
-        }
+        };
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
@@ -111,15 +111,15 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                     <VictoryAxis
                         style={{
                             grid: { strokeWidth: 0 },
-                            axis: { stroke: "transparent" },
-                            ticks: { stroke: "transparent" },
-                            tickLabels: { fill: "transparent" }
+                            axis: { stroke: 'transparent' },
+                            ticks: { stroke: 'transparent' },
+                            tickLabels: { fill: 'transparent' }
                         }} />
                     <VictoryAxis
                         dependentAxis
                         style={{
                             grid: { strokeWidth: 0 },
-                            axis: { stroke: "transparent" },
+                            axis: { stroke: 'transparent' },
                             tickLabels: { fontFamily: 'Arial', fontSize: 12 }
                         }}
                         domainPadding={1000}
@@ -154,7 +154,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                     />
                 </VictoryChart>
             </Svg>
-        </View>
+        </View>;
     }
 }
 

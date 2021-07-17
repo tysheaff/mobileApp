@@ -189,9 +189,8 @@ export default function MessageStackScreen() {
                 name="Identity" component={IdentityScreen}
             />
         </MessageStack.Navigator>
-    )
-};
-
+    );
+}
 
 const styles = StyleSheet.create(
     {
@@ -204,4 +203,4 @@ const styles = StyleSheet.create(
             shadowOffset: { height: 0, width: 0 }
         }
     }
-)
+);

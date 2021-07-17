@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { snackbar, SnackbarConfig, isNumber } from '@services';
 import { themeStyles } from '@styles';
 
-export function SnackbarComponent() {
+export function SnackbarComponent(): JSX.Element {
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [text, setText] = useState('');
     const [backgroundColor, setBackgroundColor] = useState('');
@@ -22,13 +22,13 @@ export function SnackbarComponent() {
         let newTextColor = p_config.textColor;
         if (!newTextColor) {
             newTextColor = themeStyles.fontColorMain.color;
-            setTextColor(newTextColor)
+            setTextColor(newTextColor);
         }
 
         let newBorderColor = p_config.borderColor;
         if (!newBorderColor) {
             newBorderColor = themeStyles.recloutBorderColor.borderColor;
-            setBorderColor(newBorderColor)
+            setBorderColor(newBorderColor);
         }
 
         const duration = isNumber(p_config.duration) ? p_config.duration : 2000;
@@ -36,28 +36,30 @@ export function SnackbarComponent() {
         setBackgroundColor(newBackgroundColor);
         setShowSnackBar(true);
         setTimeout(() => setShowSnackBar(false), duration);
-    }
+    };
 
     return showSnackBar ?
         <View style={[styles.container, { backgroundColor: backgroundColor, borderColor: borderColor }]}>
             <Text style={{ color: textColor }}>{text}</Text>
         </View>
         :
-        <View></View>
+        <View></View>;
 }
 
-const styles = StyleSheet.create({
-    container: {
-        height: 50,
-        width: Dimensions.get('window').width - 40,
-        position: 'absolute',
-        backgroundColor: 'white',
-        bottom: 50,
-        left: 20,
-        borderRadius: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        justifyContent: 'center',
-        borderWidth: 1
+const styles = StyleSheet.create(
+    {
+        container: {
+            height: 50,
+            width: Dimensions.get('window').width - 40,
+            position: 'absolute',
+            backgroundColor: 'white',
+            bottom: 50,
+            left: 20,
+            borderRadius: 10,
+            paddingLeft: 20,
+            paddingRight: 20,
+            justifyContent: 'center',
+            borderWidth: 1
+        }
     }
-});
+);

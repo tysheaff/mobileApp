@@ -16,12 +16,12 @@ export function LoginScreen({ navigation }: any) {
     useEffect(
         () => {
             checkCloutFeedIdentity();
-            Keyboard.addListener("keyboardDidShow", keyboardDidShow);
-            Keyboard.addListener("keyboardDidHide", keyboardDidHide);
+            Keyboard.addListener('keyboardDidShow', keyboardDidShow);
+            Keyboard.addListener('keyboardDidHide', keyboardDidHide);
 
             return () => {
-                Keyboard.removeListener("keyboardDidShow", keyboardDidShow);
-                Keyboard.removeListener("keyboardDidHide", keyboardDidHide);
+                Keyboard.removeListener('keyboardDidShow', keyboardDidShow);
+                Keyboard.removeListener('keyboardDidHide', keyboardDidHide);
                 mount = false;
             };
         },
@@ -109,14 +109,14 @@ export function LoginScreen({ navigation }: any) {
             setUsername('');
             setWorking(false);
         }
-    }
+    };
 
     const keyboardDidShow = () => setLogoVisible(false);
     const keyboardDidHide = () => setLogoVisible(true);
 
     function onTextChange(p_value: string) {
         if (mount) {
-            setUsername(p_value)
+            setUsername(p_value);
         }
     }
 

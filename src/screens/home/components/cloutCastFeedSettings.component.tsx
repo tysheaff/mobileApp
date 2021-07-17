@@ -1,8 +1,8 @@
-import { SelectListControl } from "@controls/selectList.control";
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { View, StyleSheet, Text, ScrollView } from "react-native";
-import Modal from 'react-native-modal'
+import { SelectListControl } from '@controls/selectList.control';
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { View, StyleSheet, Text, ScrollView } from 'react-native';
+import Modal from 'react-native-modal';
 
 export enum CloutCastFeedFilter {
     None = 'None',
@@ -35,33 +35,33 @@ export class CloutCastFeedSettingsComponent extends React.Component<Props, State
         this.state = {
             filter: this.props.filter,
             sort: this.props.sort,
-        }
+        };
 
         this.onFilterValueChange = this.onFilterValueChange.bind(this);
         this.onSortValueChange = this.onSortValueChange.bind(this);
         this.onDone = this.onDone.bind(this);
     }
 
-    onFilterValueChange(p_value: CloutCastFeedFilter) {
+    onFilterValueChange(p_value: CloutCastFeedFilter): void {
         this.setState({ filter: p_value });
     }
 
-    onSortValueChange(p_value: CloutCastFeedSort) {
+    onSortValueChange(p_value: CloutCastFeedSort): void {
         this.setState({ sort: p_value });
     }
 
-    onDone() {
+    onDone(): void {
         this.props.onSettingsChange(this.state.filter, this.state.sort);
     }
 
-    render() {
+    render(): JSX.Element {
         return <Modal
             animationIn={'slideInUp'}
             animationOutTiming={500}
             swipeDirection={'down'}
-            onSwipeComplete={this.onDone}
-            onBackdropPress={this.onDone}
-            onBackButtonPress={this.onDone}
+            onSwipeComplete={() => this.onDone()}
+            onBackdropPress={() => this.onDone()}
+            onBackButtonPress={() => this.onDone()}
             isVisible={this.props.isFilterShown}
             propagateSwipe={true}
             style={[styles.modal]}>
@@ -82,7 +82,7 @@ export class CloutCastFeedSettingsComponent extends React.Component<Props, State
                         }
                     ]}
                     value={this.state.filter}
-                    onValueChange={this.onFilterValueChange}
+                    onValueChange={(p_value: string | string[]) => this.onFilterValueChange(p_value as CloutCastFeedFilter)}
                 >
                 </SelectListControl>
                 <View style={[styles.headerContainer, themeStyles.recloutBorderColor]}>
@@ -105,11 +105,11 @@ export class CloutCastFeedSettingsComponent extends React.Component<Props, State
                         }
                     ]}
                     value={this.state.sort}
-                    onValueChange={this.onSortValueChange}
+                    onValueChange={(p_value: string | string[]) => this.onSortValueChange(p_value as CloutCastFeedSort)}
                 >
                 </SelectListControl>
             </ScrollView>
-        </Modal>
+        </Modal>;
     }
 }
 

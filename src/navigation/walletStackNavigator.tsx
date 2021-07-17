@@ -148,8 +148,8 @@ export default function WalletStackScreen() {
                 }
                 name="Identity" component={IdentityScreen} />
         </WalletStack.Navigator>
-    )
-};
+    );
+}
 
 const styles = StyleSheet.create(
     {
@@ -157,4 +157,4 @@ const styles = StyleSheet.create(
             marginRight: 10,
         },
     }
-)
+);

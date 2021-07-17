@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const EC = require('elliptic').ec;
 const HDKey = require('hdkey');
 const bip39 = require('bip39');
 const bs58check = require('bs58check');
 
-global.Buffer = global.Buffer || require('buffer').Buffer
+global.Buffer = global.Buffer || require('buffer').Buffer;
 
 function seedHexToPrivateKey(seedHex: string) {
     const ec2 = new EC('secp256k1');
@@ -32,7 +36,7 @@ function isValidMnemonic(mnemonic: string): boolean {
     return true;
 }
 
-function keychainToSeedHex(keychain: any) {
+function keychainToSeedHex(keychain: any): string {
     return keychain.privateKey.toString('hex');
 }
 
@@ -65,7 +69,7 @@ function publicKeyToECBuffer(publicKey: string): Buffer {
     return new Buffer(publicKeyEC.getPublic('array'));
 }
 
-const ecies = require("./ecies");
+const ecies = require('./ecies');
 
 export const crypto = {
     isValidMnemonic,

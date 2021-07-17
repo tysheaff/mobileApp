@@ -3,40 +3,45 @@ import { View } from 'react-native';
 import { api, notificationsService } from '@services';
 import { themeStyles } from '@styles';
 import { constants, eventManager, globals } from '@globals';
-import { EventType, NavigationEvent, Post, ToggleCloutCastFeedEvent } from '@types';
+import { EventType, NavigationEvent, Post } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { HomeScreenTab, PostListComponent } from './components/postList.component';
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from 'expo-secure-store';
 import { CloutCastFeedComponent } from './components/cloutCastFeed.component';
 import { HotFeedComponent } from './components/hotFeed.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type RouteParams = {
     Home: {
         newPost: Post;
         deletedPost: Post;
-        blockedUser: any;
+        blockedUser: string;
     }
 };
 
 interface Props {
-    navigation: NavigationProp<any> | any;
+    navigation: StackNavigationProp<ParamListBase>;
     route: RouteProp<RouteParams, 'Home'>;
-};
+}
 
 interface State {
     selectedTab: HomeScreenTab;
     tabs: TabConfig[];
-    api: any;
-};
+    api: (publicKey: string, count: number, lastPostHashHex: string) => Promise<any>;
+}
 
 export class HomeScreen extends React.Component<Props, State> {
 
     private _postListComponent = React.createRef<PostListComponent>();
+
     private _cloutCastFeedComponent = React.createRef<CloutCastFeedComponent>();
+
     private _hotFeedComponent = React.createRef<HotFeedComponent>();
-    private _unsubscribeNavigationEvent: any;
-    private _unsubscribeCloutCastEvent: any;
+
+    private _unsubscribeNavigationEvent: () => void = () => undefined;
+
+    private _unsubscribeCloutCastEvent: () => void = () => undefined;
 
     constructor(props: Props) {
 
@@ -53,15 +58,15 @@ export class HomeScreen extends React.Component<Props, State> {
         this.subscribeToggleCloutCastEvent();
 
         this.onTabClick = this.onTabClick.bind(this);
-    };
+    }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         notificationsService.unregisterNotificationHandler();
         this._unsubscribeNavigationEvent();
         this._unsubscribeCloutCastEvent();
-    };
+    }
 
-    async init() {
+    private async init(): Promise<void> {
         const key = globals.user.publicKey + constants.localStorage_defaultFeed;
         const defaultFeed = await SecureStore.getItemAsync(key).catch(() => undefined);
 
@@ -70,7 +75,7 @@ export class HomeScreen extends React.Component<Props, State> {
         this.configureTabs();
     }
 
-    async configureTabs() {
+    private async configureTabs(): Promise<void> {
         const newTabs: TabConfig[] = [
             {
                 name: HomeScreenTab.Hot
@@ -103,27 +108,27 @@ export class HomeScreen extends React.Component<Props, State> {
         this.setState({ tabs: newTabs });
     }
 
-    subscribeNavigationEvent() {
+    subscribeNavigationEvent(): void {
         this._unsubscribeNavigationEvent = eventManager.addEventListener(
             EventType.Navigation,
             (p_event: NavigationEvent) => {
                 let params;
                 let key;
-
+                const publicKey = p_event.publicKey as string;
                 switch (p_event.screen) {
                     case 'UserProfile':
                         params = {
                             publicKey: p_event.publicKey,
                             username: p_event.username
                         };
-                        key = 'Profile_' + p_event.publicKey;
+                        key = 'Profile_' + publicKey;
                         break;
                     case 'Post':
                         params = {
                             postHashHex: p_event.postHashHex,
                             priorityComment: p_event.priorityCommentHashHex
                         };
-                        key = 'Post_' + p_event.postHashHex;
+                        key = 'Post_' + publicKey;
                         break;
                 }
 
@@ -138,7 +143,7 @@ export class HomeScreen extends React.Component<Props, State> {
         );
     }
 
-    subscribeToggleCloutCastEvent() {
+    private subscribeToggleCloutCastEvent(): void {
         this._unsubscribeCloutCastEvent = eventManager.addEventListener(
             EventType.ToggleCloutCastFeed,
             () => {
@@ -147,14 +152,14 @@ export class HomeScreen extends React.Component<Props, State> {
         );
     }
 
-    onTabClick(p_tabName: string) {
-        let apiCallback: any;
+    private onTabClick(p_tabName: string): void {
+        let apiCallback: (publicKey: string, count: number, lastPostHashHex: string) => Promise<any>;
         if (p_tabName === HomeScreenTab.Global) {
-            apiCallback = api.getGlobalPosts
+            apiCallback = api.getGlobalPosts;
         } else if (p_tabName === HomeScreenTab.Following) {
-            apiCallback = api.getFollowingPosts
+            apiCallback = api.getFollowingPosts;
         } else {
-            apiCallback = api.getRecentPosts
+            apiCallback = api.getRecentPosts;
         }
         this.setState({ api: apiCallback, selectedTab: p_tabName as HomeScreenTab });
 
@@ -165,9 +170,9 @@ export class HomeScreen extends React.Component<Props, State> {
         } else {
             this._postListComponent?.current?.refresh();
         }
-    };
+    }
 
-    render() {
+    render(): JSX.Element {
         const renderTab = () => {
             switch (this.state.selectedTab) {
                 case HomeScreenTab.Hot:
@@ -205,7 +210,7 @@ export class HomeScreen extends React.Component<Props, State> {
                     return <CloutCastFeedComponent
                         ref={this._cloutCastFeedComponent}
                         route={this.props.route}
-                        navigation={this.props.navigation}></CloutCastFeedComponent>
+                        navigation={this.props.navigation}></CloutCastFeedComponent>;
             }
         };
 
@@ -214,7 +219,7 @@ export class HomeScreen extends React.Component<Props, State> {
                 <TabsComponent
                     tabs={this.state.tabs}
                     selectedTab={this.state.selectedTab}
-                    onTabClick={this.onTabClick}
+                    onTabClick={(tab) => this.onTabClick(tab)}
                 />
                 {
                     renderTab()

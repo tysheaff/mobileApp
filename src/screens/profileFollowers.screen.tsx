@@ -26,7 +26,7 @@ export function ProfileFollowersScreen({ route }: any) {
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -43,7 +43,7 @@ export function ProfileFollowersScreen({ route }: any) {
         const requests = [
             api.getProfileFollowers('', route.params.username, '', 50),
             api.getProfileFollowing('', route.params.username, '', 50)
-        ]
+        ];
 
         requests.push(cache.user.getData());
 
@@ -76,9 +76,9 @@ export function ProfileFollowersScreen({ route }: any) {
     }
 
     function setFollowedByUserMap(p_user: User) {
-        let followedByUserMap: any = {};
+        const followedByUserMap: any = {};
 
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser as string[];
+        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
 
         if (followedByUserPublicKeys?.length > 0) {
             for (let i = 0; i < followedByUserPublicKeys.length; i++) {
@@ -126,9 +126,7 @@ export function ProfileFollowersScreen({ route }: any) {
                     }
                 }
             }
-        ).catch(
-            () => { }
-        ).finally(
+        ).catch(() => undefined).finally(
             () => {
                 if (mount) {
                     setLoadingMore(false);
@@ -143,7 +141,7 @@ export function ProfileFollowersScreen({ route }: any) {
         if (p_response.PublicKeyToProfileEntry) {
             const publicKeys = Object.keys(p_response.PublicKeyToProfileEntry);
             for (const publicKey of publicKeys) {
-                if (!!p_response.PublicKeyToProfileEntry[publicKey]) {
+                if (p_response.PublicKeyToProfileEntry[publicKey]) {
                     profiles.push(p_response.PublicKeyToProfileEntry[publicKey]);
                 } else {
                     const anonymousProfile = getAnonymousProfile(publicKey);
@@ -162,7 +160,7 @@ export function ProfileFollowersScreen({ route }: any) {
         tintColor={themeStyles.fontColorMain.color}
         titleColor={themeStyles.fontColorMain.color}
         refreshing={refreshing}
-        onRefresh={loadData} />
+        onRefresh={loadData} />;
 
     return <View style={[styles.container, themeStyles.containerColorMain]}>
         <View style={[styles.tabsContainer, themeStyles.containerColorMain, themeStyles.borderColor]}>

@@ -1,16 +1,16 @@
-import { crypto } from "./crypto";
+import { crypto } from './crypto';
 import * as SecureStore from 'expo-secure-store';
 import { SecureStoreAuthenticatedUserEncryptionKey, SecureStoreAuthenticatedUser } from '@types';
-import KeyEncoder from "key-encoder";
-import { constants } from "@globals/constants";
-import { globals } from "@globals/globals";
-const sha256 = require("sha256");
-const ecies = require("./ecies");
+import KeyEncoder from 'key-encoder';
+import { constants } from '@globals/constants';
+import { globals } from '@globals/globals';
+const sha256 = require('sha256');
+const ecies = require('./ecies');
 
-var rs = require("jsrsasign");
-var JWS = rs.jws.JWS;
+const rs = require('jsrsasign');
+const JWS = rs.jws.JWS;
 
-var header = { alg: "ES256", typ: "JWT" };
+const header = { alg: 'ES256', typ: 'JWT' };
 
 async function getSeedHex(): Promise<string> {
     const publicKey = globals.user.publicKey;
@@ -35,7 +35,7 @@ async function getSeedHex(): Promise<string> {
     const key = new Buffer(userKey.key, 'hex');
     const iv = new Buffer(userKey.iv, 'hex');
 
-    let seedHex = ''
+    let seedHex = '';
     seedHex = crypto.aesDecrypt(iv, key, encryptedSeedHex);
 
     return seedHex;
@@ -43,13 +43,13 @@ async function getSeedHex(): Promise<string> {
 
 const signJWT = async (): Promise<string> => {
     const seedHex = await getSeedHex();
-    const keyEncoder = new KeyEncoder("secp256k1");
-    const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, "raw", "pem");
+    const keyEncoder = new KeyEncoder('secp256k1');
+    const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
 
     const expDate = new Date();
     expDate.setSeconds(expDate.getSeconds() + 60);
 
-    var signedJWT = JWS.sign(
+    const signedJWT = JWS.sign(
         header.alg,
         JSON.stringify(header),
         JSON.stringify({ exp: Math.floor(expDate.getTime() / 1000) }),
@@ -78,7 +78,7 @@ const signTransaction = async (transactionHex: string): Promise<string> => {
         ]
     );
 
-    return signedTransactionBytes.toString("hex");
+    return signedTransactionBytes.toString('hex');
 };
 
 const decryptData = async (encryptedHex: string): Promise<string> => {
@@ -94,7 +94,7 @@ const decryptData = async (encryptedHex: string): Promise<string> => {
     );
 
     return decryptedHex;
-}
+};
 
 const encryptShared = async (publicKey: string, data: string): Promise<string> => {
     const seedHex = await getSeedHex();
@@ -110,7 +110,7 @@ const encryptShared = async (publicKey: string, data: string): Promise<string> =
     );
 
     return encryptedHex.toString('hex');
-}
+};
 
 const decryptShared = async (publicKey: string, encryptedHex: string): Promise<string> => {
     const seedHex = await getSeedHex();
@@ -127,7 +127,7 @@ const decryptShared = async (publicKey: string, encryptedHex: string): Promise<s
     );
 
     return decryptedHex;
-}
+};
 
 export const signing = {
     signTransaction,

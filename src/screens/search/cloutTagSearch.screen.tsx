@@ -1,5 +1,5 @@
-import React from 'react'
-import { NavigationProp } from '@react-navigation/native';
+import React from 'react';
+import { ParamListBase } from '@react-navigation/native';
 import { StyleSheet, FlatList, Text, View } from 'react-native';
 import { cloutApi } from '@services/api/cloutApi';
 import { CloutTag } from '@types';
@@ -9,9 +9,10 @@ import { navigatorGlobals } from '@globals/navigatorGlobals';
 import { globals } from '@globals/globals';
 import CloutListCardComponent from './components/cloutTagCard.component';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -22,10 +23,14 @@ interface State {
 export default class CloutTagSearchScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
+
     private _timer: number | undefined = undefined;
-    private _lastCloutTagPrefix: string = '';
+
+    private _lastCloutTagPrefix = '';
+
     private _topCloutTags: CloutTag[] = [];
-    private _focusSubscription: any;
+
+    private _focusSubscription: () => void;
 
     constructor(props: Props) {
         super(props);
@@ -76,17 +81,14 @@ export default class CloutTagSearchScreen extends React.Component<Props, State> 
                     this.setState({ isLoading: true });
                 }
                 this._timer = window.setTimeout(
-                    async () => {
-                        try {
-                            const response = await cloutApi.searchCloutTags(p_cloutTagPrefix);
-
-                            if (this._isMounted && this._lastCloutTagPrefix === p_cloutTagPrefix) {
-                                this.setState({ cloutTags: response, isLoading: false });
+                    () => {
+                        cloutApi.searchCloutTags(p_cloutTagPrefix).then(
+                            response => {
+                                if (this._isMounted && this._lastCloutTagPrefix === p_cloutTagPrefix) {
+                                    this.setState({ cloutTags: response, isLoading: false });
+                                }
                             }
-                            this._timer = undefined;
-                        } catch (p_error) {
-                            globals.defaultHandleError(p_error);
-                        }
+                        ).catch(error => globals.defaultHandleError(error));
                     },
                     500
                 );

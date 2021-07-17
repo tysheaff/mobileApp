@@ -14,12 +14,12 @@ export default class ProfileInfoUsernameComponent extends React.Component<Props>
         super(props);
     }
 
-    shouldComponentUpdate(nextProps: Props) {
+    shouldComponentUpdate(nextProps: Props): boolean {
         return this.props.username !== nextProps.username ||
             this.props.verified !== nextProps.verified;
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={styles.container}>
             <Text style={[styles.username, themeStyles.fontColorMain]}>{this.props.username}</Text>
             {

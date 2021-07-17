@@ -1,15 +1,15 @@
-import React from "react";
-import { View, StyleSheet, RefreshControl, Text, SectionList } from "react-native";
-import { globals } from "@globals/globals";
-import { themeStyles } from "@styles/globalColors";
-import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from "@services/bitCloutCalculator";
-import { cache } from "@services/dataCaching";
+import React from 'react';
+import { View, StyleSheet, RefreshControl, Text, SectionList } from 'react-native';
+import { globals } from '@globals/globals';
+import { themeStyles } from '@styles/globalColors';
+import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
+import { cache } from '@services/dataCaching';
 import { CreatorCoinHODLer } from '@types';
-import { TabConfig, TabsComponent } from "@components/tabs.component";
-import { CreatorCoinHODLerComponent } from "@components/creatorCoinHODLer.component";
-import { formatNumber } from "@services/helpers";
-import { navigatorGlobals } from "@globals/navigatorGlobals";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { TabConfig, TabsComponent } from '@components/tabs.component';
+import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.component';
+import { formatNumber } from '@services/helpers';
+import { navigatorGlobals } from '@globals/navigatorGlobals';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
 enum WalletTab {
     Purchased = 'Purchased',
@@ -52,6 +52,7 @@ export class WalletScreen extends React.Component<Props, State> {
     ]
 
     private _isMounted = false;
+
     constructor(props: Props) {
         super(props);
 
@@ -84,7 +85,7 @@ export class WalletScreen extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
-        this._isMounted = false
+        this._isMounted = false;
     }
 
     shouldComponentUpdate(_nextProps: Props, p_nextSate: State) {
@@ -111,7 +112,7 @@ export class WalletScreen extends React.Component<Props, State> {
                 const bitCloutPriceUsd = calculateAndFormatBitCloutInUsd(bitCloutNanos);
                 const balanceUsd = calculateAndFormatBitCloutInUsd(user.BalanceNanos);
 
-                let usersYouHODL = user.UsersYouHODL as CreatorCoinHODLer[];
+                const usersYouHODL = user.UsersYouHODL ;
 
                 let creatorCoinsTotalValueUsd = 0;
 
@@ -277,7 +278,7 @@ export class WalletScreen extends React.Component<Props, State> {
                                         tabs={this.tabs}
                                         selectedTab={this.state.selectedTab}
                                         onTabClick={this.onTabClick}
-                                    ></TabsComponent>
+                                    ></TabsComponent>;
                             }
                         }
                         refreshControl={<RefreshControl
@@ -288,10 +289,9 @@ export class WalletScreen extends React.Component<Props, State> {
                         />}
                     />
             }
-        </View>
+        </View>;
     }
 }
-
 
 const styles = StyleSheet.create(
     {

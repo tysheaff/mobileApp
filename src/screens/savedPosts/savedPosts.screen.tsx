@@ -1,18 +1,19 @@
-import React from "react";
-import { PostComponent } from "@components/post/post.component";
-import { NavigationProp } from "@react-navigation/native";
-import { themeStyles } from "@styles/globalColors";
-import { ActivityIndicator, FlatList, RefreshControl, View, StyleSheet, Text } from "react-native";
+import React from 'react';
+import { PostComponent } from '@components/post/post.component';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { themeStyles } from '@styles/globalColors';
+import { ActivityIndicator, FlatList, RefreshControl, View, StyleSheet, Text } from 'react-native';
 import { EventType, Post, UnsavePostEvent } from '@types';
-import { cache } from "@services/dataCaching";
-import { api } from "@services";
-import { globals } from "@globals/globals";
-import { eventManager } from "@globals/injector";
-import CloutFeedLoader from "@components/loader/cloutFeedLoader.component";
+import { cache } from '@services/dataCaching';
+import { api } from '@services';
+import { globals } from '@globals/globals';
+import { eventManager } from '@globals/injector';
+import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>
-    route: any;
+    navigation: StackNavigationProp<ParamListBase>
+    route: RouteProp<ParamListBase, 'Home'>;
 }
 
 interface State {
@@ -24,9 +25,12 @@ interface State {
 
 export class SavedPostsScreen extends React.Component<Props, State> {
 
-    private _unsavePostSubscription: any;
+    private _unsavePostSubscription: () => void = () => undefined;
+
     private _noMoreData = false;
+
     private _postHashHexes: string[] = [];
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -79,7 +83,7 @@ export class SavedPostsScreen extends React.Component<Props, State> {
             this._postHashHexes = Object.keys(savedPosts).filter(p_key => savedPosts[p_key]);
             this.loadPosts(false);
         } catch {
-
+            return;
         }
     }
 
@@ -111,7 +115,7 @@ export class SavedPostsScreen extends React.Component<Props, State> {
             }
 
         } catch {
-
+            undefined;
         } finally {
             if (this._isMounted) {
                 this.setState({ isLoading: false, isLoadingMore: false, isRefreshing: false });
@@ -124,12 +128,12 @@ export class SavedPostsScreen extends React.Component<Props, State> {
 
         for (const postHashHex of postHashHexes) {
             const promise = new Promise<Post | undefined>(
-                (p_resolve, _reject) => {
+                (p_resolve) => {
                     api.getSinglePost(globals.user.publicKey, postHashHex, false, 0, 0).then(
                         (response: any) => {
                             p_resolve(response.PostFound);
                         }
-                    ).catch(() => p_resolve(undefined))
+                    ).catch(() => p_resolve(undefined));
                 }
             );
             promises.push(promise);
@@ -155,7 +159,7 @@ export class SavedPostsScreen extends React.Component<Props, State> {
             );
         }
         return filteredPosts;
-    };
+    }
 
     render() {
         if (this.state.isLoading) {
@@ -168,12 +172,12 @@ export class SavedPostsScreen extends React.Component<Props, State> {
             </View>;
         }
 
-        const keyExtractor = (item: any, index: number) => item.PostHashHex + index;
+        const keyExtractor = (item: Post, index: number) => item.PostHashHex + String(index);
         const renderItem = ({ item }: { item: Post }) => {
             return <PostComponent
                 route={this.props.route}
                 navigation={this.props.navigation}
-                post={item} />
+                post={item} />;
         };
 
         return (
@@ -192,7 +196,7 @@ export class SavedPostsScreen extends React.Component<Props, State> {
                         tintColor={themeStyles.fontColorMain.color}
                         titleColor={themeStyles.fontColorMain.color}
                         refreshing={this.state.isRefreshing}
-                        onRefresh={this.loadData} />
+                        onRefresh={() => this.loadData()} />
                     }
                     ListFooterComponent={this.state.isLoadingMore && !this.state.isLoading ? <ActivityIndicator color={themeStyles.fontColorMain.color} /> : undefined}
                 />

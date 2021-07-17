@@ -35,7 +35,7 @@ const get = (p_route: string, p_useHost = true) => {
 const post = (p_route: string, p_body: any, p_cloutCastToken?: string) => {
     const headersCopy = JSON.parse(JSON.stringify(headers));
     if (p_cloutCastToken) {
-        (headersCopy as any)['clout-cast-bearer'] = p_cloutCastToken;
+        (headersCopy)['clout-cast-bearer'] = p_cloutCastToken;
     }
 
     return fetch(
@@ -59,16 +59,16 @@ const authenticate = (p_publicKey: string, p_username: string, p_jwt: string) =>
             jwt: p_jwt
         }
     );
-}
+};
 
 const promotions = () => {
     const route = 'promotions';
 
     return get(route);
-}
+};
 
 const proofOfWork = (p_promotionId: number, p_publicKey: string, p_jwt: string, p_cloutCastToken: string) => {
-    const route = 'proofOfWork/' + p_promotionId;
+    const route = 'proofOfWork/' + String(p_promotionId);
     return post(
         route,
         {
@@ -77,12 +77,12 @@ const proofOfWork = (p_promotionId: number, p_publicKey: string, p_jwt: string, 
         },
         p_cloutCastToken
     );
-}
+};
 
 const blacklist = () => {
     const route = 'black-list';
     return get(route);
-}
+};
 
 export const cloutCastApi = {
     authenticate,

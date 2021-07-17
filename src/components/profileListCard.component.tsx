@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { Profile } from '../types';
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { themeStyles } from '@styles';
 import { constants, globals } from '@globals';
 import { api, cache, calculateAndFormatBitCloutInUsd } from '@services';
 import { signing } from '@services/authorization/signing';
 import CloutFeedButton from '@components/cloutfeedButton.component';
 import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 export function ProfileListCardComponent({ profile, isFollowing }:
-    { profile: Profile, isFollowing: boolean }) {
+    { profile: Profile, isFollowing: boolean }): JSX.Element {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     const [profileCoinPrice, setProfileCoinPrice] = useState('');
     const [working, setWorking] = useState(false);
@@ -33,7 +34,7 @@ export function ProfileListCardComponent({ profile, isFollowing }:
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -49,7 +50,7 @@ export function ProfileListCardComponent({ profile, isFollowing }:
                 }
 
                 const signedTransactionHex = await signing.signTransaction(transactionHex);
-                await api.submitTransaction(signedTransactionHex as string);
+                await api.submitTransaction(signedTransactionHex);
 
                 if (mount) {
                     setFollowing((p_previous) => !p_previous);
@@ -66,7 +67,7 @@ export function ProfileListCardComponent({ profile, isFollowing }:
         ).finally(
             () => {
                 if (mount) {
-                    setWorking(false)
+                    setWorking(false);
                 }
             }
         );
@@ -74,11 +75,14 @@ export function ProfileListCardComponent({ profile, isFollowing }:
 
     function goToProfile() {
         if (profile.Username !== 'anonymous') {
-            (navigation as any).push('UserProfile', {
-                publicKey: profile.PublicKeyBase58Check,
-                username: profile.Username,
-                key: 'Profile_' + profile.PublicKeyBase58Check
-            });
+            navigation.push(
+                'UserProfile',
+                {
+                    publicKey: profile.PublicKeyBase58Check,
+                    username: profile.Username,
+                    key: 'Profile_' + profile.PublicKeyBase58Check
+                }
+            );
         }
     }
 

@@ -1,19 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesome } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import ImageModal from './imageModal.component';
 import { themeStyles } from '@styles/globalColors';
 
-export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemove, selectedImageIndex }: any) {
+interface Props {
+    imageUrls: string[];
+    goToStats: () => void;
+    removable: boolean;
+    onRemove: (index: number) => void;
+    selectedImageIndex: number;
+}
+
+export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemove, selectedImageIndex }: Props): JSX.Element {
     let mount = true;
-    const scrollRef = useRef(null);
+    const scrollRef = useRef<ScrollView>(null);
     const [internalIndex, setInternalIndex] = useState(0);
     const [imageWidth, setImageWidth] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
 
-    function onChangeImage({ nativeEvent }: any) {
+    function onChangeImage(event: NativeSyntheticEvent<NativeScrollEvent>) {
+        const nativeEvent = event.nativeEvent;
         const slide = Math.round(nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width);
         if (slide !== internalIndex && slide >= 0 && slide < imageUrls.length) {
             if (mount) {
@@ -26,7 +35,7 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
         () => {
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -38,7 +47,7 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
             if (mount) {
                 setInternalIndex(selectedImageIndex);
                 if (scrollRef.current) {
-                    (scrollRef.current as any).scrollTo({ x: Dimensions.get('window').width * selectedImageIndex });
+                    scrollRef.current.scrollTo({ x: Dimensions.get('window').width * selectedImageIndex });
                 }
             }
         },
@@ -80,9 +89,9 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
                     <FlatList
                         style={styles.dotsContainer}
                         data={imageUrls}
-                        keyExtractor={(item, index) => index.toString()}
+                        keyExtractor={(index) => index.toString()}
                         horizontal
-                        renderItem={({ item, index }) => (
+                        renderItem={({ index }) => (
                             <FontAwesome
                                 style={[styles.dot, internalIndex === index ? themeStyles.fontColorMain : themeStyles.switchColor]}
                                 name="circle"
@@ -111,44 +120,46 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        marginTop: 14
-    },
-    imagesContainer: {
-        height: 400,
-        width: '100%'
-    },
-    image: {
-        height: 400,
-        resizeMode: 'contain'
-    },
-    dotsContainer: {
-        alignSelf: 'center',
-        marginTop: 2
-    },
-    dot: {
-        marginRight: 4
-    },
-    removeButtonContainer: {
-        backgroundColor: '#c42326',
-        width: 30,
-        height: 30,
-        zIndex: 10,
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 8,
-        opacity: 0.8
-    },
-    removeButton: {
-        width: 30,
-        height: 30,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+const styles = StyleSheet.create(
+    {
+        container: {
+            marginTop: 14
+        },
+        imagesContainer: {
+            height: 400,
+            width: '100%'
+        },
+        image: {
+            height: 400,
+            resizeMode: 'contain'
+        },
+        dotsContainer: {
+            alignSelf: 'center',
+            marginTop: 2
+        },
+        dot: {
+            marginRight: 4
+        },
+        removeButtonContainer: {
+            backgroundColor: '#c42326',
+            width: 30,
+            height: 30,
+            zIndex: 10,
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 8,
+            opacity: 0.8
+        },
+        removeButton: {
+            width: 30,
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        }
     }
-});
+);

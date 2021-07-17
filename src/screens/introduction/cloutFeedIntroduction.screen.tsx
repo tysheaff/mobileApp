@@ -3,11 +3,11 @@ import { StyleSheet, Animated, View, ScrollView, Dimensions, Text, TouchableOpac
 import { themeStyles } from '@styles/globalColors';
 import { FontAwesome } from '@expo/vector-icons';
 import IntroSlideComponent from './components/introSlide.component';
-import { introduction } from './components/introContent';
-import { NavigationProp } from '@react-navigation/native';
+import { introduction, IntroductionElement } from './components/introContent';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: NavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -20,9 +20,9 @@ const { width: screenWidth } = Dimensions.get('screen');
 
 export default class CloutFeedIntroduction extends React.Component<Props, State> {
 
-    private _isMounted = false;
-    private _scrollViewRef: React.RefObject<ScrollView> | any;
-    private _startButtonOpacity: any = new Animated.Value(0);
+    private _scrollViewRef: React.RefObject<ScrollView>;
+
+    private _startButtonOpacity: Animated.Value = new Animated.Value(0);
 
     constructor(props: Props) {
         super(props);
@@ -38,17 +38,9 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
         this.onNavigate = this.onNavigate.bind(this);
     }
 
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
-
     private calculateTotalSlides = (contentWidth: number) => {
         if (contentWidth !== 0) {
-            const approxSlide: any = contentWidth / screenWidth;
+            const approxSlide = contentWidth / screenWidth;
             if (this.state.totalSlides !== approxSlide) {
                 this.setState({
                     totalSlides: parseInt(String(Math.ceil(approxSlide.toFixed(2))))
@@ -68,7 +60,7 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
                 this.setState({ currentSlide });
             } else {
                 const approxCurrentSlide: number = event.nativeEvent.contentOffset.x / screenWidth;
-                const parsedApproxCurrentSlide: number = parseInt(approxCurrentSlide.toFixed(2))
+                const parsedApproxCurrentSlide: number = parseInt(approxCurrentSlide.toFixed(2));
                 currentSlide = parseInt(String(Math.ceil(parsedApproxCurrentSlide) + 1));
                 this.setState({ currentSlide });
             }
@@ -99,9 +91,9 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
         this.props.navigation.navigate('TermsConditions');
     }
 
-    render() {
-        const keyExtractor = (item: any, index: number) => `${item.toString()}_${index.toString()}`;
-        const renderDots = ({ item, index }: any) => <FontAwesome
+    render(): JSX.Element {
+        const keyExtractor = (_item: IntroductionElement, index: number) => index.toString();
+        const renderDots = ({ index }: { index: number }) => <FontAwesome
             style={[styles.dot, this.state.currentSlide === index + 1 ? styles.selectedDot : styles.notSelectedDot]}
             name="circle"
             size={8}
@@ -125,7 +117,7 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             <View>
                 <ScrollView
-                    ref={(ref) => { this._scrollViewRef = ref }}
+                    ref={(ref) => { this._scrollViewRef = ref; }}
                     horizontal
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
@@ -136,7 +128,7 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
                 >
                     {
                         introduction.map(
-                            (item: any, index: number) => <IntroSlideComponent key={index.toString()} {...item} />
+                            (item: IntroductionElement, index: number) => <IntroSlideComponent key={index.toString()} {...item} />
                         )
                     }
                 </ScrollView>
@@ -154,13 +146,13 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
                 <TouchableOpacity
                     style={[styles.button, !this.state.isNext && themeStyles.buttonDisabledColor]}
                     activeOpacity={1}
-                    onPress={this.goToNext}
+                    onPress={() => this.goToNext()}
                     disabled={!this.state.isNext}>
                     <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
 
                 <Animated.View style={{ opacity: this._startButtonOpacity, width: '100%' }}>
-                    <TouchableOpacity onPress={this.onNavigate} style={styles.button} activeOpacity={1}>
+                    <TouchableOpacity onPress={() => this.onNavigate()} style={styles.button} activeOpacity={1}>
                         <Text style={styles.buttonText}>Start Clouting!</Text>
                     </TouchableOpacity>
                 </Animated.View>

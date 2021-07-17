@@ -1,8 +1,8 @@
-import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Linking } from "react-native";
+import React from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Linking } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { ScrollView } from "react-native-gesture-handler";
-import { NavigationProp } from "@react-navigation/core";
+import { ScrollView } from 'react-native-gesture-handler';
+import { NavigationProp } from '@react-navigation/core';
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -62,7 +62,7 @@ export class IdentityInfoScreen extends React.Component<Props, State> {
             >
                 <Text style={styles.continueButtonText}>Continue</Text>
             </TouchableOpacity>
-        </View>
+        </View>;
     }
 }
 

@@ -58,7 +58,7 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
 
             return () => {
                 mount = false;
-            }
+            };
         },
         []
     );
@@ -92,7 +92,7 @@ export function MessageTopHoldersInputScreen({ route, navigation }: any) {
                                         async p_response => {
                                             const transactionHex = p_response.TransactionHex;
                                             const signedTransactionHex = await signing.signTransaction(transactionHex);
-                                            await api.submitTransaction(signedTransactionHex as string);
+                                            await api.submitTransaction(signedTransactionHex );
                                             resolve();
                                         }
                                     ).catch(() => reject());

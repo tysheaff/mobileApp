@@ -1,9 +1,9 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Notification } from '@types';
-import { globalStyles } from "@styles/globalStyles";
+import { globalStyles } from '@styles/globalStyles';
 
 interface Props {
     goToProfile: (p_userKey: string, p_username: string) => void;
@@ -48,6 +48,6 @@ export class FollowNotificationComponent extends React.Component<Props> {
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>{this.props.notification.Metadata.FollowTxindexMetadata?.IsUnfollow ? 'unfollowed' : 'followed'} you</Text>
                 </View>
             </TouchableOpacity>
-        )
+        );
     }
-};
+}

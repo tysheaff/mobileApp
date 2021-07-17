@@ -1,14 +1,15 @@
-import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import React from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome5, AntDesign } from '@expo/vector-icons';
 import { CloutCastPromotion } from '@types';
-import { themeStyles } from "@styles/globalColors";
-import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
-import { CloutCastAllowedUsersModelComponent } from "./cloutCastAllowedUsersModel.component";
-import { NavigationProp } from "@react-navigation/native";
+import { themeStyles } from '@styles/globalColors';
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import { CloutCastAllowedUsersModelComponent } from './cloutCastAllowedUsersModel.component';
+import { ParamListBase } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     promotion: CloutCastPromotion;
 }
 
@@ -26,12 +27,12 @@ export class CloutCastPostRequirementsComponent extends React.Component<Props, S
         };
     }
 
-    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State): boolean {
         return p_nextProps.promotion?.id !== this.props.promotion?.id ||
             p_nextState.showAllowedUsersModel !== this.state.showAllowedUsersModel;
     }
 
-    render() {
+    render(): JSX.Element {
         const criteria = this.props.promotion?.criteria;
 
         let minFollowers: number | undefined = criteria?.minFollowerCount;
@@ -88,7 +89,7 @@ export class CloutCastPostRequirementsComponent extends React.Component<Props, S
                     publicKeys={criteria.allowedUsers}
                     close={() => this.setState({ showAllowedUsersModel: false })}></CloutCastAllowedUsersModelComponent>
             }
-        </View>
+        </View>;
     }
 }
 

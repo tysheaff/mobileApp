@@ -1,12 +1,12 @@
 import { settingsGlobals } from '@globals/settingsGlobals';
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
-import { Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 
 interface Props {
     title: string;
     onPress: () => void;
-    styles?: any;
+    styles?: StyleProp<ViewStyle>;
     disabled?: boolean;
 }
 
@@ -17,22 +17,23 @@ export default class CloutFeedButton extends React.Component<Props> {
         this.onPress = this.onPress.bind(this);
     }
 
-    shouldComponentUpdate(p_nextProps: Props) {
+    shouldComponentUpdate(p_nextProps: Props): boolean {
         return this.props.disabled !== p_nextProps.disabled ||
             this.props.title !== p_nextProps.title;
     }
 
-    onPress() {
+    private onPress(): void {
         if (this.props.disabled) {
             return;
         }
         this.props.onPress();
     }
-    render() {
+
+    render(): JSX.Element {
         return (
             <TouchableOpacity
                 activeOpacity={1}
-                onPress={this.onPress}
+                onPress={() => this.onPress()}
                 style={[
                     styles.btnContainer,
                     this.props.styles,
@@ -42,20 +43,22 @@ export default class CloutFeedButton extends React.Component<Props> {
                 ]}>
                 <Text style={styles.btnTitle}>{this.props.title}</Text>
             </TouchableOpacity>
-        )
+        );
     }
 }
 
-const styles = StyleSheet.create({
-    btnContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 4,
-        backgroundColor: 'black',
-    },
-    btnTitle: {
-        color: 'white'
+const styles = StyleSheet.create(
+    {
+        btnContainer: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 4,
+            backgroundColor: 'black',
+        },
+        btnTitle: {
+            color: 'white'
+        }
     }
-})
+);

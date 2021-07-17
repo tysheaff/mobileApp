@@ -55,13 +55,13 @@ const getHistoricalCoinPrice = (p_publicKey: string, p_timeStamp: number) => {
     const route = `creator-coin/${p_publicKey}/history/${p_timeStamp}`;
 
     return get(route);
-}
+};
 
 const getPinnedPost = () => {
-    const route = `promotion/pinned-post`;
+    const route = 'promotion/pinned-post';
 
     return get(route);
-}
+};
 
 const registerNotificationsPushToken = (p_publicKey: string, p_pushToken: string, p_jwt: string) => {
     const route = 'notifications/register/push-token/v2';
@@ -74,7 +74,7 @@ const registerNotificationsPushToken = (p_publicKey: string, p_pushToken: string
             jwt: p_jwt
         }
     );
-}
+};
 
 const unregisterNotificationsPushToken = (p_publicKey: string, p_jwt: string) => {
     const route = 'notifications/unregister/push-token/v2';
@@ -87,7 +87,7 @@ const unregisterNotificationsPushToken = (p_publicKey: string, p_jwt: string) =>
             jwt: p_jwt
         }
     );
-}
+};
 
 const getNotificationSubscriptions = (p_publicKey: string, p_jwt: string, p_subscribedPublicKey: string) => {
     const route = 'notifications/subscriptions';
@@ -100,7 +100,7 @@ const getNotificationSubscriptions = (p_publicKey: string, p_jwt: string, p_subs
             subscribedPublicKey: p_subscribedPublicKey
         }
     );
-}
+};
 
 const getNotificationsSettings = (publicKey: string, jwt: string) => {
     const route = 'notifications/get-settings';
@@ -108,7 +108,7 @@ const getNotificationsSettings = (publicKey: string, jwt: string) => {
         route,
         { publicKey, jwt }
     );
-}
+};
 
 const updateNotificationsSettings = (publicKey: string, jwt: string, notificationSetting: string, active: boolean) => {
     const route = 'notifications/settings/update';
@@ -121,7 +121,7 @@ const updateNotificationsSettings = (publicKey: string, jwt: string, notificatio
             active
         }
     );
-}
+};
 
 const subscribeNotifications = (p_publicKey: string, p_jwt: string, p_subscribedPublicKey: string, p_notificationType: string) => {
     const route = 'notifications/subscribe';
@@ -135,7 +135,7 @@ const subscribeNotifications = (p_publicKey: string, p_jwt: string, p_subscribed
             notificationType: p_notificationType
         }
     );
-}
+};
 
 const unSubscribeNotifications = (p_publicKey: string, p_jwt: string, p_subscribedPublicKey: string, p_notificationType: string) => {
     const route = 'notifications/unsubscribe';
@@ -149,7 +149,7 @@ const unSubscribeNotifications = (p_publicKey: string, p_jwt: string, p_subscrib
             notificationType: p_notificationType
         }
     );
-}
+};
 
 export const cloutFeedApi = {
     getHistoricalCoinPrice,

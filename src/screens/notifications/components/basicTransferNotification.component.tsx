@@ -1,11 +1,11 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Profile, Notification } from '@types';
-import { globalStyles } from "@styles/globalStyles";
-import { calculateAndFormatBitCloutInUsd } from "@services/bitCloutCalculator";
-import { globals } from "@globals/globals";
+import { globalStyles } from '@styles/globalStyles';
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import { globals } from '@globals/globals';
 
 interface Props {
     profile: Profile;
@@ -33,7 +33,7 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
 
         if (output) {
             bitCloutAmount = (output.AmountNanos / 1000000000).toFixed(2);
-            usdAmount = calculateAndFormatBitCloutInUsd(output.AmountNanos as number);
+            usdAmount = calculateAndFormatBitCloutInUsd(output.AmountNanos );
         }
 
         return (
@@ -66,7 +66,7 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
                     <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount})</Text>
                 </View>
             </TouchableOpacity>
-        )
+        );
     }
 
-};
+}

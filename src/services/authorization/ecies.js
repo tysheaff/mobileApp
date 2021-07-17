@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * Browser ecies-parity implementation.
  *
@@ -11,14 +15,14 @@
  */
 
 import * as Random from 'expo-random';
-const EC = require("elliptic").ec;
-const ec = new EC("secp256k1");
-const jsSHA = require("jssha");
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
+const jsSHA = require('jssha');
 const aesjs = require('aes-js');
 
 function assert(condition, message) {
   if (!condition) {
-    throw new Error(message || "Assertion failed");
+    throw new Error(message || 'Assertion failed');
   }
 }
 
@@ -30,11 +34,11 @@ const kdf = function (secret, outputLength) {
   while (written < outputLength) {
     const ctrs = Buffer.from([ctr >> 24, ctr >> 16, ctr >> 8, ctr]);
 
-    const shaObj = new jsSHA("SHA-256", "UINT8ARRAY", { encoding: "UTF8" });
+    const shaObj = new jsSHA('SHA-256', 'UINT8ARRAY', { encoding: 'UTF8' });
     shaObj.update(Buffer.concat([ctrs, secret]));
-    const hashResult = new Buffer(shaObj.getHash("UINT8ARRAY"));
+    const hashResult = new Buffer(shaObj.getHash('UINT8ARRAY'));
 
-    result = Buffer.concat([result, hashResult])
+    result = Buffer.concat([result, hashResult]);
     written += 32;
     ctr += 1;
   }
@@ -43,7 +47,7 @@ const kdf = function (secret, outputLength) {
 
 const convertUtf8 = (function () {
   function utf8ByteToUnicodeStr(utf8Bytes) {
-    var unicodeStr = "";
+    var unicodeStr = '';
     for (var pos = 0; pos < utf8Bytes.length;) {
       var flag = utf8Bytes[pos];
       var unicode = 0;
@@ -132,31 +136,31 @@ export const aesCtrEncrypt = function (counter, key, data, convertToString = tru
 
   var encryptedText = aesjs.utils.hex.fromBytes(encryptedBytes);
   return encryptedText;
-}
+};
 
 export const aesCtrDecrypt = function (counter, key, data) {
   var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(counter));
   var decryptedBytes = aesCtr.decrypt(data);
   var decryptedText = convertUtf8.fromBytes(decryptedBytes);
   return decryptedText;
-}
+};
 
 function hmacSha256Sign(key, msg) {
-  const shaObj = new jsSHA("SHA-256", "UINT8ARRAY", {
-    hmacKey: { value: key, format: "UINT8ARRAY" },
+  const shaObj = new jsSHA('SHA-256', 'UINT8ARRAY', {
+    hmacKey: { value: key, format: 'UINT8ARRAY' },
   });
   shaObj.update(msg);
-  const hmac = shaObj.getHash("UINT8ARRAY");
+  const hmac = shaObj.getHash('UINT8ARRAY');
   return new Buffer(hmac);
 }
 
 //ECDH
 const derive = function (privateKeyA, publicKeyB) {
-  assert(Buffer.isBuffer(privateKeyA), "Bad input");
-  assert(Buffer.isBuffer(publicKeyB), "Bad input");
-  assert(privateKeyA.length === 32, "Bad private key");
-  assert(publicKeyB.length === 65, "Bad public key");
-  assert(publicKeyB[0] === 4, "Bad public key");
+  assert(Buffer.isBuffer(privateKeyA), 'Bad input');
+  assert(Buffer.isBuffer(publicKeyB), 'Bad input');
+  assert(privateKeyA.length === 32, 'Bad private key');
+  assert(publicKeyB.length === 65, 'Bad public key');
+  assert(publicKeyB[0] === 4, 'Bad public key');
   const keyA = ec.keyFromPrivate(privateKeyA);
   const keyB = ec.keyFromPublic(publicKeyB);
   const Px = keyA.derive(keyB.getPublic());  // BN instance
@@ -176,9 +180,9 @@ export const encrypt = function (publicKeyTo, msg, opts) {
   const encryptionKey = hash.slice(0, 16);
 
   // Generate hmac
-  const shaObj = new jsSHA("SHA-256", "UINT8ARRAY", { encoding: "UTF8" });
+  const shaObj = new jsSHA('SHA-256', 'UINT8ARRAY', { encoding: 'UTF8' });
   shaObj.update(hash.slice(16));
-  const macKey = new Buffer(shaObj.getHash("UINT8ARRAY"));
+  const macKey = new Buffer(shaObj.getHash('UINT8ARRAY'));
   const msgBuffer = new Buffer(msg);
   const ciphertext = aesCtrEncrypt(iv, encryptionKey, msgBuffer, false);
   const dataToMac = Buffer.from([...iv, ...ciphertext]);
@@ -190,8 +194,8 @@ export const encrypt = function (publicKeyTo, msg, opts) {
 // Decrypt serialised AES-128-CTR
 export const decrypt = function (privateKey, encrypted) {
   const metaLength = 1 + 64 + 16 + 32;
-  assert(encrypted.length > metaLength, "Invalid Ciphertext. Data is too small")
-  assert(encrypted[0] >= 2 && encrypted[0] <= 4, "Not valid ciphertext.")
+  assert(encrypted.length > metaLength, 'Invalid Ciphertext. Data is too small');
+  assert(encrypted[0] >= 2 && encrypted[0] <= 4, 'Not valid ciphertext.');
 
   // deserialize
   const ephemPublicKey = encrypted.slice(0, 65);
@@ -206,30 +210,30 @@ export const decrypt = function (privateKey, encrypted) {
   const hash = kdf(px, 32);
   const encryptionKey = hash.slice(0, 16);
 
-  const shaObj = new jsSHA("SHA-256", "UINT8ARRAY", { encoding: "UTF8" });
+  const shaObj = new jsSHA('SHA-256', 'UINT8ARRAY', { encoding: 'UTF8' });
   shaObj.update(hash.slice(16));
-  const macKey = new Buffer(shaObj.getHash("UINT8ARRAY"));
+  const macKey = new Buffer(shaObj.getHash('UINT8ARRAY'));
 
   const dataToMac = Buffer.from(cipherAndIv);
   const hmacGood = hmacSha256Sign(macKey, dataToMac);
-  assert(hmacGood.equals(msgMac), "Incorrect MAC");
+  assert(hmacGood.equals(msgMac), 'Incorrect MAC');
   const decrypted = aesCtrDecrypt(iv, encryptionKey, ciphertext);
   return decrypted;
 };
 
 export const getPublic = function (privateKey) {
-  assert(privateKey.length === 32, "Bad private key");
-  return new Buffer(ec.keyFromPrivate(privateKey).getPublic("arr"));
+  assert(privateKey.length === 32, 'Bad private key');
+  return new Buffer(ec.keyFromPrivate(privateKey).getPublic('arr'));
 };
 
 export const encryptShared = function (privateKeySender, publicKeyRecipient, msg, opts) {
   opts = opts || {};
-  const sharedPx = derive(privateKeySender, publicKeyRecipient)
+  const sharedPx = derive(privateKeySender, publicKeyRecipient);
   const sharedPrivateKey = kdf(sharedPx, 32);
   const sharedPublicKey = getPublic(sharedPrivateKey);
 
   return encrypt(sharedPublicKey, msg, opts);
-}
+};
 
 export const decryptShared = function (privateKeyRecipient, publicKeySender, encrypted, opts) {
   opts = opts || {};
@@ -237,4 +241,4 @@ export const decryptShared = function (privateKeyRecipient, publicKeySender, enc
   const sharedPrivateKey = kdf(sharedPx, 32);
 
   return decrypt(sharedPrivateKey, encrypted, opts);
-}
+};

@@ -1,17 +1,18 @@
-import React from "react";
+import React from 'react';
 import { View, StyleSheet, Image, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { TextWithLinks } from '@components/textWithLinks.component';
 import { api, cache, formatNumber } from '@services';
 import { eventManager, globals, settingsGlobals } from '@globals';
 import { ChangeFollowersEvent, EventType, Profile, User } from '@types';
 import { themeStyles } from '@styles';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     profile: Profile;
     coinPrice: number;
 }
@@ -28,7 +29,7 @@ export class ProfileCard extends React.Component<Props, State> {
 
     mount = true;
 
-    private _unsubscribes: any[] = [];
+    private _unsubscribes: (() => void)[] = [];
 
     constructor(props: Props) {
         super(props);
@@ -141,7 +142,7 @@ export class ProfileCard extends React.Component<Props, State> {
     }
 
     private goToFollowersScreen(p_selectedTab: string) {
-        (this.props.navigation as any).push(
+        this.props.navigation.push(
             'ProfileFollowers',
             {
                 publicKey: this.props.profile.PublicKeyBase58Check,
@@ -152,7 +153,7 @@ export class ProfileCard extends React.Component<Props, State> {
     }
 
     private goToCreatorCoinScreen() {
-        (this.props.navigation as any).push(
+        this.props.navigation.push(
             'CreatorCoin',
             {
                 publicKey: this.props.profile.PublicKeyBase58Check,
@@ -179,7 +180,7 @@ export class ProfileCard extends React.Component<Props, State> {
                         </Text>
                     </View>
                 </View>
-                <Image style={styles.profilePic} source={{ uri: this.props.profile.ProfilePic + '?' + new Date() }}></Image>
+                <Image style={styles.profilePic} source={{ uri: this.props.profile.ProfilePic + '?' + new Date().toISOString() }}></Image>
 
                 <View style={styles.usernameContainer}>
                     <Text style={[styles.username, themeStyles.fontColorMain]} selectable={true}>{this.props.profile.Username}</Text>

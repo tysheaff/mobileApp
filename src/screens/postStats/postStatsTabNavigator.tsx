@@ -45,6 +45,6 @@ export default class postStatsTabNavigator extends React.Component<Props> {
                 <PostStatTab.Screen name="Quotes" children={props => <PostQuoteStatsComponent postHashHex={this.props.route.params.postHashHex} {...props} />} />
                 <PostStatTab.Screen name="Diamonds" children={props => <PostDiamondStatsComponent postHashHex={this.props.route.params.postHashHex}  {...props} />} />
             </PostStatTab.Navigator>
-        )
+        );
     }
 }

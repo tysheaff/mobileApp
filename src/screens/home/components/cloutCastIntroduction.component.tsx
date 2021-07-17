@@ -1,10 +1,10 @@
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Linking, Image } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Linking, Image } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import * as SecureStore from 'expo-secure-store';
-import { constants } from "@globals/constants";
-import { globals } from "@globals/globals";
+import { constants } from '@globals/constants';
+import { globals } from '@globals/globals';
 
 interface Props {
     close: () => void;
@@ -17,13 +17,13 @@ export class CloutCastIntroductionComponent extends React.Component<Props> {
         this.close = this.close.bind(this);
     }
 
-    async close() {
+    private async close(): void {
         const key = globals.user.publicKey + '_' + constants.localStorage_cloutCastIntroduction;
         await SecureStore.setItemAsync(key, 'true');
         this.props.close();
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             <View style={styles.headerContainer}>
                 <Image
@@ -62,14 +62,14 @@ export class CloutCastIntroductionComponent extends React.Component<Props> {
                     {'\n\n'}
                     Read this
                     <Text
-                        style={[{ fontWeight: '500' }, , themeStyles.linkColor]}
+                        style={[{ fontWeight: '500' }, themeStyles.linkColor]}
                         onPress={() => Linking.openURL('https://www.notion.so/CloutCast-Read-Me-5dd54d062e9543b5a55316dc83627aa6')}
                     > White Paper </Text>
                     for more information.
                 </Text>
             </ScrollView>
             <TouchableOpacity
-                onPress={this.close}
+                onPress={() => this.close()}
                 style={[styles.continueButton, themeStyles.buttonBorderColor]}
                 activeOpacity={0.8}
             >
@@ -87,6 +87,9 @@ const styles = StyleSheet.create(
             paddingRight: '10%',
             paddingTop: '5%',
             alignItems: 'center'
+        },
+        test: {
+
         },
         headerContainer: {
             flexDirection: 'row',

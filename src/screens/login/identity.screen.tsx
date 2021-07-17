@@ -1,15 +1,15 @@
-import React from "react";
-import { authentication } from "@services/authorization/authentication";
-import { crypto } from "@services/authorization/crypto";
+import React from 'react';
+import { authentication } from '@services/authorization/authentication';
+import { crypto } from '@services/authorization/crypto';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { LoginUserListComponent } from "./components/loginUserList.component";
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { LoginUserListComponent } from './components/loginUserList.component';
 import { AuthenticatedUser, AuthenticatedUserEncryptionKey, AuthenticatedUserTypes } from '@types';
-import { constants } from "@globals/constants";
-import { globals } from "@globals/globals";
+import { constants } from '@globals/constants';
+import { globals } from '@globals/globals';
 import * as SecureStore from 'expo-secure-store';
-import { themeStyles } from "@styles/globalColors";
-import { ScrollView } from "react-native-gesture-handler";
+import { themeStyles } from '@styles/globalColors';
+import { ScrollView } from 'react-native-gesture-handler';
 import * as ScreenCapture from 'expo-screen-capture';
 
 type RouteParams = {
@@ -33,8 +33,9 @@ interface State {
 
 export class IdentityScreen extends React.Component<Props, State> {
 
-    mnemonic: string = '';
-    extraText: string = '';
+    mnemonic = '';
+
+    extraText = '';
 
     private _user: AuthenticatedUserTypes | undefined = undefined;
 
@@ -74,7 +75,6 @@ export class IdentityScreen extends React.Component<Props, State> {
                 return;
             }
 
-
             this._user = authentication.authenticateUser(this.mnemonic, this.extraText);
 
             const standardPublicKey = this._user.standard.authenticatedUser.publicKey;
@@ -98,7 +98,7 @@ export class IdentityScreen extends React.Component<Props, State> {
     }
 
     back() {
-        this.setState(previousState => ({ accountLoaded: !previousState.accountLoaded }))
+        this.setState(previousState => ({ accountLoaded: !previousState.accountLoaded }));
     }
 
     async selectAccount(publicKey: string) {
@@ -167,7 +167,7 @@ export class IdentityScreen extends React.Component<Props, State> {
                 <TouchableOpacity style={styles.advancedButton} onPress={() => this.setState(previousState => ({ advanced: !previousState.advanced }))}>
                     <Text style={styles.advancedText}>{this.state.advanced ? 'Simple' : 'Advanced'}</Text>
                 </TouchableOpacity>
-            </ScrollView>
+            </ScrollView>;
     }
 }
 

@@ -16,13 +16,13 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/core';
 
 const Tab = createBottomTabNavigator();
 
-let firstScreen: any = {
+const firstScreen: any = {
     HomeStack: 'Home',
     ProfileStack: 'Profile',
     WalletStack: 'Wallet',
     CreatePostStack: 'CreatePost',
     NotificationStack: 'Notifications'
-}
+};
 
 const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
     const [profilePic, setProfilePic] = useState('https://i.imgur.com/vZ2mB1W.png');
@@ -40,11 +40,11 @@ const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
     } else if (tab.name === 'WalletStack') {
         icon = <Ionicons name="wallet-outline" size={28} color={iconColor} />;
     } else if (tab.name === 'CreatePostStack') {
-        icon = <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />
+        icon = <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />;
     } else if (tab.name === 'NotificationStack') {
         icon = <Ionicons name="md-notifications-outline" size={28} color={iconColor} />;
     } else if (tab.name === 'ProfileStack') {
-        icon = <Image style={{ width: 30, height: 30, borderRadius: 30, borderWidth: selectedTab === tab.name ? 2 : 0, borderColor: iconColor }} source={{ uri: profilePic }}></Image>
+        icon = <Image style={{ width: 30, height: 30, borderRadius: 30, borderWidth: selectedTab === tab.name ? 2 : 0, borderColor: iconColor }} source={{ uri: profilePic }}></Image>;
     }
 
     useEffect(
@@ -64,11 +64,11 @@ const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
             };
         },
         []
-    )
+    );
 
     function openProfileManager() {
         if (tab.name === 'ProfileStack' && !globals.readonly) {
-            eventManager.dispatchEvent(EventType.ToggleProfileManager, { visible: true, navigation: navigation })
+            eventManager.dispatchEvent(EventType.ToggleProfileManager, { visible: true, navigation: navigation });
             hapticsManager.customizedImpact();
         }
     }
@@ -92,8 +92,8 @@ const TabBar = ({ state, navigation }: any) => {
     const tabScreenNames = routes.map((route: any) => route.name);
 
     useEffect(() => {
-        setSelectedTab(tabScreenNames[index])
-    }, [index])
+        setSelectedTab(tabScreenNames[index]);
+    }, [index]);
 
     useEffect(() => {
         let keyboardEventListeners: any;
@@ -112,7 +112,7 @@ const TabBar = ({ state, navigation }: any) => {
     }, []);
 
     function navigate(p_screenName: string, p_params?: any) {
-        let focusedRouteName = getFocusedRouteNameFromRoute(routes.find((route: any) => p_screenName === route.name));
+        const focusedRouteName = getFocusedRouteNameFromRoute(routes.find((route: any) => p_screenName === route.name));
         if (selectedTab === p_screenName) {
             if (selectedTab === 'HomeStack' && (focusedRouteName === 'Home' || focusedRouteName === undefined)) {
                 navigatorGlobals.refreshHome();
@@ -171,7 +171,7 @@ const TabBar = ({ state, navigation }: any) => {
             }
         </View>
     );
-}
+};
 
 export function TabNavigator() {
     return (

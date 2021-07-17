@@ -1,11 +1,12 @@
 import { themeStyles } from '@styles/globalColors';
-import React from 'react'
-import { View } from 'react-native'
-import { NavigationProp } from "@react-navigation/native";
+import React from 'react';
+import { View } from 'react-native';
+import { ParamListBase } from '@react-navigation/native';
 import BlockedUsersListComponent from './components/blockedUsersList.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 export default class BlockedUsersScreen extends React.Component<Props> {
@@ -30,6 +31,6 @@ export default class BlockedUsersScreen extends React.Component<Props> {
             <View style={[{ flex: 1, }, themeStyles.containerColorMain]}>
                 <BlockedUsersListComponent navigation={this.props.navigation} />
             </View>
-        )
+        );
     }
 }

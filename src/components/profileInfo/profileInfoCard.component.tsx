@@ -21,12 +21,12 @@ export default class ProfileInfoCardComponent extends React.Component<Props> {
         super(props);
     }
 
-    shouldComponentUpdate(nextProps: Props) {
+    shouldComponentUpdate(nextProps: Props): boolean {
         return this.props.username !== nextProps.username ||
             this.props.coinPrice !== nextProps.coinPrice;
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={[styles.container]}>
             <ProfileInfoImageComponent publicKey={this.props.publicKey} />
             <View>

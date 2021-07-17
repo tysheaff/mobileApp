@@ -13,7 +13,7 @@ export function NotificationsHeaderComponent() {
         >
             <Ionicons name="ios-filter" size={24} color={themeStyles.fontColorMain.color} />
         </TouchableOpacity>
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create(

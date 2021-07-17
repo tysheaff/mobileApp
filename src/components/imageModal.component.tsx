@@ -5,12 +5,12 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { themeStyles } from '@styles/globalColors';
-import * as ImageManipulator from "expo-image-manipulator";
+import * as ImageManipulator from 'expo-image-manipulator';
 
 interface Props {
-    closeModal: Function;
+    closeModal: () => void;
     modalVisible: boolean;
-    imageUrls: Array<any>;
+    imageUrls: string[];
 }
 
 interface State {
@@ -20,10 +20,12 @@ interface State {
 class ImageModal extends Component<Props, State> {
 
     private _isMounted = false;
-    private _snackBarTimeout: number = -1;
-    private _selectedIndex: number = 0;
 
-    constructor(props: any) {
+    private _snackBarTimeout = -1;
+
+    private _selectedIndex = 0;
+
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -31,15 +33,15 @@ class ImageModal extends Component<Props, State> {
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    saveToLibrary = async () => {
+    saveToLibrary = async (): Promise<void> => {
         try {
             let permission = await MediaLibrary.getPermissionsAsync();
             if (!permission.granted) {
@@ -51,14 +53,14 @@ class ImageModal extends Component<Props, State> {
                 }
             }
 
-            const fileUri = FileSystem.cacheDirectory + this.props.imageUrls[this._selectedIndex].replace('https://images.bitclout.com/', '');
+            const fileUri = String(FileSystem.cacheDirectory) + this.props.imageUrls[this._selectedIndex].replace('https://images.bitclout.com/', '');
             const downloadObject = FileSystem.createDownloadResumable(
                 this.props.imageUrls[this._selectedIndex],
                 fileUri
             );
 
-            const response: any = await downloadObject.downloadAsync();
-            if (response.status === 200) {
+            const response: FileSystem.FileSystemDownloadResult | undefined = await downloadObject.downloadAsync();
+            if (response?.status === 200) {
                 let mediaUri = response.uri;
 
                 if (response.uri.slice(-3) !== 'gif') {
@@ -68,21 +70,21 @@ class ImageModal extends Component<Props, State> {
                         { compress: 1, format: ImageManipulator.SaveFormat.PNG }
                     );
                     mediaUri = convertedImage.uri;
-                } 
+                }
 
                 FileSystem.getInfoAsync(mediaUri)
                     .then(async (p_result) => {
                         await MediaLibrary.saveToLibraryAsync(p_result.uri);
-                        this.showSnackBar("Image saved");
+                        this.showSnackBar('Image saved');
                     })
-                    .catch(() => this.showSnackBar("Something went wrong"));
+                    .catch(() => this.showSnackBar('Something went wrong'));
             }
         } catch (error) {
             this.showSnackBar('Something went wrong');
         }
     }
 
-    showSnackBar(p_text: string) {
+    showSnackBar(p_text: string): void {
         if (this._isMounted) {
             window.clearTimeout(this._snackBarTimeout);
             this.setState({ snackBarText: p_text });
@@ -98,7 +100,7 @@ class ImageModal extends Component<Props, State> {
         }
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <Modal
                 animationType="fade"
@@ -125,8 +127,8 @@ class ImageModal extends Component<Props, State> {
                     <ImageViewer
                         renderIndicator={(currentIndex, allSize) => {
                             return allSize && allSize > 1 ?
-                                <Text>{currentIndex + "/" + allSize}</Text> :
-                                <Text></Text>
+                                <Text>{String(currentIndex) + '/' + String(allSize)}</Text> :
+                                <Text></Text>;
                         }}
                         saveToLocalByLongPress={false}
                         style={styles.images}
@@ -154,50 +156,52 @@ class ImageModal extends Component<Props, State> {
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: 'black',
-        flex: 1,
-    },
-    header: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        zIndex: 20,
-        marginTop: Platform.OS === 'ios' ? 30 : 0
-    },
-    modalView: {
-        width: '100%',
-        height: '100%',
-        elevation: 5
-    },
-    closeBtn: {
-        marginTop: '4%',
-        marginLeft: '2%'
-    },
-    downloadBtn: {
-        marginTop: '4%',
-        marginRight: '4%'
-    },
-    images: {
-        flex: 11
-    },
-    footer: {
-        flex: 1
-    },
-    snackBar: {
-        height: 50,
-        width: Dimensions.get('window').width - 40,
-        position: 'absolute',
-        backgroundColor: 'white',
-        bottom: 50,
-        left: 20,
-        borderRadius: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        justifyContent: 'center',
-        borderWidth: 1
+const styles = StyleSheet.create(
+    {
+        container: {
+            backgroundColor: 'black',
+            flex: 1,
+        },
+        header: {
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            zIndex: 20,
+            marginTop: Platform.OS === 'ios' ? 30 : 0
+        },
+        modalView: {
+            width: '100%',
+            height: '100%',
+            elevation: 5
+        },
+        closeBtn: {
+            marginTop: '4%',
+            marginLeft: '2%'
+        },
+        downloadBtn: {
+            marginTop: '4%',
+            marginRight: '4%'
+        },
+        images: {
+            flex: 11
+        },
+        footer: {
+            flex: 1
+        },
+        snackBar: {
+            height: 50,
+            width: Dimensions.get('window').width - 40,
+            position: 'absolute',
+            backgroundColor: 'white',
+            bottom: 50,
+            left: 20,
+            borderRadius: 10,
+            paddingLeft: 20,
+            paddingRight: 20,
+            justifyContent: 'center',
+            borderWidth: 1
+        }
     }
-});
+);
 
 export default ImageModal;

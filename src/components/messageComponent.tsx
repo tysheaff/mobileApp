@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { settingsGlobals } from '@globals';
 import { getMessageText } from '@services';
 import { Message } from '@types';
 import { TextWithLinks } from './textWithLinks.component';
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 export function MessageComponent(
     { message }: { message: Message }
-) {
-    const navigation = useNavigation();
+): JSX.Element {
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
     const [messageText, setMessageText] = useState<string>('');
     let mount = true;
 
@@ -20,10 +21,10 @@ export function MessageComponent(
                 getMessageText(message).then(
                     p_text => {
                         if (mount) {
-                            setMessageText(p_text)
+                            setMessageText(p_text);
                         }
                     }
-                ).catch(() => { });
+                ).catch(() => undefined);
             }
 
             return () => {
@@ -40,7 +41,7 @@ export function MessageComponent(
     ]}
     >
         <TextWithLinks style={[styles.messageText]} navigation={navigation} text={messageText}></TextWithLinks>
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create(

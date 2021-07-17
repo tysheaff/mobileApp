@@ -1,6 +1,6 @@
-import { NavigationProp } from "@react-navigation/core";
-import { ActionSheetConfig } from "@services/actionSheet";
-import { Post } from "./models";
+import { NavigationProp } from '@react-navigation/core';
+import { ActionSheetConfig } from '@services/actionSheet';
+import { Post } from './models';
 
 export enum EventType {
     IncreaseFollowers = 0,

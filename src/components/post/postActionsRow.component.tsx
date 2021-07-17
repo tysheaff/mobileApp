@@ -1,24 +1,30 @@
-import React from "react";
+import React from 'react';
 import { View, StyleSheet, Text, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons, Fontisto, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { NavigationProp } from "@react-navigation/native";
+import { ParamListBase } from '@react-navigation/native';
 import { EventType, Post } from '@types';
-import { globals } from "@globals/globals";
-import { diamondAnimation } from "@services/diamondAnimation";
-import { api, calculateAndFormatBitCloutInUsd } from "@services";
-import { signing } from "@services/authorization/signing";
-import { themeStyles } from "@styles/globalColors";
-import { eventManager, hapticsManager } from "@globals/injector";
+import { globals } from '@globals/globals';
+import { diamondAnimation } from '@services/diamondAnimation';
+import { api, calculateAndFormatBitCloutInUsd } from '@services';
+import { signing } from '@services/authorization/signing';
+import { themeStyles } from '@styles/globalColors';
+import { eventManager, hapticsManager } from '@globals/injector';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+interface LikeIcon {
+    name: 'ios-heart-sharp' | 'ios-heart-outline';
+    color: string
+}
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     post: Post;
     actionsDisabled?: boolean;
     toggleHeartIcon: () => void
 }
 
 interface State {
-    likeIcon: any;
+    likeIcon: LikeIcon;
     diamondLevel: number;
 }
 
@@ -41,22 +47,22 @@ export class PostActionsRow extends React.Component<Props, State> {
         this.goToStats = this.goToStats.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
+    shouldComponentUpdate(p_nextProps: Props, p_nextState: State): boolean {
         return this.props.post.PostHashHex !== p_nextProps.post.PostHashHex ||
             this.state.likeIcon.name !== p_nextState.likeIcon.name ||
             this.state.diamondLevel !== p_nextState.diamondLevel;
     }
 
     private getLikeIcon = () => {
-        const icon = this.props.post.PostEntryReaderState?.LikedByReader ? { name: 'ios-heart-sharp', color: '#eb1b0c' } : { name: 'ios-heart-outline', color: '#a1a1a1' };
+        const icon: LikeIcon = this.props.post.PostEntryReaderState?.LikedByReader ? { name: 'ios-heart-sharp', color: '#eb1b0c' } : { name: 'ios-heart-outline', color: '#a1a1a1' };
         return icon;
     }
 
@@ -70,10 +76,10 @@ export class PostActionsRow extends React.Component<Props, State> {
             return;
         }
 
-        let originalLikedByReader = post.PostEntryReaderState.LikedByReader;
+        const originalLikedByReader = post.PostEntryReaderState.LikedByReader;
         post.PostEntryReaderState.LikedByReader = !originalLikedByReader;
         if (post.PostEntryReaderState.LikedByReader) {
-            post.LikeCount++
+            post.LikeCount++;
             this.props.toggleHeartIcon();
         } else {
             post.LikeCount--;
@@ -91,12 +97,12 @@ export class PostActionsRow extends React.Component<Props, State> {
             const transactionHex = response.TransactionHex;
 
             const signedTransactionHex = await signing.signTransaction(transactionHex);
-            await api.submitTransaction(signedTransactionHex as string);
+            await api.submitTransaction(signedTransactionHex);
 
         } catch {
             post.PostEntryReaderState.LikedByReader = originalLikedByReader;
             if (post.PostEntryReaderState.LikedByReader) {
-                post.LikeCount++
+                post.LikeCount++;
             } else {
                 post.LikeCount--;
             }
@@ -107,7 +113,7 @@ export class PostActionsRow extends React.Component<Props, State> {
         }
     }
 
-    private async onSendDiamonds() {
+    private onSendDiamonds() {
         const post = this.props.post;
 
         if (this.props.actionsDisabled || !post.PostEntryReaderState) {
@@ -120,26 +126,31 @@ export class PostActionsRow extends React.Component<Props, State> {
         }
 
         if (post.PostEntryReaderState.DiamondLevelBestowed === 0) {
-            this.sendDiamonds(1);
+            this.sendDiamonds(1).then(() => undefined).catch(() => undefined);
         } else {
             const calculateDiamondsWorth = (count: number): string => {
                 const nanos = 5000 * Math.pow(10, count);
                 const usd = calculateAndFormatBitCloutInUsd(nanos);
-                return '💎 ' + count + ' ($' + usd + ')';
+                return '💎 ' + String(count) + ' ($' + usd + ')';
             };
 
             const options: string[] = [];
-            for (var i = post.PostEntryReaderState.DiamondLevelBestowed + 1; i < 7; i++) {
+            for (let i = post.PostEntryReaderState.DiamondLevelBestowed + 1; i < 7; i++) {
                 const usd = calculateDiamondsWorth(i);
                 options.push(usd);
             }
 
             options.push('Cancel');
 
-            const callback = async (p_optionIndex: number) => {
+            const callback = (p_optionIndex: number) => {
                 const diamondLevel = post.PostEntryReaderState.DiamondLevelBestowed + 1 + p_optionIndex;
                 if (diamondLevel < 4) {
-                    setTimeout(() => this.sendDiamonds(diamondLevel), 100);
+                    setTimeout(
+                        () => {
+                            this.sendDiamonds(diamondLevel).then(() => undefined).catch(() => undefined);
+                        },
+                        100
+                    );
                 } else {
                     const username = this.props.post.ProfileEntryResponse.Username;
                     setTimeout(
@@ -154,7 +165,7 @@ export class PostActionsRow extends React.Component<Props, State> {
                                     {
                                         text: 'Yes',
                                         onPress: () => {
-                                            this.sendDiamonds(diamondLevel);
+                                            this.sendDiamonds(diamondLevel).then(() => undefined).catch(() => undefined);
                                         }
                                     }
                                 ]
@@ -199,7 +210,7 @@ export class PostActionsRow extends React.Component<Props, State> {
             const transactionHex = response.TransactionHex;
 
             const signedTransactionHex = await signing.signTransaction(transactionHex);
-            await api.submitTransaction(signedTransactionHex as string);
+            await api.submitTransaction(signedTransactionHex);
 
         } catch {
             post.PostEntryReaderState.DiamondLevelBestowed -= diamondDiff;
@@ -240,7 +251,7 @@ export class PostActionsRow extends React.Component<Props, State> {
     }
 
     private goToStats(p_selectedTab: string) {
-        (this.props.navigation as any).push(
+        this.props.navigation.push(
             'PostStatsTabNavigator',
             {
                 postHashHex: this.props.post.PostHashHex,
@@ -250,32 +261,32 @@ export class PostActionsRow extends React.Component<Props, State> {
         hapticsManager.customizedImpact();
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onLike} onLongPress={() => this.goToStats('Likes')}>
-                <Ionicons name={this.state.likeIcon.name as any} size={24} color={this.state.likeIcon.color} />
+            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={() => this.onLike()} onLongPress={() => this.goToStats('Likes')}>
+                <Ionicons name={this.state.likeIcon.name} size={24} color={this.state.likeIcon.color} />
                 <Text style={styles.actionText}>{this.props.post.LikeCount}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReply}>
+            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={() => this.goToReply()}>
                 <Fontisto name='comment' size={19} color={'#a1a1a1'} />
                 <Text style={styles.actionText}>{this.props.post.CommentCount}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.goToReclout} onLongPress={() => this.goToStats('Reclouts')}>
-                <MaterialCommunityIcons name="twitter-retweet" size={28} color={this.props.post.PostEntryReaderState?.RecloutedByReader ? '#5ba358' : '#a1a1a1'} />
+            <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={() => this.goToReclout()} onLongPress={() => this.goToStats('Reclouts')}>
+                <MaterialCommunityIcons name='twitter-retweet' size={28} color={this.props.post.PostEntryReaderState?.RecloutedByReader ? '#5ba358' : '#a1a1a1'} />
                 <Text style={styles.actionText}>{this.props.post.RecloutCount}</Text>
             </TouchableOpacity>
 
             {
-                Platform.OS !== 'ios' ?
-                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={this.onSendDiamonds} onLongPress={() => this.goToStats('Diamonds')}>
-                        <FontAwesome name="diamond" size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
+                Platform.OS !== 'ios' || true ?
+                    <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={() => this.onSendDiamonds()} onLongPress={() => this.goToStats('Diamonds')}>
+                        <FontAwesome name='diamond' size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
                         <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>
                     </TouchableOpacity> :
                     <View style={styles.actionButton} />
             }
-        </View>
+        </View>;
     }
 }
 

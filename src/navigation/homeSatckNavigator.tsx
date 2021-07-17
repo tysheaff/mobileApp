@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { View, StyleSheet, Text, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -24,7 +24,7 @@ import CloutFeedButton from '@components/cloutfeedButton.component';
 
 const HomeStack = createStackNavigator();
 
-export default function HomeStackScreen() {
+export default function HomeStackScreen(): JSX.Element {
     return (
         <HomeStack.Navigator
             screenOptions={({ navigation }: any) => ({
@@ -184,9 +184,8 @@ export default function HomeStackScreen() {
                 name="Identity" component={IdentityScreen}
             />
         </HomeStack.Navigator>
-    )
-};
-
+    );
+}
 
 const styles = StyleSheet.create(
     {
@@ -202,4 +201,4 @@ const styles = StyleSheet.create(
             shadowOffset: { height: 0, width: 0 }
         }
     }
-)
+);

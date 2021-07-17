@@ -1,4 +1,4 @@
-import { EventType } from "@types";
+import { EventType } from '@types';
 
 export class EventManager {
 
@@ -24,7 +24,7 @@ export class EventManager {
                     this._eventListeners.set(p_eventType, callbacks);
                 }
             }
-        }
+        };
     }
 
     public dispatchEvent(p_eventType: EventType, p_event?: any) {

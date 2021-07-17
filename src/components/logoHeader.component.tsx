@@ -1,9 +1,9 @@
-import { settingsGlobals } from "@globals/settingsGlobals";
-import { themeStyles } from "@styles/globalColors";
-import React from "react";
-import { StyleSheet, View, Image, Text } from "react-native";
+import { settingsGlobals } from '@globals/settingsGlobals';
+import { themeStyles } from '@styles/globalColors';
+import React from 'react';
+import { StyleSheet, View, Image, Text } from 'react-native';
 
-export function LogoHeaderComponent() {
+export function LogoHeaderComponent(): JSX.Element {
     return <View style={styles.headerContainer}>
         {
             settingsGlobals.darkMode ?
@@ -18,7 +18,7 @@ export function LogoHeaderComponent() {
                 ></Image>
         }
         <Text style={{ marginLeft: -10, fontWeight: '700', fontSize: 20, color: themeStyles.fontColorMain.color }}>CloutFeed</Text>
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create(
