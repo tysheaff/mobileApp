@@ -12,8 +12,6 @@ import { getAnonymousProfile } from '@services';
 import { ContactMessagesListCardComponent } from '@screens/messages/components/contactMessagesListCard.component';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
-interface Props { }
-
 interface State {
     isLoading: boolean;
     isFilterShown: boolean;
@@ -25,13 +23,13 @@ interface State {
     noMoreMessages: boolean;
 }
 
-export class MessagesScreen extends React.Component<Props, State>{
+export class MessagesScreen extends React.Component<Record<string, never>, State>{
 
     private _isMounted = false;
 
     private _subscriptions: (() => void)[] = [];
 
-    constructor(props: Props) {
+    constructor(props: Record<string, never>) {
         super(props);
 
         this.state = {
@@ -65,11 +63,11 @@ export class MessagesScreen extends React.Component<Props, State>{
         this.toggleMessagesFilter = this.toggleMessagesFilter.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         for (const unsubscribe of this._subscriptions) {
             unsubscribe();
         }
@@ -77,20 +75,20 @@ export class MessagesScreen extends React.Component<Props, State>{
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(_nextProps: Props, p_nextState: State) {
-        return p_nextState.isFilterShown !== this.state.isFilterShown ||
-            p_nextState.isLoading !== this.state.isLoading ||
-            p_nextState.isLoadingMore !== this.state.isLoadingMore;
+    shouldComponentUpdate(_nextProps: Record<string, never>, nextState: State): boolean {
+        return nextState.isFilterShown !== this.state.isFilterShown ||
+            nextState.isLoading !== this.state.isLoading ||
+            nextState.isLoadingMore !== this.state.isLoadingMore;
     }
 
-    loadMessages(p_messageFilter: MessageFilter[], p_messageSort: MessageSort) {
+    private loadMessages(messageFilter: MessageFilter[], messageSort: MessageSort): void {
         if (this._isMounted && !this.state.isLoading) {
             this.setState({ isLoading: true });
         }
 
-        this.getMessagesCallback(p_messageFilter, p_messageSort, '').then(
-            p_response => {
-                const contacts = this.processData(p_response);
+        this.getMessagesCallback(messageFilter, messageSort, '').then(
+            response => {
+                const contacts = this.processData(response);
 
                 if (this._isMounted) {
                     this.setState({ contacts, isLoading: false, noMoreMessages: contacts.length < 25 });
@@ -99,7 +97,7 @@ export class MessagesScreen extends React.Component<Props, State>{
         );
     }
 
-    loadMoreMessages(p_messageFilter: MessageFilter[], p_messageSort: MessageSort) {
+    private loadMoreMessages(messageFilter: MessageFilter[], messageSort: MessageSort): void {
         if (this.state.isLoadingMore || !this.state.contacts || this.state.contacts.length === 0 || this.state.noMoreMessages) {
             return;
         }
@@ -110,9 +108,9 @@ export class MessagesScreen extends React.Component<Props, State>{
 
         const lastPublicKey = this.state.contacts[this.state.contacts.length - 1].PublicKeyBase58Check;
 
-        this.getMessagesCallback(p_messageFilter, p_messageSort, lastPublicKey).then(
-            p_response => {
-                const contacts = this.processData(p_response);
+        this.getMessagesCallback(messageFilter, messageSort, lastPublicKey).then(
+            response => {
+                const contacts = this.processData(response);
 
                 if (this._isMounted) {
                     this.setState({ contacts: this.state.contacts.concat(contacts), isLoadingMore: false, noMoreMessages: contacts.length < 25 });
@@ -121,24 +119,24 @@ export class MessagesScreen extends React.Component<Props, State>{
         );
     }
 
-    getMessagesCallback(p_messageFilter: MessageFilter[], p_messageSort: MessageSort, p_lastPublicKey: string) {
-        p_messageFilter = p_messageFilter ? p_messageFilter : [];
+    private getMessagesCallback(messageFilter: MessageFilter[], messageSort: MessageSort, lastPublicKey: string): Promise<any> {
+        messageFilter = messageFilter ? messageFilter : [];
 
         return api.getMessages(
             globals.user.publicKey,
-            p_messageFilter.indexOf(MessageFilter.Followers) !== -1,
-            p_messageFilter.indexOf(MessageFilter.Following) !== -1,
-            p_messageFilter.indexOf(MessageFilter.Holders) !== -1,
-            p_messageFilter.indexOf(MessageFilter.Holding) !== -1,
+            messageFilter.indexOf(MessageFilter.Followers) !== -1,
+            messageFilter.indexOf(MessageFilter.Following) !== -1,
+            messageFilter.indexOf(MessageFilter.Holders) !== -1,
+            messageFilter.indexOf(MessageFilter.Holding) !== -1,
             25,
-            p_messageSort,
-            p_lastPublicKey
+            messageSort,
+            lastPublicKey
         );
     }
 
-    processData(p_response: any): ContactWithMessages[] {
-        const unreadStateByContact = p_response?.UnreadStateByContact ? p_response.UnreadStateByContact : {};
-        const contactsWithMessages: ContactWithMessages[] = p_response?.OrderedContactsWithMessages ? p_response.OrderedContactsWithMessages : [];
+    private processData(response: any): ContactWithMessages[] {
+        const unreadStateByContact = response?.UnreadStateByContact ? response.UnreadStateByContact : {};
+        const contactsWithMessages: ContactWithMessages[] = response?.OrderedContactsWithMessages ? response.OrderedContactsWithMessages : [];
 
         for (const contactWithMessages of contactsWithMessages) {
             if (!contactWithMessages.ProfileEntryResponse) {
@@ -153,7 +151,7 @@ export class MessagesScreen extends React.Component<Props, State>{
         return contactsWithMessages;
     }
 
-    async getMessageSettings(): Promise<{ messagesFilter: MessageFilter[], messagesSort: MessageSort }> {
+    private async getMessageSettings(): Promise<{ messagesFilter: MessageFilter[], messagesSort: MessageSort }> {
         let messagesFilter: MessageFilter[] = [];
         let messagesSort: MessageSort = MessageSort.MostRecent;
 
@@ -166,31 +164,31 @@ export class MessagesScreen extends React.Component<Props, State>{
                 if (messagesFilterValue.constructor === Array) {
                     messagesFilter = messagesFilterValue;
                 }
-            } catch { }
+            } catch { undefined; }
         }
 
         const messageSortKey = globals.user.publicKey + constants.localStorage_messagesSort;
-        const messageSortValue = await SecureStore.getItemAsync(messageSortKey);
+        const messageSortValue = await SecureStore.getItemAsync(messageSortKey) as MessageSort;
 
         if (messageSortValue && this.validSort(messageSortValue)) {
-            messagesSort = messageSortValue as MessageSort;
+            messagesSort = messageSortValue;
         }
 
         return { messagesFilter, messagesSort };
     }
 
-    toggleMessagesFilter() {
+    private toggleMessagesFilter(): void {
         if (this._isMounted) {
             this.setState({ isFilterShown: true });
         }
     }
 
-    async onMessageSettingChange(p_filter: MessageFilter[], p_sort: MessageSort) {
+    private async onMessageSettingChange(filter: MessageFilter[], sort: MessageSort) {
 
         try {
-            const filterJson = JSON.stringify(p_filter);
+            const filterJson = JSON.stringify(filter);
 
-            if (filterJson === JSON.stringify(this.state.messagesFilter) && p_sort === this.state.messagesSort) {
+            if (filterJson === JSON.stringify(this.state.messagesFilter) && sort === this.state.messagesSort) {
                 this.setState({ isFilterShown: false });
                 return;
             }
@@ -199,36 +197,34 @@ export class MessagesScreen extends React.Component<Props, State>{
             await SecureStore.setItemAsync(messageFilterKey, filterJson);
 
             const messageSortKey = globals.user.publicKey + constants.localStorage_messagesSort;
-            await SecureStore.setItemAsync(messageSortKey, p_sort);
+            await SecureStore.setItemAsync(messageSortKey, sort);
 
             if (this._isMounted) {
-                this.setState({ messagesFilter: p_filter, messagesSort: p_sort, isFilterShown: false });
-                this.loadMessages(p_filter, p_sort);
+                this.setState({ messagesFilter: filter, messagesSort: sort, isFilterShown: false });
+                this.loadMessages(filter, sort);
             }
-        } catch {
-
-        }
+        } catch { undefined; }
     }
 
-    validSort(p_value: any): boolean {
-        return p_value === MessageSort.MostRecent ||
-            p_value === MessageSort.MostFollowed ||
-            p_value === MessageSort.MostClout ||
-            p_value === MessageSort.LargestHolder;
+    private validSort(value: MessageSort): boolean {
+        return value === MessageSort.MostRecent ||
+            value === MessageSort.MostFollowed ||
+            value === MessageSort.MostClout ||
+            value === MessageSort.LargestHolder;
     }
 
-    render() {
+    render(): JSX.Element {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading ?
                     <CloutFeedLoader />
                     :
                     globals.readonly ?
-                        <View style={[{ alignItems: 'center', justifyContent: 'center' }, styles.listContainer, themeStyles.containerColorSub]}>
+                        <View style={[styles.readOnlyText, styles.container, themeStyles.containerColorSub]}>
                             <Text style={[themeStyles.fontColorMain]}>Messages are not available in the read-only mode.</Text>
                         </View>
                         :
-                        <View style={[styles.listContainer, themeStyles.containerColorMain]}>
+                        <View style={[styles.container, themeStyles.containerColorMain]}>
                             <FlatList
                                 data={this.state.contacts}
                                 keyExtractor={(item, index) => item.PublicKeyBase58Check + index.toString()}
@@ -252,7 +248,7 @@ export class MessagesScreen extends React.Component<Props, State>{
                     filter={this.state.messagesFilter}
                     sort={this.state.messagesSort}
                     isFilterShown={this.state.isFilterShown}
-                    onSettingsChange={this.onMessageSettingChange}
+                    onSettingsChange={(filter: MessageFilter[], sort: MessageSort) => this.onMessageSettingChange(filter, sort)}
                 />
             }
         </View>;
@@ -265,9 +261,9 @@ const styles = StyleSheet.create(
             flex: 1,
             width: '100%'
         },
-        listContainer: {
-            flex: 1,
-            width: '100%'
+        readOnlyText: {
+            alignItems: 'center',
+            justifyContent: 'center'
         }
     }
 );

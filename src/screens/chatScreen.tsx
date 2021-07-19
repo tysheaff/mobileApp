@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, SectionList, Dimensions, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { View, StyleSheet, Text, SectionList, Dimensions, KeyboardAvoidingView, Platform, Keyboard, TextInput, KeyboardEvent } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { ContactWithMessages, Message } from '@types';
 import { MessageComponent } from '@components/messageComponent';
@@ -10,17 +10,22 @@ import { themeStyles } from '@styles';
 import { signing } from '@services/authorization/signing';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 
-export function ChatScreen({ route, navigation }: any) {
+interface Section {
+    date: string;
+    data: Message[];
+}
+
+export function ChatScreen({ route }: any) {
 
     const [isLoading, setLoading] = useState<boolean>(true);
-    const [sections, setSections] = useState<any[]>([]);
+    const [sections, setSections] = useState<Section[]>([]);
     const [textInputHeight, setTextInputHeight] = useState<number>(35);
-    const [messageText, setMessageText] = useState('');
-    const [paddingTop, setPaddingTop] = useState(0);
+    const [messageText, setMessageText] = useState<string>('');
+    const [paddingTop, setPaddingTop] = useState<number>(0);
 
-    const sectionListRef = useRef(null);
+    const sectionListRef: React.RefObject<SectionList> = useRef(null);
 
-    let mount = true;
+    const isMounted = useRef<boolean>(true);
 
     useEffect(
         () => {
@@ -37,22 +42,22 @@ export function ChatScreen({ route, navigation }: any) {
                     'time',
                     ''
                 ).then(
-                    p_response => {
-                        const messages: ContactWithMessages[] = p_response?.OrderedContactsWithMessages ? p_response.OrderedContactsWithMessages : [];
+                    response => {
+                        const messages: ContactWithMessages[] = response?.OrderedContactsWithMessages ? response.OrderedContactsWithMessages : [];
                         const newContactWithMessages = messages.find(
-                            p_message => p_message?.PublicKeyBase58Check === contactWithMessages.PublicKeyBase58Check
+                            message => message?.PublicKeyBase58Check === contactWithMessages.PublicKeyBase58Check
                         );
 
                         if (newContactWithMessages) {
                             contactWithMessages = newContactWithMessages;
                         }
 
-                        if (mount) {
+                        if (isMounted) {
                             initializeSections(contactWithMessages);
                             setLoading(false);
                         }
                     }
-                ).catch(p_error => globals.defaultHandleError(p_error));
+                ).catch(error => globals.defaultHandleError(error));
             } else {
                 initializeSections(contactWithMessages);
                 setLoading(false);
@@ -62,7 +67,7 @@ export function ChatScreen({ route, navigation }: any) {
             Keyboard.addListener('keyboardWillHide', keyboardWillHide);
 
             return () => {
-                mount = false;
+                isMounted.current = false;
                 Keyboard.removeListener('keyboardWillShow', keyboardWillShow);
                 Keyboard.removeListener('keyboardWillHide', keyboardWillHide);
             };
@@ -77,25 +82,25 @@ export function ChatScreen({ route, navigation }: any) {
             }
 
             return () => {
-                mount = false;
+                isMounted.current = false;
             };
         },
         [paddingTop]
     );
 
-    const keyboardWillShow = (p_event: any) => {
-        setPaddingTop(p_event.endCoordinates.height - 25);
+    const keyboardWillShow = (event: KeyboardEvent): void => {
+        setPaddingTop(event.endCoordinates.height - 25);
     };
 
     const keyboardWillHide = () => {
         setPaddingTop(0);
     };
 
-    function initializeSections(p_contactWithMessages: ContactWithMessages) {
-        const groupedMessages = groupMessagesByDay(p_contactWithMessages);
+    function initializeSections(contactWithMessages: ContactWithMessages): void {
+        const groupedMessages = groupMessagesByDay(contactWithMessages);
         const keys = Object.keys(groupedMessages);
 
-        const newSections = [];
+        const newSections: Section[] = [];
 
         for (const key of keys) {
             const messages = groupedMessages[key];
@@ -117,11 +122,11 @@ export function ChatScreen({ route, navigation }: any) {
         setSections(newSections);
     }
 
-    function groupMessagesByDay(p_contactWithMessages: ContactWithMessages) {
+    function groupMessagesByDay(contactWithMessages: ContactWithMessages): { [key: string]: Message[] } {
         const dayMessagesMap: { [key: string]: Message[] } = {};
 
-        if (p_contactWithMessages?.Messages?.length > 0) {
-            for (const message of p_contactWithMessages.Messages) {
+        if (contactWithMessages?.Messages?.length > 0) {
+            for (const message of contactWithMessages.Messages) {
                 const messageDate = new Date(message.TstampNanos / 1000000);
                 const formattedMessageDate = isToday(messageDate) ?
                     'Today' :
@@ -140,14 +145,14 @@ export function ChatScreen({ route, navigation }: any) {
         return dayMessagesMap;
     }
 
-    function isToday(p_date: Date) {
+    function isToday(date: Date): boolean {
         const today = new Date();
-        return p_date.getDate() == today.getDate() &&
-            p_date.getMonth() == today.getMonth() &&
-            p_date.getFullYear() == today.getFullYear();
+        return date.getDate() == today.getDate() &&
+            date.getMonth() == today.getMonth() &&
+            date.getFullYear() == today.getFullYear();
     }
 
-    async function onSendMessage() {
+    async function onSendMessage(): Promise<void> {
         const contactWithMessages = route.params.contactWithMessages as ContactWithMessages;
         const timeStampNanos = new Date().getTime() * 1000000;
 
@@ -162,11 +167,13 @@ export function ChatScreen({ route, navigation }: any) {
             V2: true
         };
 
-        let todaySection: any;
+        let todaySection: Section = {
+            date: '',
+            data: []
+        };
 
         if (sections.length > 0 && sections[sections.length - 1].date === 'Today') {
             todaySection = sections[sections.length - 1];
-
         }
 
         if (!todaySection) {
@@ -178,14 +185,14 @@ export function ChatScreen({ route, navigation }: any) {
         }
 
         if (todaySection.data.length > 0) {
-            const lastMessage = todaySection.data[todaySection.data.length - 1];
+            const lastMessage: Message = todaySection.data[todaySection.data.length - 1];
             if (lastMessage.IsSender) {
                 lastMessage.LastOfGroup = false;
             }
         }
 
         todaySection.data.push(message);
-        setSections((previous) => sections);
+        setSections(sections);
 
         try {
             const encryptedMessage = await signing.encryptShared(contactWithMessages.PublicKeyBase58Check, messageText);
@@ -193,24 +200,34 @@ export function ChatScreen({ route, navigation }: any) {
 
             api.sendMessage(globals.user.publicKey, contactWithMessages.PublicKeyBase58Check, encryptedMessage)
                 .then(
-                    async p_response => {
-                        const transactionHex = p_response.TransactionHex;
+                    async response => {
+                        const transactionHex = response.TransactionHex;
                         const signedTransactionHex = await signing.signTransaction(transactionHex);
                         await api.submitTransaction(signedTransactionHex);
                     }
-                ).catch(p_error => globals.defaultHandleError(p_error));
-        } catch (p_exception) {
-            globals.defaultHandleError(p_exception);
+                ).catch(error => globals.defaultHandleError(error));
+        } catch (exception) {
+            globals.defaultHandleError(exception);
         }
     }
 
-    function scrollToBottom(p_animated: boolean) {
+    function scrollToBottom(animated: boolean): void {
         if (sectionListRef?.current && sections?.length > 0) {
             const sectionIndex = sections.length - 1;
             const itemIndex = sections[sectionIndex].data.length - 1;
-            (sectionListRef.current as any).scrollToLocation({ itemIndex: itemIndex, sectionIndex: sectionIndex, animated: p_animated });
+            sectionListRef.current.scrollToLocation({ itemIndex: itemIndex, sectionIndex: sectionIndex, animated: animated });
         }
     }
+
+    const renderItem = (item: Message) => <View style={styles.messageComponent}>
+        <MessageComponent message={item} />
+    </View>;
+
+    const keyExtractor = (item: Message, index: number) => `${item.SenderPublicKeyBase58Check}_${item.TstampNanos}_${index.toString()}`;
+
+    const renderHeader = (date: string) => <View style={[styles.dateContainer, themeStyles.chipColor]}>
+        <Text style={[styles.dateText, themeStyles.fontColorMain]}>{date}</Text>
+    </View>;
 
     return isLoading ?
         <CloutFeedLoader />
@@ -222,37 +239,29 @@ export function ChatScreen({ route, navigation }: any) {
                 <SectionList
                     ref={sectionListRef}
                     onContentSizeChange={() => scrollToBottom(false)}
-                    onScrollToIndexFailed={() => { }}
+                    onScrollToIndexFailed={() => { undefined; }}
                     showsVerticalScrollIndicator={false}
                     stickySectionHeadersEnabled={false}
                     sections={sections}
-                    keyExtractor={(item, index) => item.SenderPublicKeyBase58Check + item.TstampNanos + index}
-                    renderItem={({ item, section }) =>
-                        <View style={{ flexDirection: 'row' }}>
-                            <MessageComponent message={item}></MessageComponent>
-                        </View>
-                    }
-                    renderSectionHeader={
-                        ({ section: { date } }) => {
-                            return <View style={[styles.dateContainer, themeStyles.chipColor]}>
-                                <Text style={[styles.dateText, themeStyles.fontColorMain]}>{date}</Text>
-                            </View>;
-                        }
-                    }
+                    keyExtractor={keyExtractor}
+                    renderItem={({ item }) => renderItem(item)}
+                    renderSectionHeader={({ section: { date } }) => renderHeader(date)}
                 />
                 <View style={[
                     styles.textInputContainer,
-                    { height: textInputHeight + 45, backgroundColor: settingsGlobals.darkMode ? themeStyles.containerColorMain.backgroundColor : '#1e2428' }
+                    { height: textInputHeight + 45 }
                 ]}>
                     <TextInput
-                        style={[
-                            styles.textInput,
-                            { height: textInputHeight, backgroundColor: settingsGlobals.darkMode ? themeStyles.containerColorSub.backgroundColor : '#33383b' }
-                        ]}
-                        onContentSizeChange={(p_event) => {
-                            if (mount) {
+                        style={
+                            [
+                                styles.textInput,
+                                { height: textInputHeight }
+                            ]
+                        }
+                        onContentSizeChange={(event) => {
+                            if (isMounted) {
                                 setTextInputHeight(
-                                    Math.max(Math.min(p_event.nativeEvent.contentSize.height, 100), 35)
+                                    Math.max(Math.min(event.nativeEvent.contentSize.height, 100), 35)
                                 );
                             }
                         }}
@@ -285,12 +294,9 @@ const styles = StyleSheet.create(
         dateContainer: {
             alignSelf: 'center',
             borderRadius: 8,
-            paddingTop: 2,
-            paddingBottom: 2,
-            paddingRight: 6,
-            paddingLeft: 6,
-            marginTop: 4,
-            marginBottom: 4,
+            paddingVertical: 2,
+            paddingHorizontal: 6,
+            marginVertical: 4,
             borderWidth: 1,
             borderColor: 'black'
         },
@@ -299,25 +305,30 @@ const styles = StyleSheet.create(
             fontWeight: '700'
         },
         textInputContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'flex-end',
             paddingBottom: 36,
-            paddingTop: 8
+            paddingTop: 8,
+            backgroundColor: settingsGlobals.darkMode ?
+                themeStyles.containerColorMain.backgroundColor : '#1e2428'
         },
         textInput: {
             minHeight: 35,
             borderRadius: 25,
             marginLeft: 6,
             marginRight: 12,
-            paddingRight: 10,
-            paddingLeft: 10,
+            paddingHorizontal: 10,
             color: 'white',
             flex: 1,
-            fontSize: 16
+            fontSize: 16,
+            backgroundColor: settingsGlobals.darkMode ?
+                themeStyles.containerColorSub.backgroundColor : '#33383b'
         },
         sendButton: {
             marginRight: 5
+        },
+        messageComponent: {
+            flexDirection: 'row'
         }
     }
 );

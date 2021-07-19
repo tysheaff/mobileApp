@@ -12,7 +12,7 @@ import { signing } from '@services/authorization/signing';
 
 export function ContactMessagesListCardComponent(
     { contactWithMessages }: { contactWithMessages: ContactWithMessages }
-) {
+): JSX.Element {
     const [lastMessageText, setLastMessageText] = useState<string>('');
     const [duration, setDuration] = useState<string>('');
     const [showCreatorCoinHolding, setShowCreatorCoinHolding] = useState<boolean>(false);
@@ -38,7 +38,7 @@ export function ContactMessagesListCardComponent(
                             setLastMessageText(p_text);
                         }
                     }
-                ).catch(() => { });
+                ).catch(() => { undefined; });
 
                 setDuration(calculateDurationUntilNow(lastMessage.TstampNanos));
             } else {
@@ -62,9 +62,7 @@ export function ContactMessagesListCardComponent(
                 );
                 contactWithMessages.UnreadMessages = false;
                 setUnreadMessages(false);
-            } catch {
-
-            }
+            } catch { undefined; }
         }
 
         navigation.navigate(
