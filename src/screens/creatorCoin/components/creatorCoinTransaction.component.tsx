@@ -45,7 +45,7 @@ export class CreatorCoinTransactionComponent extends React.Component<Props> {
             <View style={[styles.profileListCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
                 <ProfileInfoCardComponent
                     publicKey={this.props.publicKey}
-                    username={profile.Username}
+                    username={profile?.Username}
                     coinPrice={formattedCoinPrice}
                     verified={profile?.IsVerified}
                     duration={calculateDurationUntilNow(this.props.creatorCoinTransaction.timeStamp * 1000000000)}

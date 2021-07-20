@@ -105,9 +105,9 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
         const renderItem = ({ item }: { item: DiamondSender }) => <TouchableOpacity onPress={() => this.goToProfile(item.DiamondSenderProfile)} activeOpacity={1}>
             <View style={[styles.diamondSenderCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
                 <ProfileInfoCardComponent
-                    publicKey={item.DiamondSenderProfile.PublicKeyBase58Check}
-                    username={item.DiamondSenderProfile.Username}
-                    coinPrice={item.DiamondSenderProfile.FormattedCoinPriceUSD as string}
+                    publicKey={item.DiamondSenderProfile?.PublicKeyBase58Check}
+                    username={item.DiamondSenderProfile?.Username}
+                    coinPrice={item.DiamondSenderProfile?.FormattedCoinPriceUSD as string}
                     verified={item.DiamondSenderProfile?.IsVerified}
                 />
                 <View style={styles.diamondsContainer}>

@@ -89,7 +89,7 @@ export function ProfileListCardComponent({ profile, isFollowing }:
     return <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
         <View style={[styles.profileListCard, themeStyles.containerColorMain]}>
             <ProfileInfoCardComponent
-                publicKey={profile.PublicKeyBase58Check}
+                publicKey={profile?.PublicKeyBase58Check}
                 username={profile?.Username}
                 coinPrice={profileCoinPrice}
                 verified={profile?.IsVerified}

@@ -22,8 +22,9 @@ export default class ProfileInfoCardComponent extends React.Component<Props> {
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        return this.props.username !== nextProps.username ||
-            this.props.coinPrice !== nextProps.coinPrice;
+        return this.props.publicKey !== nextProps.publicKey ||
+            this.props.coinPrice !== nextProps.coinPrice ||
+            this.props.duration !== nextProps.duration;
     }
 
     render(): JSX.Element {

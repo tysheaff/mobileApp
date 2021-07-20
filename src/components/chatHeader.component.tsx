@@ -1,18 +1,18 @@
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
 import { ContactWithMessages } from '@types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import MessageInfoCardComponent from './profileInfo/messageInfoCard.component';
 
 export function ChatHeaderComponent(
     { contactWithMessages }: { contactWithMessages: ContactWithMessages }
 ): JSX.Element {
     const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
-    function goToProfile() {
+    function goToProfile(): void {
         if (
             contactWithMessages.ProfileEntryResponse &&
             contactWithMessages.ProfileEntryResponse.Username !== 'anonymous') {
@@ -33,19 +33,13 @@ export function ChatHeaderComponent(
             <Ionicons name="chevron-back" size={32} color="#007ef5" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
-            <Image style={styles.profileImage}
-                source={{ uri: contactWithMessages.ProfileEntryResponse?.ProfilePic }}></Image>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
-            <View style={styles.horizontalContainer}>
-                <Text style={[styles.username, themeStyles.fontColorMain]}>{contactWithMessages.ProfileEntryResponse?.Username}</Text>
-                {
-                    contactWithMessages.ProfileEntryResponse?.IsVerified ?
-                        <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
-                }
-            </View>
+        <TouchableOpacity activeOpacity={1} onPress={goToProfile}>
+            <MessageInfoCardComponent
+                publicKey={contactWithMessages.ProfileEntryResponse?.PublicKeyBase58Check}
+                username={contactWithMessages.ProfileEntryResponse?.Username}
+                verified={contactWithMessages.ProfileEntryResponse?.IsVerified}
+                isLarge
+            />
         </TouchableOpacity>
     </View>;
 }
@@ -53,7 +47,6 @@ export function ChatHeaderComponent(
 const styles = StyleSheet.create(
     {
         container: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             paddingRight: 10,
@@ -62,23 +55,5 @@ const styles = StyleSheet.create(
             height: 50
 
         },
-        profileImage: {
-            width: 30,
-            height: 30,
-            borderRadius: 6,
-            marginRight: 12,
-            marginLeft: 12
-        },
-        username: {
-            fontWeight: '700',
-            maxWidth: Dimensions.get('window').width / 2,
-            marginRight: 6,
-            fontSize: 16
-        },
-        horizontalContainer: {
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-        }
     }
 );

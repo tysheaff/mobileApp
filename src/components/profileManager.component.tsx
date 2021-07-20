@@ -115,16 +115,15 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
                 key={item.PublicKeyBase58Check + String(index)}
             >
                 <ProfileInfoCardComponent
-                    publicKey={item.PublicKeyBase58Check}
+                    publicKey={item?.PublicKeyBase58Check}
                     username={item?.Username}
                     coinPrice={calculateAndFormatBitCloutInUsd(item.CoinPriceBitCloutNanos)}
                     verified={item?.IsVerified}
                     isProfileManager={true}
                 />
                 {
-                    item.PublicKeyBase58Check === globals.user.publicKey
-                        ? <AntDesign style={{ marginLeft: 'auto' }} name="checkcircle" size={24} color="#007ef5" />
-                        : undefined
+                    item.PublicKeyBase58Check === globals.user.publicKey &&
+                    <AntDesign style={styles.icon} name="checkcircle" size={24} color="#007ef5" />
                 }
             </TouchableOpacity>;
 
@@ -206,6 +205,9 @@ const styles = StyleSheet.create(
         },
         addAccountButtonText: {
             fontWeight: '500'
+        },
+        icon: {
+            marginLeft: 'auto'
         }
     }
 );

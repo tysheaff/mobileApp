@@ -1,11 +1,13 @@
 import React from 'react';
 import { Text, StyleSheet, View, Dimensions } from 'react-native';
 import { themeStyles } from '@styles/globalColors';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 
 interface Props {
     username: string;
     verified: boolean;
+    showCreatorCoinHolding?: boolean;
+    isLarge?: boolean;
 }
 
 export default class ProfileInfoUsernameComponent extends React.Component<Props> {
@@ -15,16 +17,19 @@ export default class ProfileInfoUsernameComponent extends React.Component<Props>
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        return this.props.username !== nextProps.username ||
-            this.props.verified !== nextProps.verified;
+        return this.props.username !== nextProps.username;
     }
 
     render(): JSX.Element {
         return <View style={styles.container}>
-            <Text style={[styles.username, themeStyles.fontColorMain]}>{this.props.username}</Text>
+            <Text style={[styles.username, themeStyles.fontColorMain, this.props.isLarge ? styles.chatHeaderUsername : {}]}>{this.props.username}</Text>
             {
-                this.props.verified
-                && <MaterialIcons name="verified" size={16} style={styles.verified} color="#007ef5" />
+                this.props.verified &&
+                <MaterialIcons name="verified" size={16} style={styles.verified} color="#007ef5" />
+            }
+            {
+                !!this.props.showCreatorCoinHolding &&
+                <AntDesign style={styles.starIcon} name={'star'} size={15} color={'#ffdb58'} />
             }
         </View>;
     }
@@ -42,6 +47,12 @@ const styles = StyleSheet.create(
         },
         verified: {
             marginLeft: 5,
+        },
+        starIcon: {
+            marginBottom: 3
+        },
+        chatHeaderUsername: {
+            fontSize: 16,
         }
     }
 );
