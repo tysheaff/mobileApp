@@ -4,7 +4,7 @@ import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
 import { cache } from '@services/dataCaching';
-import { CreatorCoinHODLer } from '@types';
+import { CoinEntry, CreatorCoinHODLer } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.component';
 import { formatNumber } from '@services/helpers';
@@ -22,10 +22,6 @@ interface Section {
     renderItem: any;
 }
 
-interface Props {
-
-}
-
 interface State {
     isLoading: boolean;
     publicKey: string;
@@ -39,8 +35,9 @@ interface State {
     refreshing: boolean;
 }
 
-export class WalletScreen extends React.Component<Props, State> {
-    sectionListRef: any;
+export class WalletScreen extends React.Component<Record<string, never>, State> {
+
+    private _sectionListRef: SectionList<CreatorCoinHODLer | null, Section> | null = null;
 
     private readonly tabs: TabConfig[] = [
         {
@@ -53,7 +50,7 @@ export class WalletScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
 
-    constructor(props: Props) {
+    constructor(props: Record<string, never>) {
         super(props);
 
         this.state = {
@@ -74,26 +71,33 @@ export class WalletScreen extends React.Component<Props, State> {
         this.onTabClick = this.onTabClick.bind(this);
 
         navigatorGlobals.refreshWallet = () => {
-            if (this.sectionListRef) {
-                this.sectionListRef.scrollToLocation({ sectionIndex: 0, itemIndex: 0, animated: true, viewPosition: 0 });
+            if (this._sectionListRef) {
+                this._sectionListRef?.scrollToLocation(
+                    {
+                        sectionIndex: 0,
+                        itemIndex: 0,
+                        animated: true,
+                        viewPosition: 0
+                    }
+                );
             }
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(_nextProps: Props, p_nextSate: State) {
-        return p_nextSate.isLoading !== this.state.isLoading ||
-            p_nextSate.selectedTab !== this.state.selectedTab;
+    shouldComponentUpdate(_nextProps: Record<string, never>, nextSate: State): boolean {
+        return nextSate.isLoading !== this.state.isLoading ||
+            nextSate.selectedTab !== this.state.selectedTab;
     }
 
-    loadData() {
+    private loadData() {
 
         if (this._isMounted) {
             this.setState({ isLoading: true });
@@ -105,14 +109,14 @@ export class WalletScreen extends React.Component<Props, State> {
                 cache.user.getData(true)
             ]
         ).then(
-            p_responses => {
-                const user = p_responses[1];
+            responses => {
+                const user = responses[1];
                 const bitCloutNanos = 1000000000.0;
                 const balanceBitClout = (user.BalanceNanos / bitCloutNanos).toFixed(9);
                 const bitCloutPriceUsd = calculateAndFormatBitCloutInUsd(bitCloutNanos);
                 const balanceUsd = calculateAndFormatBitCloutInUsd(user.BalanceNanos);
 
-                const usersYouHODL = user.UsersYouHODL ;
+                const usersYouHODL = user.UsersYouHODL;
 
                 let creatorCoinsTotalValueUsd = 0;
 
@@ -160,7 +164,7 @@ export class WalletScreen extends React.Component<Props, State> {
         );
     }
 
-    bitCloutNanosYouWouldGetIfYouSold(creatorCoinAmountNano: number, coinEntry: any): number {
+    private bitCloutNanosYouWouldGetIfYouSold(creatorCoinAmountNano: number, coinEntry: CoinEntry): number {
         const bitCloutLockedNanos = coinEntry.BitCloutLockedNanos;
         const currentCreatorCoinSupply = coinEntry.CoinsInCirculationNanos;
 
@@ -179,7 +183,7 @@ export class WalletScreen extends React.Component<Props, State> {
         );
     }
 
-    getSections(p_usersYouHODL: CreatorCoinHODLer[], p_purchased: boolean) {
+    private getSections(p_usersYouHODL: CreatorCoinHODLer[], p_purchased: boolean): Section[] {
         const sections: Section[] = [
             {
                 header: true,
@@ -194,10 +198,10 @@ export class WalletScreen extends React.Component<Props, State> {
                 {
                     header: false,
                     data: filteredUsersYouHODL,
-                    renderItem: ({ item }: any) => <CreatorCoinHODLerComponent
+                    renderItem: ({ item }: { item: CreatorCoinHODLer }) => <CreatorCoinHODLerComponent
                         isHolder={false}
-                        creatorCoinPrice={(item as CreatorCoinHODLer).ProfileEntryResponse?.CoinPriceUSD}
-                        userWhoHODL={item}></CreatorCoinHODLerComponent>
+                        creatorCoinPrice={item.ProfileEntryResponse?.CoinPriceUSD}
+                        userWhoHODL={item} />
                 }
             );
         } else {
@@ -205,7 +209,7 @@ export class WalletScreen extends React.Component<Props, State> {
                 {
                     header: false,
                     data: [null],
-                    renderItem: ({ item }: any) => <Text style={[styles.noCoinsText, themeStyles.fontColorSub]}>
+                    renderItem: () => <Text style={[styles.noCoinsText, themeStyles.fontColorSub]}>
                         You have not {p_purchased ? 'purchased' : 'received'} any creator coins yet.
                     </Text>
                 }
@@ -222,17 +226,17 @@ export class WalletScreen extends React.Component<Props, State> {
         );
     }
 
-    onTabClick(p_selectedTab: string) {
-        const sections = this.getSections(this.state.usersYouHODL, p_selectedTab === WalletTab.Purchased);
+    onTabClick(selectedTab: string) {
+        const sections = this.getSections(this.state.usersYouHODL, selectedTab === WalletTab.Purchased);
 
-        if (this.sectionListRef) {
-            this.sectionListRef.scrollToLocation({ sectionIndex: 1, itemIndex: 0, animated: true, viewPosition: 0.5 });
+        if (this._sectionListRef) {
+            this._sectionListRef.scrollToLocation({ sectionIndex: 1, itemIndex: 0, animated: true, viewPosition: 0.5 });
         }
 
         if (this._isMounted) {
             this.setState(
                 {
-                    selectedTab: p_selectedTab as any,
+                    selectedTab: selectedTab as any,
                     sections
                 }
             );
@@ -240,53 +244,54 @@ export class WalletScreen extends React.Component<Props, State> {
     }
 
     render() {
+        const renderItem = () => <>
+            <View style={[styles.bitCloutPriceContainer]}>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>$BitClout Price</Text>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.bitCloutPriceUsd}</Text>
+            </View>
+
+            <View style={[styles.balanceContainer, themeStyles.containerColorSub]}>
+                <Text style={[styles.balanceText, themeStyles.fontColorSub]}>Balance</Text>
+                <Text style={[styles.balanceBitClout, themeStyles.fontColorMain]}>{this.state.balanceBitClout}</Text>
+                <Text style={[styles.balanceUsd, themeStyles.fontColorMain]}>≈ ${this.state.balanceUsd} USD Value</Text>
+            </View>
+
+            <View style={[styles.creatorCoinsContainer]}>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>Creator Coins</Text>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.creatorCoinsTotalValueUsd}</Text>
+            </View>
+        </>;
+
+        const renderRefresh = <RefreshControl
+            tintColor={themeStyles.fontColorMain.color}
+            titleColor={themeStyles.fontColorMain.color}
+            refreshing={this.state.refreshing}
+            onRefresh={() => this.loadData()}
+        />;
+
+        const renderHeader = (header: boolean) => header ?
+            <View />
+            : <TabsComponent
+                tabs={this.tabs}
+                selectedTab={this.state.selectedTab}
+                onTabClick={(selectedTab: string) => this.onTabClick(selectedTab)}
+            />;
+
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading ?
                     <CloutFeedLoader />
                     :
                     <SectionList
-                        ref={ref => (this.sectionListRef = ref)}
-                        onScrollToIndexFailed={() => { }}
+                        ref={ref => (this._sectionListRef = ref)}
+                        onScrollToIndexFailed={() => { return; }}
                         style={[styles.container, themeStyles.containerColorMain]}
                         stickySectionHeadersEnabled={true}
                         sections={this.state.sections}
                         keyExtractor={(item, index) => item ? item.CreatorPublicKeyBase58Check + index.toString() : index.toString()}
-                        renderItem={
-                            () => <>
-                                <View style={[styles.bitCloutPriceContainer]}>
-                                    <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>$BitClout Price</Text>
-                                    <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.bitCloutPriceUsd}</Text>
-                                </View>
-
-                                <View style={[styles.balanceContainer, themeStyles.containerColorSub]}>
-                                    <Text style={[styles.balanceText, themeStyles.fontColorSub]}>Balance</Text>
-                                    <Text style={[styles.balanceBitClout, themeStyles.fontColorMain]}>{this.state.balanceBitClout}</Text>
-                                    <Text style={[styles.balanceUsd, themeStyles.fontColorMain]}>≈ ${this.state.balanceUsd} USD Value</Text>
-                                </View>
-
-                                <View style={[styles.creatorCoinsContainer]}>
-                                    <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>Creator Coins</Text>
-                                    <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.creatorCoinsTotalValueUsd}</Text>
-                                </View>
-                            </>
-                        }
-                        renderSectionHeader={
-                            ({ section: { header } }) => {
-                                return header ? <View></View> :
-                                    <TabsComponent
-                                        tabs={this.tabs}
-                                        selectedTab={this.state.selectedTab}
-                                        onTabClick={this.onTabClick}
-                                    ></TabsComponent>;
-                            }
-                        }
-                        refreshControl={<RefreshControl
-                            tintColor={themeStyles.fontColorMain.color}
-                            titleColor={themeStyles.fontColorMain.color}
-                            refreshing={this.state.refreshing}
-                            onRefresh={this.loadData}
-                        />}
+                        renderItem={renderItem}
+                        renderSectionHeader={({ section: { header } }) => renderHeader(header)}
+                        refreshControl={renderRefresh}
                     />
             }
         </View>;

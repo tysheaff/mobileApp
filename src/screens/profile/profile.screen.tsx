@@ -16,6 +16,8 @@ import OwnProfileOptionsComponent from './ownProfileOptions.component';
 import { useFocusEffect } from '@react-navigation/core';
 import { cloutApi } from '@services/api/cloutApi';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { ParamListBase, RouteProp, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 enum ProfileScreenTab {
     Posts = 'Posts',
@@ -24,8 +26,22 @@ enum ProfileScreenTab {
     Diamonds = 'Diamonds'
 }
 
+type Route = {
+    route: {
+        params: {
+            username: string;
+            deletedPost: string | undefined;
+            profileUpdated: boolean;
+        }
+    }
+};
+
 let tempTab = '';
-export function ProfileScreen({ navigation, route }: any) {
+
+export function ProfileScreen({ route }: Route): JSX.Element {
+
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+
     let username = route.params?.username;
     if (!username) {
         username = globals.user.username;
@@ -33,30 +49,29 @@ export function ProfileScreen({ navigation, route }: any) {
 
     const isLoggedInUser = username === globals.user.username;
 
-    const [isLoading, setLoading] = useState(true);
-    const [isLoadingMore, setLoadingMore] = useState(false);
-    const [noMorePosts, setNoMorePosts] = useState(false);
-    const [noMoreHolders, setNoMoreHolders] = useState(false);
-    const [canCreateProfile, setCanCreateProfile] = useState(false);
+    const [isLoading, setLoading] = useState<boolean>(true);
+    const [isLoadingMore, setLoadingMore] = useState<boolean>(false);
+    const [noMorePosts, setNoMorePosts] = useState<boolean>(false);
+    const [noMoreHolders, setNoMoreHolders] = useState<boolean>(false);
+    const [canCreateProfile, setCanCreateProfile] = useState<boolean>(false);
     const [profile, setProfile] = useState<Profile>({} as Profile);
     const [fullProfile, setFullProfile] = useState<Profile | undefined>(undefined);
     const [diamondSenders, setDiamondSenders] = useState<DiamondSender[] | undefined>(undefined);
     const [coinPrice, setCoinPrice] = useState<number>(0);
-    const [refreshing, setRefreshing] = useState(false);
     const [tabs, setTabs] = useState<TabConfig[]>([]);
     const [selectedTab, setSelectedTab] = useState<ProfileScreenTab>(ProfileScreenTab.Posts);
     const [sections, setSections] = useState<any>({});
-    const sectionListRef = useRef(null);
+    const sectionListRef: React.RefObject<SectionList> = useRef(null);
     const pinnedPostHashHex = useRef('');
+    const isMounted = useRef<boolean>(true);
 
-    let mount = true;
-    const reload = { posts: () => { }, creatorCoin: () => { }, stats: () => { } };
+    const reload = { posts: () => { undefined; }, creatorCoin: () => { undefined; }, stats: () => { undefined; } };
 
     if (route.params?.deletedPost) {
-        const newPosts = profile.Posts.filter((p_post: Post) => p_post.PostHashHex !== route.params.deletedPost);
+        const newPosts = profile.Posts.filter((post: Post) => post.PostHashHex !== route.params.deletedPost);
         profile.Posts = newPosts;
 
-        if (mount) {
+        if (isMounted) {
             setProfile(profile);
             configureSections(profile, selectedTab);
             route.params.deletedPost = undefined;
@@ -66,7 +81,7 @@ export function ProfileScreen({ navigation, route }: any) {
     if (!route.params) {
         navigatorGlobals.refreshProfile = () => {
             if (sectionListRef.current) {
-                (sectionListRef.current as any).scrollToLocation({ sectionIndex: 0, itemIndex: 0, animated: true, viewPosition: 0 });
+                sectionListRef.current.scrollToLocation({ sectionIndex: 0, itemIndex: 0, animated: true, viewPosition: 0 });
             }
         };
     }
@@ -77,7 +92,7 @@ export function ProfileScreen({ navigation, route }: any) {
             loadData();
 
             return () => {
-                mount = false;
+                isMounted.current = false;
             };
         },
         []
@@ -101,7 +116,7 @@ export function ProfileScreen({ navigation, route }: any) {
         )
     );
 
-    function configureTabs() {
+    function configureTabs(): void {
         const newTabs: TabConfig[] = [
             {
                 name: ProfileScreenTab.Posts
@@ -125,8 +140,8 @@ export function ProfileScreen({ navigation, route }: any) {
         setTabs(newTabs);
     }
 
-    function loadData() {
-        if (mount) {
+    function loadData(): void {
+        if (isMounted) {
             setLoading(true);
             setNoMoreHolders(false);
             setNoMorePosts(false);
@@ -135,7 +150,7 @@ export function ProfileScreen({ navigation, route }: any) {
         }
 
         if (!username) {
-            if (mount) {
+            if (isMounted) {
                 setLoading(false);
                 setCanCreateProfile(false);
                 return;
@@ -148,9 +163,9 @@ export function ProfileScreen({ navigation, route }: any) {
                 loadSingleProfile()
             ]
         ).then(
-            async p_responses => {
-                if (mount) {
-                    const profile = p_responses[1];
+            async responses => {
+                if (isMounted) {
+                    const profile = responses[1];
                     const posts = await loadPosts(profile.PublicKeyBase58Check);
                     profile.Posts = posts;
 
@@ -158,7 +173,7 @@ export function ProfileScreen({ navigation, route }: any) {
                         post.ProfileEntryResponse = getProfileCopy(profile);
                     }
 
-                    if (mount) {
+                    if (isMounted) {
                         setProfile(profile);
                         setSelectedTab(ProfileScreenTab.Posts);
                         configureSections(profile, ProfileScreenTab.Posts);
@@ -166,10 +181,10 @@ export function ProfileScreen({ navigation, route }: any) {
                     }
                 }
             }
-        ).catch(p_error => globals.defaultHandleError(p_error));
+        ).catch(error => globals.defaultHandleError(error));
     }
 
-    async function loadSingleProfile() {
+    async function loadSingleProfile(): Promise<Profile> {
         const response = await api.getSingleProfile(username);
         const newProfile = response.Profile as Profile;
 
@@ -177,7 +192,7 @@ export function ProfileScreen({ navigation, route }: any) {
             const calculatedCoinPrice = calculateBitCloutInUSD(newProfile.CoinPriceBitCloutNanos);
             newProfile.ProfilePic = api.getSingleProfileImage(newProfile.PublicKeyBase58Check);
 
-            if (mount) {
+            if (isMounted) {
                 setCanCreateProfile(true);
                 setCoinPrice(calculatedCoinPrice);
             }
@@ -185,7 +200,7 @@ export function ProfileScreen({ navigation, route }: any) {
         return newProfile;
     }
 
-    async function loadPosts(publicKey: string) {
+    async function loadPosts(publicKey: string): Promise<Post[]> {
         const response = await api.getProfilePostsBatch(globals.user.publicKey, username, 10);
         let posts = response.Posts as Post[] ?? [];
 
@@ -204,60 +219,60 @@ export function ProfileScreen({ navigation, route }: any) {
             pinnedPostHashHex.current = '';
         }
 
-        posts = posts.filter((p_post, p_index) => !p_post.IsHidden && (p_post.PostHashHex !== pinnedPostHashHex.current || p_index === 0));
+        posts = posts.filter((post, index) => !post.IsHidden && (post.PostHashHex !== pinnedPostHashHex.current || index === 0));
         return posts;
     }
 
-    function configureSections(p_profile: Profile, p_selectedTab: string, p_fullProfile?: Profile | undefined, p_diamondSenders?: DiamondSender[] | undefined) {
-        let tabData: any[] = [null];
-        let renderItem: any = () => undefined;
+    function configureSections(profile: Profile, selectedTab: string, fullProfile?: Profile | undefined, diamondSenders?: DiamondSender[] | undefined): void {
+        let tabData: DiamondSender[] | Post[] | Profile[] | CreatorCoinHODLer[] | null[] = [null];
+        let renderItem: ({ item }: any) => void = () => undefined;
 
-        if (p_selectedTab === ProfileScreenTab.Posts) {
-            if (p_profile.Posts?.length > 0) {
-                tabData = p_profile.Posts;
+        if (selectedTab === ProfileScreenTab.Posts) {
+            if (profile.Posts?.length > 0) {
+                tabData = profile.Posts;
                 renderItem = ({ item }: { item: Post }) => <PostComponent
-                    route={route}
+                    route={route as RouteProp<ParamListBase, string>}
                     navigation={navigation}
                     post={item}
-                    isPinned={item.PostHashHex === pinnedPostHashHex.current}></PostComponent>;
+                    isPinned={item.PostHashHex === pinnedPostHashHex.current} />;
             } else {
-                renderItem = ({ item }: any) => <View style={styles.noPostsContainer}>
+                renderItem = () => <View style={styles.noPostsContainer}>
                     <Text style={[styles.noPostsText, themeStyles.fontColorSub]}>No posts yet</Text>
                 </View>;
             }
 
-        } else if (p_selectedTab === ProfileScreenTab.CreatorCoin) {
-            if (p_profile.UsersThatHODL) {
-                tabData = p_profile.UsersThatHODL;
-                renderItem = ({ item }: any) => <CreatorCoinHODLerComponent
+        } else if (selectedTab === ProfileScreenTab.CreatorCoin) {
+            if (profile.UsersThatHODL) {
+                tabData = profile.UsersThatHODL;
+                renderItem = ({ item }: { item: CreatorCoinHODLer }) => <CreatorCoinHODLerComponent
                     isHolder={true}
                     creatorCoinPrice={coinPrice}
-                    userWhoHODL={item}></CreatorCoinHODLerComponent>;
+                    userWhoHODL={item} />;
             } else {
                 renderItem = () => <ActivityIndicator
-                    style={{ marginTop: 100 }}
+                    style={styles.activityIndicator}
                     color={themeStyles.fontColorMain.color}
-                ></ActivityIndicator>;
+                />;
             }
-        } else if (p_selectedTab === ProfileScreenTab.Stats) {
-            if (p_fullProfile) {
+        } else if (selectedTab === ProfileScreenTab.Stats) {
+            if (fullProfile) {
                 renderItem = () => <ProfileStats
-                    profile={p_fullProfile} followers={[]} reload={reload}></ProfileStats>;
+                    profile={fullProfile} followers={[]} reload={reload} />;
             } else {
                 renderItem = () => <ActivityIndicator
-                    style={{ marginTop: 100 }}
+                    style={styles.activityIndicator}
                     color={themeStyles.fontColorMain.color}
-                ></ActivityIndicator>;
+                />;
             }
-        } else if (p_selectedTab === ProfileScreenTab.Diamonds) {
-            if (p_diamondSenders) {
-                tabData = p_diamondSenders;
-                renderItem = ({ item }: any) => <DiamondSenderComponent navigation={navigation} diamondSender={item}></DiamondSenderComponent>;
+        } else if (selectedTab === ProfileScreenTab.Diamonds) {
+            if (diamondSenders) {
+                tabData = diamondSenders;
+                renderItem = ({ item }: { item: DiamondSender }) => <DiamondSenderComponent navigation={navigation} diamondSender={item} />;
             } else {
                 renderItem = () => <ActivityIndicator
-                    style={{ marginTop: 100 }}
+                    style={styles.activityIndicator}
                     color={themeStyles.fontColorMain.color}
-                ></ActivityIndicator>;
+                />;
             }
         }
 
@@ -273,12 +288,12 @@ export function ProfileScreen({ navigation, route }: any) {
             }
         ];
 
-        if (mount) {
+        if (isMounted) {
             setSections(newSections);
         }
     }
 
-    function goToChat() {
+    function goToChat(): void {
         const newProfile: Profile = getProfileCopy(profile);
 
         navigation.navigate(
@@ -298,33 +313,40 @@ export function ProfileScreen({ navigation, route }: any) {
         );
     }
 
-    async function onTabClick(p_tabName: string) {
-        tempTab = p_tabName;
-        setSelectedTab(p_tabName as any);
+    async function onTabClick(tabName: string): Promise<void> {
+        tempTab = tabName;
+        setSelectedTab(tabName as ProfileScreenTab);
 
         if (sectionListRef.current) {
-            (sectionListRef.current as any).scrollToLocation({ sectionIndex: 1, itemIndex: 0, animated: false, viewPosition: 1 });
+            sectionListRef.current.scrollToLocation(
+                {
+                    sectionIndex: 1,
+                    itemIndex: 0,
+                    animated: false,
+                    viewPosition: 1
+                }
+            );
         }
 
         let newFullProfile = fullProfile;
         let newDiamondSenders = diamondSenders;
 
-        if (p_tabName === ProfileScreenTab.CreatorCoin && !profile.UsersThatHODL) {
-            configureSections(profile, p_tabName);
+        if (tabName === ProfileScreenTab.CreatorCoin && !profile.UsersThatHODL) {
+            configureSections(profile, tabName);
             await loadHolders();
-        } else if (p_tabName === ProfileScreenTab.Stats && !newFullProfile) {
-            configureSections(profile, p_tabName);
+        } else if (tabName === ProfileScreenTab.Stats && !newFullProfile) {
+            configureSections(profile, tabName);
             newFullProfile = await loadFullProfile();
-        } else if (p_tabName === ProfileScreenTab.Diamonds && !newDiamondSenders) {
-            configureSections(profile, p_tabName);
+        } else if (tabName === ProfileScreenTab.Diamonds && !newDiamondSenders) {
+            configureSections(profile, tabName);
             newDiamondSenders = await loadDiamondSenders();
         }
 
-        if (mount) {
+        if (isMounted) {
             setProfile(profile);
 
-            if (tempTab === p_tabName) {
-                configureSections(profile, p_tabName, newFullProfile, newDiamondSenders);
+            if (tempTab === tabName) {
+                configureSections(profile, tabName, newFullProfile, newDiamondSenders);
             }
 
             if (newFullProfile) {
@@ -341,11 +363,11 @@ export function ProfileScreen({ navigation, route }: any) {
         await api.getProfileHolders(
             username, 25
         ).then(
-            p_response => {
-                const holders = p_response.Hodlers as CreatorCoinHODLer[] ?? [];
+            response => {
+                const holders = response.Hodlers as CreatorCoinHODLer[] ?? [];
                 profile.UsersThatHODL = holders;
             }
-        ).catch(p_error => globals.defaultHandleError(p_error));
+        ).catch(error => globals.defaultHandleError(error));
     }
 
     async function loadFullProfile() {
@@ -369,29 +391,28 @@ export function ProfileScreen({ navigation, route }: any) {
 
             let loading = false;
             if (selectedTab === ProfileScreenTab.Posts) {
-                if (!noMorePosts && mount) {
+                if (!noMorePosts && isMounted) {
                     loading = true;
                     setLoadingMore(true);
                     await loadMorePosts();
                 }
             } else if (selectedTab === ProfileScreenTab.CreatorCoin) {
-                if (!noMoreHolders && mount) {
+                if (!noMoreHolders && isMounted) {
                     loading = true;
                     setLoadingMore(true);
                     await loadMoreHolders();
                 }
             }
 
-            if (loading && mount) {
+            if (loading && isMounted) {
                 setProfile(profile);
                 configureSections(profile, selectedTab);
                 setLoadingMore(false);
             }
-        } catch (p_exception) {
-        }
+        } catch { return; }
     }
 
-    async function loadMorePosts() {
+    async function loadMorePosts(): Promise<void> {
         if (profile.Posts?.length > 0) {
             const lastPostHashHex = profile.Posts[profile.Posts.length - 1].PostHashHex;
             const response = await api.getProfilePostsBatch(globals.user.publicKey, username, 10, lastPostHashHex);
@@ -401,17 +422,17 @@ export function ProfileScreen({ navigation, route }: any) {
                 for (const post of newPosts) {
                     post.ProfileEntryResponse = getProfileCopy(profile);
                 }
-                newPosts = newPosts.filter(p_post => !p_post.IsHidden && p_post.PostHashHex !== pinnedPostHashHex.current);
+                newPosts = newPosts.filter(post => !post.IsHidden && post.PostHashHex !== pinnedPostHashHex.current);
                 profile.Posts = profile.Posts.concat(newPosts);
             } else {
-                if (mount) {
+                if (isMounted) {
                     setNoMorePosts(true);
                 }
             }
         }
     }
 
-    async function loadMoreHolders() {
+    async function loadMoreHolders(): Promise<void> {
         if (profile.UsersThatHODL && profile.UsersThatHODL.length > 0) {
             const lastPublicKey = profile.UsersThatHODL[profile.UsersThatHODL?.length - 1].HODLerPublicKeyBase58Check;
             const response = await api.getProfileHolders(username, 30, lastPublicKey);
@@ -420,29 +441,29 @@ export function ProfileScreen({ navigation, route }: any) {
             if (holders?.length > 0) {
                 profile.UsersThatHODL = profile.UsersThatHODL.concat(holders);
             } else {
-                if (mount) {
+                if (isMounted) {
                     setNoMoreHolders(true);
                 }
             }
         }
     }
 
-    function getProfileCopy(p_profile: Profile): Profile {
+    function getProfileCopy(profile: Profile): Profile {
         const newProfile: Profile = {
-            ProfilePic: p_profile.ProfilePic,
-            Username: p_profile.Username,
-            Description: p_profile.Description,
-            PublicKeyBase58Check: p_profile.PublicKeyBase58Check,
-            CoinPriceBitCloutNanos: p_profile.CoinPriceBitCloutNanos,
-            CoinEntry: p_profile.CoinEntry,
-            IsVerified: p_profile.IsVerified,
+            ProfilePic: profile.ProfilePic,
+            Username: profile.Username,
+            Description: profile.Description,
+            PublicKeyBase58Check: profile.PublicKeyBase58Check,
+            CoinPriceBitCloutNanos: profile.CoinPriceBitCloutNanos,
+            CoinEntry: profile.CoinEntry,
+            IsVerified: profile.IsVerified,
             Posts: []
         };
 
         return newProfile;
     }
 
-    const keyExtractor = (item: any, index: number) => {
+    const keyExtractor = (item: Post | CreatorCoinHODLer | DiamondSender, index: number) => {
         if (selectedTab === ProfileScreenTab.Posts) {
             return (item as Post)?.PostHashHex + index.toString();
         } else if (selectedTab === ProfileScreenTab.CreatorCoin) {
@@ -454,6 +475,46 @@ export function ProfileScreen({ navigation, route }: any) {
         }
     };
 
+    const renderItem = () => <View style={styles.profileCardContainer}>
+        {
+            !globals.readonly &&
+                !isLoggedInUser ?
+                <ProfileScreenOptionsComponent
+                    publicKey={profile.PublicKeyBase58Check}
+                    goToChat={goToChat}
+                    username={profile.Username}
+                />
+                :
+                <OwnProfileOptionsComponent
+                    username={profile.Username}
+                    publicKey={profile.PublicKeyBase58Check}
+                    navigation={navigation} />
+        }
+        <ProfileCard
+            navigation={navigation}
+            profile={profile}
+            coinPrice={coinPrice}
+        />
+    </View>;
+
+    const renderHeader = (profileCard: JSX.Element) => profileCard ?
+        <View /> :
+        <TabsComponent
+            tabs={tabs}
+            selectedTab={selectedTab}
+            onTabClick={onTabClick}
+        />;
+
+    const renderFooter = () => isLoadingMore ?
+        <ActivityIndicator color={themeStyles.fontColorMain.color} />
+        : <View />;
+
+    const renderRefresh = <RefreshControl
+        tintColor={themeStyles.fontColorMain.color}
+        titleColor={themeStyles.fontColorMain.color}
+        refreshing={false}
+        onRefresh={loadData} />;
+
     return isLoading ?
         <CloutFeedLoader />
         :
@@ -461,7 +522,7 @@ export function ProfileScreen({ navigation, route }: any) {
             <View style={styles.container}>
                 <SectionList
                     ref={sectionListRef}
-                    onScrollToIndexFailed={() => { }}
+                    onScrollToIndexFailed={() => { return; }}
                     style={themeStyles.containerColorSub}
                     stickySectionHeadersEnabled={true}
                     initialNumToRender={3}
@@ -471,51 +532,14 @@ export function ProfileScreen({ navigation, route }: any) {
                     onEndReachedThreshold={3}
                     maxToRenderPerBatch={selectedTab === ProfileScreenTab.Posts ? 5 : 20}
                     windowSize={selectedTab === ProfileScreenTab.Posts ? 8 : 20}
-                    renderItem={
-                        () => <View style={styles.profileCardContainer}>
-                            {
-                                !globals.readonly ?
-                                    !isLoggedInUser ?
-                                        <ProfileScreenOptionsComponent
-                                            publicKey={profile.PublicKeyBase58Check}
-                                            goToChat={goToChat}
-                                            username={profile.Username}
-                                        ></ProfileScreenOptionsComponent>
-                                        :
-                                        <OwnProfileOptionsComponent
-                                            username={profile.Username}
-                                            publicKey={profile.PublicKeyBase58Check}
-                                            navigation={navigation} />
-                                    :
-                                    undefined
-                            }
-                            <ProfileCard
-                                navigation={navigation}
-                                profile={profile}
-                                coinPrice={coinPrice}
-                            ></ProfileCard>
-                        </View>
-                    }
-                    renderSectionHeader={
-                        ({ section: { profileCard } }) => {
-                            return profileCard ? <View></View> :
-                                <TabsComponent
-                                    tabs={tabs}
-                                    selectedTab={selectedTab}
-                                    onTabClick={onTabClick}
-                                ></TabsComponent>;
-                        }
-                    }
-                    refreshControl={<RefreshControl
-                        tintColor={themeStyles.fontColorMain.color}
-                        titleColor={themeStyles.fontColorMain.color}
-                        refreshing={refreshing}
-                        onRefresh={loadData} />}
-                    ListFooterComponent={() => isLoadingMore ? <ActivityIndicator color={themeStyles.fontColorMain.color}></ActivityIndicator> : <View></View>}
+                    renderItem={renderItem}
+                    renderSectionHeader={({ section: { profileCard } }) => renderHeader(profileCard)}
+                    refreshControl={renderRefresh}
+                    ListFooterComponent={renderFooter}
                 />
             </View>
             :
-            <ProfileNotCompletedComponent></ProfileNotCompletedComponent>;
+            <ProfileNotCompletedComponent />;
 }
 
 const styles = StyleSheet.create(
@@ -523,14 +547,8 @@ const styles = StyleSheet.create(
         container: {
             flex: 1
         },
-        profileActionsContainer: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-end'
-        },
         profileCardContainer: {
-            marginRight: 10,
-            marginLeft: 10,
+            marginHorizontal: 10,
             marginTop: 10,
             marginBottom: 8
         },
@@ -540,6 +558,9 @@ const styles = StyleSheet.create(
         },
         noPostsText: {
             fontWeight: '500'
+        },
+        activityIndicator: {
+            marginTop: 100
         }
     }
 );
