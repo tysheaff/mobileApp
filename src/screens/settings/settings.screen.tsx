@@ -4,14 +4,20 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { themeStyles } from '@styles';
 import { globals } from '@globals';
 import { Entypo, Ionicons, Feather, SimpleLineIcons, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Settings {
     title: string;
-    icon: any;
+    icon: JSX.Element;
     action: () => void;
 }
 
-export function SettingsScreen({ navigation }: any) {
+interface Props {
+    navigation: StackNavigationProp<ParamListBase>
+}
+
+export function SettingsScreen({ navigation }: Props) {
 
     const settings: Settings[] = [
         {
@@ -65,9 +71,9 @@ export function SettingsScreen({ navigation }: any) {
             action: () => globals.onLogout()
         },
         {
-            title: 'CloutFeed v 1.4.5',
-            icon: <AntDesign name="copyright" style={{ marginLeft: 6 }} size={24} color={themeStyles.fontColorMain.color} />,
-            action: () => { }
+            title: 'CloutFeed v 1.4.6',
+            icon: <AntDesign name="copyright" style={styles.iconMargin} size={24} color={themeStyles.fontColorMain.color} />,
+            action: () => { return; }
         }
     ];
 
@@ -109,6 +115,9 @@ const styles = StyleSheet.create(
         buttonText: {
             marginLeft: 12,
             fontWeight: '600'
+        },
+        iconMargin: {
+            marginLeft: 6
         }
     }
 );
