@@ -9,13 +9,25 @@ import { api } from '@services';
 import { themeStyles } from '@styles';
 import { signing } from '@services/authorization/signing';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { RouteProp } from '@react-navigation/native';
 
 interface Section {
     date: string;
     data: Message[];
 }
 
-export function ChatScreen({ route }: any) {
+type RouteParams = {
+    Chat: {
+        loadMessages: boolean;
+        contactWithMessages: ContactWithMessages;
+    }
+};
+
+interface Props {
+    route: RouteProp<RouteParams, 'Chat'>
+}
+
+export function ChatScreen({ route }: Props) {
 
     const [isLoading, setLoading] = useState<boolean>(true);
     const [sections, setSections] = useState<Section[]>([]);
@@ -30,7 +42,7 @@ export function ChatScreen({ route }: any) {
     useEffect(
         () => {
             const loadMessages = route.params?.loadMessages;
-            let contactWithMessages = route.params?.contactWithMessages as ContactWithMessages;
+            let contactWithMessages = route.params?.contactWithMessages;
             if (loadMessages) {
                 api.getMessages(
                     globals.user.publicKey,
@@ -153,7 +165,7 @@ export function ChatScreen({ route }: any) {
     }
 
     async function onSendMessage(): Promise<void> {
-        const contactWithMessages = route.params.contactWithMessages as ContactWithMessages;
+        const contactWithMessages = route.params.contactWithMessages;
         const timeStampNanos = new Date().getTime() * 1000000;
 
         const message: Message = {

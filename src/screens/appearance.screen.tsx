@@ -8,13 +8,19 @@ import { api, cache } from '@services';
 import { signing } from '@services/authorization/signing';
 import CloutFeedButton from '@components/cloutfeedButton.component';
 import { ChangeFollowersEvent, EventType } from '@types';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 export enum CloutFeedTheme {
     Light = 'light',
     Dark = 'dark'
 }
 
-export function AppearanceScreen({ navigation }: any) {
+interface Props {
+    navigation: StackNavigationProp<ParamListBase>
+}
+
+export function AppearanceScreen({ navigation }: Props) {
 
     const isMounted = useRef<boolean>(true);
 
@@ -31,7 +37,7 @@ export function AppearanceScreen({ navigation }: any) {
 
     async function initScreen() {
         const key = globals.user.publicKey + constants.localStorage_appearance;
-        const response: any = await SecureStore.getItemAsync(key).catch(() => undefined) as CloutFeedTheme;
+        const response = await SecureStore.getItemAsync(key).catch(() => undefined) as CloutFeedTheme;
         if (isMounted) {
             setSelectedTheme(response);
         }
@@ -57,7 +63,7 @@ export function AppearanceScreen({ navigation }: any) {
     function openProfile() {
         const publicKey: string = constants.cloutfeed_publicKey;
         const username = 'cloutfeed';
-        (navigation ).push(
+        (navigation).push(
             'UserProfile',
             {
                 publicKey,
@@ -73,7 +79,7 @@ export function AppearanceScreen({ navigation }: any) {
         }
         try {
             const publicKey: string = constants.cloutfeed_publicKey;
-            const response: any = await api.createFollow(globals.user.publicKey, publicKey, false);
+            const response = await api.createFollow(globals.user.publicKey, publicKey, false);
 
             const transactionHex: string = response.TransactionHex;
             const signedTransactionHex: string = await signing.signTransaction(transactionHex);
@@ -111,7 +117,7 @@ export function AppearanceScreen({ navigation }: any) {
                         },
                     ]}
                     value={selectedTheme}
-                    onValueChange={changeTheme}
+                    onValueChange={(theme: string | string[]) => changeTheme(theme as string)}
                 >
                 </SelectListControl>
                 : <View style={styles.lockContainer} >
@@ -169,9 +175,6 @@ const styles = StyleSheet.create(
         followBtnContainer: {
             marginLeft: 'auto',
             marginRight: 'auto'
-        },
-        btnText: {
-            color: 'white',
         },
         lockImage: {
             width: 200,

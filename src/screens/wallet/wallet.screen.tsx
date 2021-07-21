@@ -3,7 +3,6 @@ import { View, StyleSheet, RefreshControl, Text, SectionList } from 'react-nativ
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
-import { cache, CacheableObject } from '@services/dataCaching';
 import { CoinEntry, CreatorCoinHODLer, User } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.component';
@@ -21,7 +20,7 @@ enum WalletTab {
 interface Section {
     header: boolean;
     data: CreatorCoinHODLer[] | null[];
-    renderItem: any;
+    renderItem: (({ item }: { item: CreatorCoinHODLer }) => JSX.Element) | undefined;
 }
 
 interface State {
@@ -49,7 +48,7 @@ interface Props {
 
 export class WalletScreen extends React.Component<Props, State> {
 
-    private _sectionListRef: SectionList<CreatorCoinHODLer | null, Section> | null = null;
+    private _sectionListRef: SectionList<CreatorCoinHODLer, Section> | null = null;
 
     private readonly tabs: TabConfig[] = [
         {
@@ -135,7 +134,7 @@ export class WalletScreen extends React.Component<Props, State> {
                 let creatorCoinsTotalValueUsd = 0;
 
                 if (usersYouHODL?.length > 0) {
-                    const amountUsdMap: any = {};
+                    const amountUsdMap: { [key: string]: number } = {};
                     for (let i = 0; i < usersYouHODL.length; i++) {
                         if (usersYouHODL[i].ProfileEntryResponse) {
                             const userYouHODL = usersYouHODL[i];
@@ -173,7 +172,7 @@ export class WalletScreen extends React.Component<Props, State> {
                     );
                 }
             }
-        )
+        );
     }
 
     private bitCloutNanosYouWouldGetIfYouSold(creatorCoinAmountNano: number, coinEntry: CoinEntry): number {
@@ -248,7 +247,7 @@ export class WalletScreen extends React.Component<Props, State> {
         if (this._isMounted) {
             this.setState(
                 {
-                    selectedTab: selectedTab as any,
+                    selectedTab: selectedTab as WalletTab,
                     sections
                 }
             );
@@ -289,18 +288,20 @@ export class WalletScreen extends React.Component<Props, State> {
                 onTabClick={(selectedTab: string) => this.onTabClick(selectedTab)}
             />;
 
+        const keyExtractor = (item: CreatorCoinHODLer, index: number) => item ? item.CreatorPublicKeyBase58Check + index.toString() : index.toString();
+
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             {
                 this.state.isLoading ?
                     <CloutFeedLoader />
                     :
                     <SectionList
-                        ref={ref => (this._sectionListRef = ref)}
+                        ref={ref => this._sectionListRef = ref}
                         onScrollToIndexFailed={() => { return; }}
                         style={[styles.container, themeStyles.containerColorMain]}
                         stickySectionHeadersEnabled={true}
-                        sections={this.state.sections}
-                        keyExtractor={(item, index) => item ? item.CreatorPublicKeyBase58Check + index.toString() : index.toString()}
+                        sections={this.state.sections as any[]}
+                        keyExtractor={keyExtractor}
                         renderItem={renderItem}
                         renderSectionHeader={({ section: { header } }) => renderHeader(header)}
                         refreshControl={renderRefresh}
