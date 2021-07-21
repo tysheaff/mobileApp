@@ -36,7 +36,7 @@ export default class MessageInfoCardComponent extends React.Component<Props> {
                 {
                     !!this.props.lastMessage &&
                     <View style={styles.bottomRow}>
-                        <Text style={[styles.lastMessage, themeStyles.fontColorSub]}>{this.props.lastMessage}</Text>
+                        <Text style={[styles.lastMessage, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.lastMessage}</Text>
                         <Text style={[styles.lastMessage, themeStyles.fontColorSub]}> • {this.props.duration}</Text>
                     </View>
                 }
