@@ -53,6 +53,15 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
         },
         [selectedImageIndex]
     );
+
+    const keyExtractor = (item: string, index: number) => `${item}_${index.toString()}`;
+
+    const renderItem = (index: number) => <FontAwesome
+        style={[styles.dot, internalIndex === index ? themeStyles.fontColorMain : themeStyles.switchColor]}
+        name="circle"
+        size={8}
+        color="black" />;
+
     return (
         <View style={styles.container}>
             <ScrollView
@@ -89,15 +98,9 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
                     <FlatList
                         style={styles.dotsContainer}
                         data={imageUrls}
-                        keyExtractor={(index) => index.toString()}
+                        keyExtractor={keyExtractor}
                         horizontal
-                        renderItem={({ index }) => (
-                            <FontAwesome
-                                style={[styles.dot, internalIndex === index ? themeStyles.fontColorMain : themeStyles.switchColor]}
-                                name="circle"
-                                size={8}
-                                color="black" />
-                        )}
+                        renderItem={({ index }) => renderItem(index)}
                     /> : undefined
             }
 
