@@ -22,7 +22,7 @@ export default class CloutFeedVideoComponent extends React.Component<Props> {
         const parsedVideoLink: string | undefined = this.props.embeddedVideoLink && parseVideoLink(this.props.embeddedVideoLink);
 
         if (!parsedVideoLink) {
-            return <> </>;
+            return <></>;
         }
 
         const renderLoadingView = () => <ActivityIndicator size='large'
