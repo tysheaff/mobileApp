@@ -1,6 +1,6 @@
 import React from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
 import { themeStyles } from '@styles/globalColors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
@@ -9,9 +9,10 @@ import * as Clipboard from 'expo-clipboard';
 import { eventManager } from '@globals/injector';
 import { EventType } from '@types';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     publicKey: string;
     username: string;
 }
@@ -26,22 +27,22 @@ export default class OwnProfileOptionsComponent extends React.Component<Props> {
         this.onOwnProfileOptionsClick = this.onOwnProfileOptionsClick.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    handleEditButtonPress = () => {
+    private handleEditButtonPress = (): void => {
         this.props.navigation.navigate('EditProfile');
     }
 
-    async onOwnProfileOptionsClick() {
+    private onOwnProfileOptionsClick(): void {
         const options = ['Open in Browser', 'Copy Public Key', 'Cancel'];
-        const callback = async (p_optionIndex: number) => {
-            switch (p_optionIndex) {
+        const callback = (optionIndex: number) => {
+            switch (optionIndex) {
                 case 0:
                     Linking.openURL(`https://bitclout.com/u/${this.props.username}`);
                     break;
@@ -64,7 +65,7 @@ export default class OwnProfileOptionsComponent extends React.Component<Props> {
         );
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <View style={styles.container}>
                 <CloutFeedButton

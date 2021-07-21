@@ -3,13 +3,15 @@ import { View, StyleSheet, RefreshControl, Text, SectionList } from 'react-nativ
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
-import { cache } from '@services/dataCaching';
-import { CoinEntry, CreatorCoinHODLer } from '@types';
+import { cache, CacheableObject } from '@services/dataCaching';
+import { CoinEntry, CreatorCoinHODLer, User } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.component';
 import { formatNumber } from '@services/helpers';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { api } from '@services';
+import { RouteProp } from '@react-navigation/native';
 
 enum WalletTab {
     Purchased = 'Purchased',
@@ -35,7 +37,17 @@ interface State {
     refreshing: boolean;
 }
 
-export class WalletScreen extends React.Component<Record<string, never>, State> {
+type RouteParams = {
+    Wallet: {
+        publicKey: string;
+    }
+};
+
+interface Props {
+    route: RouteProp<RouteParams, 'Wallet'>;
+}
+
+export class WalletScreen extends React.Component<Props, State> {
 
     private _sectionListRef: SectionList<CreatorCoinHODLer | null, Section> | null = null;
 
@@ -50,7 +62,7 @@ export class WalletScreen extends React.Component<Record<string, never>, State> 
 
     private _isMounted = false;
 
-    constructor(props: Record<string, never>) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -92,25 +104,27 @@ export class WalletScreen extends React.Component<Record<string, never>, State> 
         this._isMounted = false;
     }
 
-    shouldComponentUpdate(_nextProps: Record<string, never>, nextSate: State): boolean {
+    shouldComponentUpdate(_nextProps: Props, nextSate: State): boolean {
         return nextSate.isLoading !== this.state.isLoading ||
             nextSate.selectedTab !== this.state.selectedTab;
     }
 
     private loadData() {
-
         if (this._isMounted) {
             this.setState({ isLoading: true });
         }
 
+        const publicKey: string = this.props.route.params?.publicKey ?
+            this.props.route.params.publicKey
+            : globals.user.publicKey;
         Promise.all(
             [
                 loadTickersAndExchangeRate(),
-                cache.user.getData(true)
+                api.getProfile([publicKey])
             ]
         ).then(
             responses => {
-                const user = responses[1];
+                const user: User = responses[1].UserList[0];
                 const bitCloutNanos = 1000000000.0;
                 const balanceBitClout = (user.BalanceNanos / bitCloutNanos).toFixed(9);
                 const bitCloutPriceUsd = calculateAndFormatBitCloutInUsd(bitCloutNanos);
@@ -159,9 +173,7 @@ export class WalletScreen extends React.Component<Record<string, never>, State> 
                     );
                 }
             }
-        ).catch(
-            p_error => globals.defaultHandleError(p_error)
-        );
+        )
     }
 
     private bitCloutNanosYouWouldGetIfYouSold(creatorCoinAmountNano: number, coinEntry: CoinEntry): number {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Alert, Linking, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/core';
@@ -11,32 +11,36 @@ import * as Clipboard from 'expo-clipboard';
 import { signing } from '@services/authorization/signing';
 import NotificationSubscriptionComponent from '@screens/profile/notificationSubscription.component';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 export function ProfileScreenOptionsComponent(
     { publicKey, goToChat, username }: { publicKey: string, goToChat: () => void, username: string }
-) {
-    const navigation = useNavigation();
+): JSX.Element {
+
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     const [isFollowed, setIsFollowed] = useState<boolean | undefined>(undefined);
     const [followButtonColor, setFollowButtonColor] = useState<string>('black');
 
-    let isMounted = true;
+    const isMounted = useRef<boolean>(true);
 
     useEffect(
         () => {
             cache.user.getData().then(
-                p_response => checkIsFollowed(p_response)
+                response => checkIsFollowed(response)
             ).catch();
 
             return () => {
-                isMounted = false;
+                isMounted.current = false;
             };
         },
         []
     );
 
-    function checkIsFollowed(p_user: User) {
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
+    function checkIsFollowed(user: User): void {
+        const followedByUserPublicKeys = user.PublicKeysBase58CheckFollowedByUser;
 
         const followed = followedByUserPublicKeys?.indexOf(publicKey);
         if (isMounted) {
@@ -44,7 +48,7 @@ export function ProfileScreenOptionsComponent(
         }
     }
 
-    function onFollowButtonClick() {
+    function onFollowButtonClick(): Promise<void> | undefined {
         if (isFollowed === undefined) {
             return;
         }
@@ -52,8 +56,8 @@ export function ProfileScreenOptionsComponent(
         setFollowButtonColor(themeStyles.buttonDisabledColor.backgroundColor);
 
         api.createFollow(globals.user.publicKey, publicKey, isFollowed).then(
-            async p_response => {
-                const transactionHex = p_response.TransactionHex;
+            async response => {
+                const transactionHex = response.TransactionHex;
 
                 if (publicKey === constants.cloutfeed_publicKey) {
                     globals.followerFeatures = !isFollowed;
@@ -73,7 +77,7 @@ export function ProfileScreenOptionsComponent(
                         eventManager.dispatchEvent(EventType.IncreaseFollowers, event);
                     }
 
-                    setIsFollowed((p_previousValue: boolean | undefined) => !p_previousValue);
+                    setIsFollowed((previousValue: boolean | undefined) => !previousValue);
                 }
 
                 if (isFollowed) {
@@ -83,19 +87,19 @@ export function ProfileScreenOptionsComponent(
                 }
             }
         ).catch(
-            p_error => globals.defaultHandleError(p_error)
+            error => globals.defaultHandleError(error)
         ).finally(() => setFollowButtonColor('black'));
     }
 
-    async function onProfileOptionsClick() {
+    async function onProfileOptionsClick(): Promise<void> {
         const user = await cache.user.getData();
         const isUserBlocked = user?.BlockedPubKeys && !!user.BlockedPubKeys[publicKey];
         const blockOptionText = isUserBlocked ? 'Unblock User' : 'Block User';
 
         const options = ['Open in Browser', 'Copy Public Key', blockOptionText, 'Cancel'];
 
-        const callback = async (p_optionIndex: number) => {
-            switch (p_optionIndex) {
+        const callback = async (optionIndex: number) => {
+            switch (optionIndex) {
                 case 0:
                     Linking.openURL(`https://bitclout.com/u/${username}`);
                     break;
@@ -131,7 +135,7 @@ export function ProfileScreenOptionsComponent(
                                 Alert.alert('Error', 'Something went wrong! Please try again.');
                             }
                         }
-                    ).catch(p_error => globals.defaultHandleError(p_error));
+                    ).catch(error => globals.defaultHandleError(error));
                     break;
                 }
             }
@@ -145,38 +149,66 @@ export function ProfileScreenOptionsComponent(
         );
     }
 
+    function goToWallet(): void {
+        navigation.navigate(
+            'UserWallet',
+            {
+                publicKey,
+                username
+            }
+        );
+    }
+
     return <View style={styles.container}>
-        <NotificationSubscriptionComponent publicKey={publicKey} />
-        <CloutFeedButton
-            disabled={followButtonColor !== 'black'}
-            title={isFollowed ? 'Unfollow' : 'Follow'}
-            onPress={onFollowButtonClick}
-            styles={styles.followButton}
-        />
-        <CloutFeedButton
-            title={'Message'}
-            onPress={goToChat}
-            styles={styles.followButton}
-        />
-        <TouchableOpacity
-            activeOpacity={1}
-            onPress={onProfileOptionsClick}
-        >
-            <Feather name="more-horizontal" size={24} color={themeStyles.fontColorMain.color} />
-        </TouchableOpacity>
+        <View style={styles.leftContainer}>
+            <NotificationSubscriptionComponent publicKey={publicKey} />
+            <TouchableOpacity onPress={goToWallet}>
+                <Ionicons name="wallet-outline" size={28} style={[themeStyles.fontColorMain, styles.walletIcon]} />
+            </TouchableOpacity>
+        </View>
+        <View style={styles.rightContainer}>
+            <CloutFeedButton
+                disabled={followButtonColor !== 'black'}
+                title={isFollowed ? 'Unfollow' : 'Follow'}
+                onPress={onFollowButtonClick}
+                styles={styles.followButton}
+            />
+            <CloutFeedButton
+                title={'Message'}
+                onPress={goToChat}
+                styles={styles.followButton}
+            />
+            <TouchableOpacity
+                activeOpacity={1}
+                onPress={onProfileOptionsClick}
+            >
+                <Feather name="more-horizontal" size={24} color={themeStyles.fontColorMain.color} />
+            </TouchableOpacity>
+        </View>
     </View>;
 }
 const styles = StyleSheet.create(
     {
         container: {
             flexDirection: 'row',
-            justifyContent: 'flex-end',
+            justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 8,
         },
         followButton: {
             marginRight: 10,
             width: 90
+        },
+        leftContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        walletIcon: {
+            marginLeft: 10,
+        },
+        rightContainer: {
+            flexDirection: 'row',
+            alignItems: 'center'
         }
     }
 );

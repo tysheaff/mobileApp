@@ -48,6 +48,19 @@ export default function WalletStackScreen() {
             />
 
             <WalletStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            title: route.params ? (route.params as any).username : 'Wallet',
+                            headerBackTitle: ' '
+                        }
+                    )
+                }
+                name="UserWallet"
+                component={WalletScreen}
+            />
+
+            <WalletStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '

@@ -22,6 +22,7 @@ import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { WalletScreen } from '@screens/wallet/wallet.screen';
 
 const MessageStack = createStackNavigator();
 
@@ -177,6 +178,19 @@ export default function MessageStackScreen() {
                     )}
                 name="CloutTagPosts"
                 component={CloutTagPostsScreen}
+            />
+
+            <MessageStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            title: route.params ? (route.params as any).username : 'Wallet',
+                            headerBackTitle: ' '
+                        }
+                    )
+                }
+                name="UserWallet"
+                component={WalletScreen}
             />
 
             <MessageStack.Screen

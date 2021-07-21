@@ -21,6 +21,7 @@ import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { WalletScreen } from '@screens/wallet/wallet.screen';
 
 const HomeStack = createStackNavigator();
 
@@ -84,6 +85,19 @@ export default function HomeStackScreen(): JSX.Element {
                 }}
                 name="EditProfile"
                 component={EditProfileScreen}
+            />
+
+            <HomeStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            title: route.params ? (route.params as any).username : 'Wallet',
+                            headerBackTitle: ' '
+                        }
+                    )
+                }
+                name="UserWallet"
+                component={WalletScreen}
             />
 
             <HomeStack.Screen

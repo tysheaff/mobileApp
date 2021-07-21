@@ -45,15 +45,15 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
         this.getNotificationSubscriptions();
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._isMounted = true;
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
-    async getNotificationSubscriptions() {
+    private async getNotificationSubscriptions(): Promise<void> {
         try {
             const jwt = await signing.signJWT();
             const response = await cloutFeedApi.getNotificationSubscriptions(globals.user.publicKey, jwt, this.props.publicKey);
@@ -71,12 +71,12 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
                     isNotificationSubscriptionLoading: false
                 });
             }
-        } catch (p_error) {
-            globals.defaultHandleError(p_error);
+        } catch (error) {
+            globals.defaultHandleError(error);
         }
     }
 
-    openNotificationModal() {
+    private openNotificationModal(): void {
         if (this._isMounted) {
             this.setState({
                 notificationModalVisible: true
@@ -84,13 +84,13 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
         }
     }
 
-    closeNotificationModal() {
+    private closeNotificationModal(): void {
         if (this._isMounted) {
             this.setState({ notificationModalVisible: false });
         }
     }
 
-    async subscribeNotifications(p_notificationType: NotificationType) {
+    private async subscribeNotifications(p_notificationType: NotificationType): Promise<void> {
         try {
             if (this._isMounted) {
                 this.setState({ isNotificationSubscriptionLoading: true });
@@ -107,12 +107,12 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
                     isNotificationSubscriptionLoading: false
                 });
             }
-        } catch (p_error) {
-            globals.defaultHandleError(p_error);
+        } catch (error) {
+            globals.defaultHandleError(error);
         }
     }
 
-    async unSubscribeNotifications(p_notificationType: NotificationType) {
+    private async unSubscribeNotifications(p_notificationType: NotificationType): Promise<void> {
         try {
             if (this._isMounted) {
                 this.setState({ isNotificationSubscriptionLoading: true });
@@ -135,7 +135,7 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
         }
     }
 
-    onSubscribedNotificationChange(p_value: string[]) {
+    private onSubscribedNotificationChange(p_value: string[]): void {
         const shouldSubscribePostNotification = p_value.includes(NotificationType.Post) && !this.state.subscribedNotifications.includes(NotificationType.Post);
         const shouldUnSubscribePostNotification = !p_value.includes(NotificationType.Post) && this.state.subscribedNotifications.includes(NotificationType.Post);
         const shouldSubscribeFRNotification = p_value.includes(NotificationType.FounderReward) && !this.state.subscribedNotifications.includes(NotificationType.FounderReward);
@@ -152,10 +152,10 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
         }
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <React.Fragment>
-                <Ionicons name="md-notifications-outline" size={26} style={[themeStyles.fontColorMain, styles.notificationIcon]} onPress={() => this.openNotificationModal()} />
+                <Ionicons name="md-notifications-outline" size={26} style={themeStyles.fontColorMain} onPress={() => this.openNotificationModal()} />
                 {
                     this.state.subscribedNotifications?.length > 0 ?
                         <View style={styles.subscribedCircle}></View>
@@ -209,10 +209,6 @@ class NotificationSubscriptionComponent extends Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-    notificationIcon: {
-        left: 2,
-        position: 'absolute'
-    },
     subscribedCircle: {
         width: 6,
         height: 6,
@@ -250,31 +246,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700'
     },
-    closeIcon: {
-        position: 'absolute',
-        right: 5
-    },
     loaderContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
-    optionContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingLeft: 10,
-        paddingRight: 10,
-        width: '100%',
-        height: 50
-    },
-    optionText: {
-        fontSize: 16,
-        fontWeight: '400'
-    },
-    checkIcon: {
-        marginLeft: 'auto'
-    }
 });
 
 export default NotificationSubscriptionComponent;
