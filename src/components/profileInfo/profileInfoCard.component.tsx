@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface Props {
     publicKey: string;
     username: string;
-    coinPrice: string;
+    coinPrice?: string;
     verified: boolean;
     duration?: string;
     isProfileManager?: boolean;
@@ -33,7 +33,9 @@ export default class ProfileInfoCardComponent extends React.Component<Props> {
             <View>
                 <ProfileInfoUsernameComponent verified={this.props.verified} username={this.props.username} />
                 <View style={styles.bottomRow}>
-                    <CoinPriceComponent isProfileManager={this.props.isProfileManager} price={this.props.coinPrice} />
+                    {
+                        !!this.props.coinPrice && <CoinPriceComponent isProfileManager={this.props.isProfileManager} price={this.props.coinPrice} />
+                    }
                     {
                         this.props.duration &&
                         <>
