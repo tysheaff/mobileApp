@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { Text, Image, StyleSheet, View, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { globals } from '@globals/globals';
 import { api } from '@services';
 import { themeStyles } from '@styles/globalColors';
 import { Profile } from '@types';
-import { MaterialIcons } from '@expo/vector-icons';
+import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
 
 let lastKeyword;
 
-export function UserSuggestionList({ keyword, onSuggestionPress }: any): JSX.Element | null {
+export function UserSuggestionList({ keyword, onSuggestionPress }: { keyword: string, onSuggestionPress: (name: Profile) => void }): JSX.Element | null {
     const [suggestedMentions, setSuggestedMentions] = useState<Profile[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    let mount = true;
+    const isMounted = useRef<boolean>(true);
 
     useEffect(
         () => {
@@ -22,7 +22,7 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any): JSX.Ele
             }
 
             () => {
-                mount = false;
+                isMounted.current = false;
             };
         },
         [keyword]
@@ -37,7 +37,7 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any): JSX.Ele
             let response;
             lastKeyword = keyword;
 
-            if (mount) {
+            if (isMounted) {
                 setLoading(true);
             }
 
@@ -53,58 +53,43 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: any): JSX.Ele
 
             const profiles = response.ProfilesFound as Profile[];
 
-            if (profiles?.length > 0) {
-                for (const profile of profiles) {
-                    (profile as any).name = profile.Username;
-                    profile.ProfilePic = api.getSingleProfileImage(profile.PublicKeyBase58Check);
-
-                    try {
-                        await Image.prefetch(profile.ProfilePic);
-                    } catch {
-                        profile.ProfilePic = 'https://i.imgur.com/vZ2mB1W.png';
-                    }
-                }
+            for (const profile of profiles) {
+                (profile as any).name = profile.Username;
             }
 
-            if (mount) {
+            if (isMounted) {
                 setSuggestedMentions(profiles);
                 setLoading(false);
             }
         } catch (error) {
-            if (mount) {
+            if (isMounted) {
                 setSuggestedMentions([]);
                 setLoading(false);
             }
         }
     }
 
-    return (
-        <ScrollView style={[styles.container, themeStyles.borderColor]}>
-            {
-                loading ?
-                    <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
-                    :
-                    suggestedMentions.map(
-                        p_mention => (
-                            <TouchableOpacity
-                                key={p_mention.Username}
-                                onPress={() => { onSuggestionPress(p_mention); }}
-                                style={styles.userMentionCard}>
-                                <Image style={styles.profilePic} source={{ uri: p_mention.ProfilePic }} />
-
-                                <View style={styles.usernameContainer}>
-                                    <Text style={[styles.username, themeStyles.fontColorMain]}>{p_mention?.Username}</Text>
-                                    {
-                                        p_mention?.IsVerified ?
-                                            <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
-                                    }
-                                </View>
-                            </TouchableOpacity>
-                        )
+    return <ScrollView style={[styles.container, themeStyles.borderColor]}>
+        {
+            loading ?
+                <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
+                :
+                suggestedMentions.map(
+                    mention => (
+                        <TouchableOpacity
+                            key={mention.Username}
+                            onPress={() => { onSuggestionPress(mention); }}
+                            style={styles.userMentionCard}>
+                            <ProfileInfoCardComponent
+                                publicKey={mention?.PublicKeyBase58Check}
+                                username={mention?.Username}
+                                verified={mention?.IsVerified}
+                            />
+                        </TouchableOpacity>
                     )
-            }
-        </ScrollView>
-    );
+                )
+        }
+    </ScrollView>;
 }
 
 const styles = StyleSheet.create(
@@ -115,28 +100,12 @@ const styles = StyleSheet.create(
         activityIndicator: {
             marginTop: 10
         },
-        profilePic: {
-            width: 40,
-            height: 40,
-            borderRadius: 8,
-            marginRight: 12
-        },
         userMentionCard: {
             padding: 12,
             flex: 1,
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'center'
-        },
-        usernameContainer: {
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-        },
-        username: {
-            fontWeight: '700',
-            maxWidth: Dimensions.get('window').width / 2,
-            marginRight: 6
         },
     }
 );
