@@ -151,15 +151,16 @@ export class EditProfileScreen extends Component<Props, State> {
             {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 quality: 1,
+                aspect: [4, 3],
                 base64: true
             }
         );
+
         if (!result.cancelled && result.type === 'image') {
             const base64 = (result as ImageInfo).base64 as string;
             const base64Image = base64;
-
             if (this._isMounted) {
-                this.setState({ profilePic: base64Image });
+                this.setState({ profilePic: `data:image/jpg;base64,${base64Image}` });
             }
         }
     };
@@ -172,7 +173,7 @@ export class EditProfileScreen extends Component<Props, State> {
             if (this._isMounted) {
                 this.setState(
                     {
-                        profilePic: api.getSingleProfileImage(globals.user.publicKey),
+                        profilePic: api.getSingleProfileImage(`${globals.user.publicKey}?${new Date().toISOString()}`),
                         username: newProfile.Username,
                         description: newProfile.Description,
                         founderReward: String(newProfile.CoinEntry.CreatorBasisPoints / 100),
@@ -211,8 +212,8 @@ export class EditProfileScreen extends Component<Props, State> {
                     <View style={[styles.profilePicContainer]}>
                         <Image
                             style={styles.profilePic}
-                            source={{ uri: this.state.profilePic ? this.state.profilePic : 'https://i.imgur.com/vZ2mB1W.png' }}>
-                        </Image>
+                            source={{ uri: this.state.profilePic ? this.state.profilePic : 'https://i.imgur.com/vZ2mB1W.png' }}
+                        />
                     </View>
                     <CloutFeedButton
                         title={'Change Image'}
