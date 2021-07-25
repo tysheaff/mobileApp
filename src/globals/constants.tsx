@@ -18,5 +18,6 @@ export const constants = {
     localStorage_showNotificationsFilter: 'showNotificationsFilter',
     localStorage_notificationsFilter: 'notificationsFilter',
     localStorage_cloutCastIntroduction: 'cloutCastIntroduction',
+    localStorage_bitBadgesIntroduction: "bitBadgesIntroduction",
     cloutfeed_publicKey: 'BC1YLh5pKXs8NqaUtN8Gzi3rfoAgG2VWio2NER7baDkG8T2x7wRnSwa',
 };

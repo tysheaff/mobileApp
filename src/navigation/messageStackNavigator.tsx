@@ -22,6 +22,10 @@ import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
+import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
+import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
+import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 
 const MessageStack = createStackNavigator();
@@ -201,6 +205,50 @@ export default function MessageStackScreen() {
                     }
                 }
                 name="Identity" component={IdentityScreen}
+            />
+
+            <MessageStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'BitBadges',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="BitBadges"
+                component={BadgesScreen}
+            />
+
+            <MessageStack.Screen
+                options={
+                    {
+                        headerTitle: 'Issue Badge',
+                        headerBackTitle: ' '
+                    }
+                }
+                name="Issue"
+                component={IssueBadgeScreen}
+            />
+
+            <MessageStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'Badge',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="Badge"
+                component={BadgeScreen}
+            />
+
+            <MessageStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'Pending',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="Pending"
+                component={PendingScreen}
             />
         </MessageStack.Navigator>
     );

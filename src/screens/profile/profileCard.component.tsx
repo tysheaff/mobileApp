@@ -168,18 +168,47 @@ export class ProfileCard extends React.Component<Props, State> {
         );
     }
 
+    private goToBitBadgesScreen(p_selectedTab: string) {
+        this.props.navigation.push('BitBadges',
+            {
+                publicKey: this.props.profile.PublicKeyBase58Check,
+                username: this.props.profile.Username,
+                selectedTab: p_selectedTab,
+            }
+        );
+    }
+
     render(): JSX.Element {
         return <View style={[styles.container, themeStyles.containerColorMain, themeStyles.shadowColor]}>
-            <View style={styles.badgesContainer}>
-                {
-                    this.state.doUserHODL &&
-                    < AntDesign name={'star'} size={16} color={'#ffdb58'} />
-                }
+            <View style={[styles.headerContainer]}>
+                <View style={[styles.bitBadgesContainer]}>
+                    <TouchableOpacity
+                        onPress={() => this.goToBitBadgesScreen('received')}
+                        style={[styles.bitBadgesButton, themeStyles.containerColorSub]}
+                    >
+                        <Image
+                            style={styles.bitBadgesLogo}
+                            source={{ uri: 'https://bitbadges.web.app/img/icons/logo.png' }}
+                        />
 
-                <View style={[styles.foundRewardContainer, themeStyles.containerColorSub]}>
-                    <Text style={[styles.founderRewardText, themeStyles.fontColorMain]}>{this.state.founderReward}
-                        <Text style={styles.percentage}>%</Text>
-                    </Text>
+                        <Text
+                            style={[styles.founderRewardText, themeStyles.fontColorMain]}
+                        >
+                            BitBadges
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.foundRewardContainer}>
+                    {
+                        this.state.doUserHODL &&
+                        < AntDesign name={'star'} size={16} color={'#ffdb58'} />
+                    }
+
+                    <View style={[styles.foundRewardContainer, themeStyles.containerColorSub]}>
+                        <Text style={[styles.founderRewardText, themeStyles.fontColorMain]}>{this.state.founderReward}
+                            <Text style={styles.percentage}>%</Text>
+                        </Text>
+                    </View>
                 </View>
             </View>
             <Image style={styles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
@@ -267,11 +296,6 @@ const styles = StyleSheet.create(
             shadowRadius: 1,
             elevation: 1
         },
-        badgesContainer: {
-            marginLeft: 'auto',
-            flexDirection: 'row',
-            alignItems: 'center'
-        },
         profilePic: {
             marginBottom: 16,
             width: 60,
@@ -340,6 +364,33 @@ const styles = StyleSheet.create(
         },
         activityIndicator: {
             marginTop: 4
-        }
+        },
+        headerContainer: {
+            width: Dimensions.get('window').width,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingLeft: 12,
+            paddingRight: 12,
+        },
+        bitBadgesLogo: {
+            width: 14,
+            height: 14,
+        },
+        bitBadgesContainer: {
+            paddingVertical: 5,
+            paddingHorizontal: 6,
+            borderRadius: 4,
+        },
+        bitBadgesButton: {
+            paddingTop: 5,
+            paddingBottom: 5,
+            paddingRight: 6,
+            paddingLeft: 6,
+            borderRadius: 4,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+        },
     }
 );

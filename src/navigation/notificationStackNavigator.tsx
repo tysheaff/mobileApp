@@ -19,6 +19,10 @@ import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
+import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
+import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
+import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 
 const NotificationStack = createStackNavigator();
@@ -155,17 +159,64 @@ export default function NotificationStackScreen() {
             />
 
             <NotificationStack.Screen
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#121212',
+                        shadowRadius: 0,
+                        shadowOffset: { height: 0, width: 0 },
+                    },
+                    headerTitleStyle: { color: 'white', fontSize: 20 },
+                }}
+                name="Identity"
+                component={IdentityScreen}
+            />
+
+            <NotificationStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'BitBadges',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="BitBadges"
+                component={BadgesScreen}
+            />
+
+            <NotificationStack.Screen
                 options={
                     {
-                        headerStyle: { backgroundColor: '#121212', shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
-                        headerTitleStyle: { color: 'white', fontSize: 20 }
+                        headerTitle: 'Issue Badge',
+                        headerBackTitle: ' '
                     }
                 }
-                name="Identity" component={IdentityScreen} />
+                name="Issue"
+                component={IssueBadgeScreen}
+            />
+
+            <NotificationStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'Badge',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="Badge"
+                component={BadgeScreen}
+            />
+
+            <NotificationStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'Pending',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="Pending"
+                component={PendingScreen}
+            />
         </NotificationStack.Navigator>
     );
 }
-
 const styles = StyleSheet.create(
     {
         postButton: {

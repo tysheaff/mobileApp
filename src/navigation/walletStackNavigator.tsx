@@ -18,6 +18,10 @@ import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
+import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
+import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
+import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 
 const WalletStack = createStackNavigator();
 
@@ -153,13 +157,57 @@ export default function WalletStackScreen() {
                 component={CreatePostScreen}
             ></WalletStack.Screen>
             <WalletStack.Screen
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#121212',
+                        shadowRadius: 0,
+                        shadowOffset: { height: 0, width: 0 },
+                    },
+                    headerTitleStyle: { color: 'white', fontSize: 20 },
+                }}
+                name="Identity"
+                component={IdentityScreen}
+            />
+            <WalletStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'BitBadges',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="BitBadges"
+                component={BadgesScreen}
+            />
+            <WalletStack.Screen
                 options={
                     {
-                        headerStyle: { backgroundColor: '#121212', shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
-                        headerTitleStyle: { color: 'white', fontSize: 20 }
+                        headerTitle: 'Issue Badge',
+                        headerBackTitle: ' '
                     }
                 }
-                name="Identity" component={IdentityScreen} />
+                name="Issue"
+                component={IssueBadgeScreen}
+            />
+            <WalletStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'Badge',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="Badge"
+                component={BadgeScreen}
+            />
+            <WalletStack.Screen
+                options={({ route }) => (
+                    {
+                        title: route.params ? (route.params as any).username : 'Pending',
+                        headerBackTitle: ' ',
+                    }
+                )}
+                name="Pending"
+                component={PendingScreen}
+            />
         </WalletStack.Navigator>
     );
 }

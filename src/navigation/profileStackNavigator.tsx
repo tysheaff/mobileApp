@@ -24,6 +24,10 @@ import { stackConfig } from './stackNavigationConfig';
 import HapticsScreen from '@screens/settings/haptics.screen';
 import NotificationsSettingsScreen from '@screens/settings/notificationsSettings.screen';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
+import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
+import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
+import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 
@@ -256,6 +260,50 @@ export default function ProfileStackScreen() {
             }
             name="Identity" component={IdentityScreen}
         ></ProfileStack.Screen>
+
+        <ProfileStack.Screen
+            options={({ route }) => (
+                {
+                    title: route.params ? (route.params as any).username : 'BitBadges',
+                    headerBackTitle: ' ',
+                }
+            )}
+            name="BitBadges"
+            component={BadgesScreen}
+        />
+
+        <ProfileStack.Screen
+            options={
+                {
+                    headerTitle: 'Issue Badge',
+                    headerBackTitle: ' '
+                }
+            }
+            name="Issue"
+            component={IssueBadgeScreen}
+        />
+
+        <ProfileStack.Screen
+            options={({ route }) => (
+                {
+                    title: route.params ? (route.params as any).username : 'Badge',
+                    headerBackTitle: ' ',
+                }
+            )}
+            name="Badge"
+            component={BadgeScreen}
+        />
+
+        <ProfileStack.Screen
+            options={({ route }) => (
+                {
+                    title: route.params ? (route.params as any).username : 'Pending',
+                    headerBackTitle: ' ',
+                }
+            )}
+            name="Pending"
+            component={PendingScreen}
+        />
     </ProfileStack.Navigator>;
 }
 

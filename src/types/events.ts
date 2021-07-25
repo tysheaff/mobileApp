@@ -11,7 +11,8 @@ export enum EventType {
     ToggleNotificationsFilter = 5,
     ToggleActionSheet = 6,
     UnsavePost = 7,
-    ToggleCloutCastFeed = 8
+    ToggleCloutCastFeed = 8,
+    RemovePendingBadges = 9
 }
 
 export interface ChangeFollowersEvent {
@@ -43,4 +44,8 @@ export interface NavigationEvent {
 
 export interface UnsavePostEvent {
     post: Post;
+}
+
+export interface RemovePendingBadges {
+    badgesToRemove: string[];
 }
