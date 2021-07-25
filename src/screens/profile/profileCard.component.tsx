@@ -182,7 +182,7 @@ export class ProfileCard extends React.Component<Props, State> {
                     </Text>
                 </View>
             </View>
-            <Image style={styles.profilePic} source={{ uri: this.props.profile.ProfilePic + '?' + new Date().toISOString() }} />
+            <Image style={styles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
 
             <View style={styles.usernameContainer}>
                 <Text style={[styles.username, themeStyles.fontColorMain]} selectable={true}>{this.props.profile.Username}</Text>

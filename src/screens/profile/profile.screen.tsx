@@ -190,7 +190,7 @@ export function ProfileScreen({ route }: Route): JSX.Element {
 
         if (newProfile) {
             const calculatedCoinPrice = calculateBitCloutInUSD(newProfile.CoinPriceBitCloutNanos);
-            newProfile.ProfilePic = api.getSingleProfileImage(newProfile.PublicKeyBase58Check);
+            newProfile.ProfilePic = api.getSingleProfileImage(newProfile.PublicKeyBase58Check + '?' + new Date().toISOString());
 
             if (isMounted) {
                 setCanCreateProfile(true);
