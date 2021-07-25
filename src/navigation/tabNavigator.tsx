@@ -48,7 +48,12 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
     } else if (tab.name === 'NotificationStack') {
         icon = <Ionicons name="md-notifications-outline" size={28} color={iconColor} />;
     } else if (tab.name === 'ProfileStack') {
-        icon = <Image style={[styles.profileImage, { borderWidth: selectedTab === tab.name ? 2 : 0, borderColor: iconColor }]} source={{ uri: `${profilePic}?${new Date().toISOString()}` }} />;
+        icon = <Image
+            style={[
+                styles.profileImage,
+                { borderWidth: selectedTab === tab.name ? 2 : 0, borderColor: iconColor }
+            ]}
+            source={{ uri: profilePic }} />;
     }
 
     useEffect(
@@ -57,7 +62,7 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
                 cache.user.getData().then(
                     (user) => {
                         if (mount && user.ProfileEntryResponse) {
-                            setProfilePic(user.ProfileEntryResponse.ProfilePic);
+                            setProfilePic(user.ProfileEntryResponse.ProfilePic + '?' + new Date().toISOString());
                         }
                     }
                 );

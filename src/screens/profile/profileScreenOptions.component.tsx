@@ -150,11 +150,12 @@ export function ProfileScreenOptionsComponent(
     }
 
     function goToWallet(): void {
-        navigation.navigate(
+        navigation.push(
             'UserWallet',
             {
                 publicKey,
-                username
+                username,
+                key: 'Wallet_' + publicKey
             }
         );
     }

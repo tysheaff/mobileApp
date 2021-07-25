@@ -23,6 +23,11 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/restrict-plus-operands': 'off',
+        '@typescript-eslint/unbound-method': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         'lines-between-class-members': 'off',
         '@typescript-eslint/lines-between-class-members': ['error'],
@@ -30,6 +35,7 @@ module.exports = {
         'no-trailing-spaces': 'warn',
         'react-native/no-unused-styles': 1,
         'react-native/no-inline-styles': 1,
-        'eol-last': ['warn', 'always']
+        'eol-last': ['warn', 'always'],
+        'react-native/no-inline-styles': 'off'
     }
 };

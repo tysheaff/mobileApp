@@ -1,7 +1,7 @@
 import { SelectListControl } from '@controls/selectList.control';
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
-import { View, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import Modal from 'react-native-modal';
 
 export enum MessageFilter {

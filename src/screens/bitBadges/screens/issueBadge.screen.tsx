@@ -142,16 +142,20 @@ export class IssueBadgeScreen extends Component<Props, State> {
 
     private async getConfirmation() {
         let confirmed = false;
-        const formattedDescription = this.state.description
-            ? this.state.description.trim().length > 90
-                ? this.state.description.trim().substring(0, 90) + '...'
-                : this.state.description.trim()
+
+        const description = this.state.description?.trim();
+        const title = this.state.title?.trim();
+
+        const formattedDescription = description
+            ? description.length > 90
+                ? description.substring(0, 90) + '...'
+                : description
             : 'None';
 
         await new Promise((resolve, reject) => {
             Alert.alert(
                 'Badge Issue Confirmation',
-                `IMPORTANT: Badges are permanent once issued, so please double check.\n\nTitle: ${this.state.title.trim()
+                `IMPORTANT: Badges are permanent once issued, so please double check.\n\nTitle: ${title
                 }\nIssuer: @${globals.user.username
                 }\nRecipients: ${this.formatRecipientString()}\n${this.state.validDates
                     ? `Validity: Valid from ${new Date(
@@ -242,7 +246,7 @@ export class IssueBadgeScreen extends Component<Props, State> {
             const jwt = await signing.signJWT();
 
             const response = await bitBadgesApi.issueBadge(
-                title.trim(),
+                title,
                 endDate.getTime(),
                 startDate.getTime(),
                 this.state.validDates,
