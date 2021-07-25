@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, Platform, StyleSheet, View } from 'react-native';
+import { EmitterSubscription, Image, Keyboard, Platform, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import ProfileStackScreen from './profileStackNavigator';
 import NotificationStackScreen from './notificationStackNavigator';
 import WalletStackScreen from './walletStackNavigator';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/core';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,7 +26,9 @@ const firstScreen: any = {
     NotificationStack: 'Notifications'
 };
 
-const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
+const TabElement = ({ tab, onPress, selectedTab }: any) => {
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+
     const [profilePic, setProfilePic] = useState('https://i.imgur.com/vZ2mB1W.png');
 
     let iconColor = themeStyles.fontColorMain.color;
@@ -44,7 +48,7 @@ const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
     } else if (tab.name === 'NotificationStack') {
         icon = <Ionicons name="md-notifications-outline" size={28} color={iconColor} />;
     } else if (tab.name === 'ProfileStack') {
-        icon = <Image style={{ width: 30, height: 30, borderRadius: 30, borderWidth: selectedTab === tab.name ? 2 : 0, borderColor: iconColor }} source={{ uri: profilePic }}></Image>;
+        icon = <Image style={[styles.profileImage, { borderWidth: selectedTab === tab.name ? 2 : 0, borderColor: iconColor }]} source={{ uri: `${profilePic}?${new Date().toISOString()}` }} />;
     }
 
     useEffect(
@@ -84,7 +88,10 @@ const TabElement = ({ tab, onPress, selectedTab, navigation }: any) => {
     );
 };
 
-const TabBar = ({ state, navigation }: any) => {
+const TabBar = ({ state }: any) => {
+
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+
     const [visible, setVisible] = useState(true);
     const [selectedTab, setSelectedTab] = useState('HomeStack');
     const { routes } = state;
@@ -96,7 +103,7 @@ const TabBar = ({ state, navigation }: any) => {
     }, [index]);
 
     useEffect(() => {
-        let keyboardEventListeners: any;
+        let keyboardEventListeners: EmitterSubscription[];
         if (Platform.OS === 'android') {
             keyboardEventListeners = [
                 Keyboard.addListener('keyboardDidShow', () => setVisible(false)),
@@ -106,12 +113,12 @@ const TabBar = ({ state, navigation }: any) => {
         return () => {
             if (Platform.OS === 'android') {
                 keyboardEventListeners &&
-                    keyboardEventListeners.forEach((eventListener: any) => eventListener.remove());
+                    keyboardEventListeners.forEach((eventListener: EmitterSubscription) => eventListener.remove());
             }
         };
     }, []);
 
-    function navigate(p_screenName: string, p_params?: any) {
+    function navigate(p_screenName: string) {
         const focusedRouteName = getFocusedRouteNameFromRoute(routes.find((route: any) => p_screenName === route.name));
         if (selectedTab === p_screenName) {
             if (selectedTab === 'HomeStack' && (focusedRouteName === 'Home' || focusedRouteName === undefined)) {
@@ -178,7 +185,6 @@ export function TabNavigator() {
         <Tab.Navigator
             sceneContainerStyle={themeStyles.containerColorMain}
             tabBar={props => <TabBar {...props}></TabBar>}>
-
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="WalletStack" component={WalletStackScreen} />
             <Tab.Screen name="NotificationStack" component={NotificationStackScreen} />
@@ -191,14 +197,17 @@ const styles = StyleSheet.create(
     {
         tabsContainer: {
             height: Platform.OS === 'ios' ? 80 : 60,
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-around',
-            paddingRight: 16,
-            paddingLeft: 16,
+            paddingHorizontal: 16,
             paddingBottom: Platform.OS === 'ios' ? 20 : 0,
             borderTopWidth: 1
+        },
+        profileImage: {
+            width: 30,
+            height: 30,
+            borderRadius: 30,
         }
     }
 );
