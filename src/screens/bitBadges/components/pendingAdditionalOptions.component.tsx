@@ -84,7 +84,7 @@ export class PendingAdditionalOptions extends React.Component<Props> {
             const pendingData = await bitBadgesApi.getBadges(pendingIds);
             const declinedIds: string[] = [];
             for (const currBadge of pendingData.badges) {
-                if (currBadge.issuer == issuer) {
+                if (currBadge.issuer === issuer) {
                     await bitBadgesApi.declineBadge(
                         currBadge.id,
                         globals.user.publicKey,
@@ -127,7 +127,7 @@ export class PendingAdditionalOptions extends React.Component<Props> {
             const pendingData = await bitBadgesApi.getBadges(pendingIds);
             const acceptedIds: string[] = [];
             for (const currBadge of pendingData.badges) {
-                if (currBadge.issuer == issuer) {
+                if (currBadge.issuer === issuer) {
                     await bitBadgesApi.acceptBadge(
                         currBadge.id,
                         globals.user.publicKey,

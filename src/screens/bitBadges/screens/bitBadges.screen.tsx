@@ -175,7 +175,7 @@ export class BadgesScreen extends React.Component<Props, State> {
             }
 
             for (const badge of issued) {
-                const issuerProfile = profiles.find(elem => elem.PublicKeyBase58Check == badge.issuer)?.Username;
+                const issuerProfile = profiles.find(elem => elem.PublicKeyBase58Check === badge.issuer)?.Username;
                 if (issuerProfile) {
                     badge.issuerUsername = issuerProfile;
                 } else {
@@ -184,7 +184,7 @@ export class BadgesScreen extends React.Component<Props, State> {
 
                 const recipienstUsernames: string[] = [];
                 for (const recipient of badge.recipients) {
-                    const recipientProfile = profiles.find(elem => elem.PublicKeyBase58Check == recipient)?.Username;
+                    const recipientProfile = profiles.find(elem => elem.PublicKeyBase58Check === recipient)?.Username;
                     if (recipientProfile) {
                         recipienstUsernames.push(recipientProfile);
                     }
@@ -193,7 +193,7 @@ export class BadgesScreen extends React.Component<Props, State> {
             }
 
             for (const badge of received) {
-                const issuerProfile = profiles.find(elem => elem.PublicKeyBase58Check == badge.issuer)?.Username;
+                const issuerProfile = profiles.find(elem => elem.PublicKeyBase58Check === badge.issuer)?.Username;
                 if (issuerProfile) {
                     badge.issuerUsername = issuerProfile;
                 } else {
@@ -202,7 +202,7 @@ export class BadgesScreen extends React.Component<Props, State> {
 
                 const recipienstUsernames: string[] = [];
                 for (const recipient of badge.recipients) {
-                    const recipientProfile = profiles.find(elem => elem.PublicKeyBase58Check == recipient)?.Username;
+                    const recipientProfile = profiles.find(elem => elem.PublicKeyBase58Check === recipient)?.Username;
                     if (recipientProfile) {
                         recipienstUsernames.push(recipientProfile);
                     }

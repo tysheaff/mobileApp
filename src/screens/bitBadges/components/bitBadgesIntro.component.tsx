@@ -124,7 +124,6 @@ const styles = StyleSheet.create(
         title: {
             fontSize: 28,
             fontWeight: '600',
-            marginLeft: 12,
         },
         continueButton: {
             alignSelf: 'stretch',

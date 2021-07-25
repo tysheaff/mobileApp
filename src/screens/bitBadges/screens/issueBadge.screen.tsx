@@ -143,15 +143,15 @@ export class IssueBadgeScreen extends Component<Props, State> {
     private async getConfirmation() {
         let confirmed = false;
         const formattedDescription = this.state.description
-            ? this.state.description.length > 90
-                ? this.state.description.substring(0, 90) + '...'
-                : this.state.description
+            ? this.state.description.trim().length > 90
+                ? this.state.description.trim().substring(0, 90) + '...'
+                : this.state.description.trim()
             : 'None';
 
         await new Promise((resolve, reject) => {
             Alert.alert(
                 'Badge Issue Confirmation',
-                `IMPORTANT: Badges are permanent once issued, so please double check.\n\nTitle: ${this.state.title
+                `IMPORTANT: Badges are permanent once issued, so please double check.\n\nTitle: ${this.state.title.trim()
                 }\nIssuer: @${globals.user.username
                 }\nRecipients: ${this.formatRecipientString()}\n${this.state.validDates
                     ? `Validity: Valid from ${new Date(
@@ -242,11 +242,11 @@ export class IssueBadgeScreen extends Component<Props, State> {
             const jwt = await signing.signJWT();
 
             const response = await bitBadgesApi.issueBadge(
-                title,
+                title.trim(),
                 endDate.getTime(),
                 startDate.getTime(),
                 this.state.validDates,
-                this.state.description,
+                this.state.description.trim(),
                 this.state.backgroundColor,
                 this.state.externalUrl,
                 this.state.badgeImage
@@ -287,7 +287,7 @@ export class IssueBadgeScreen extends Component<Props, State> {
     }
 
     private formatRecipientString() {
-        if (this.state.recipients.length == 0) return '';
+        if (this.state.recipients.length === 0) return '';
 
         let str = '';
         for (const profile of this.state.recipients) {

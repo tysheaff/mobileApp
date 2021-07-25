@@ -40,7 +40,7 @@ export class RecipientInput extends React.Component<Props> {
 
     private setFormattedCurrRecipient = (currText: string) => {
         const idx = currText.indexOf(' ');
-        if (idx != -1) {
+        if (idx !== -1) {
             if (this._isMounted) {
                 this.props.setCurrRecipient(currText.substring(0, idx));
             }

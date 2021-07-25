@@ -45,7 +45,7 @@ export class PendingBar extends React.Component<Props> {
                 >
                     <Text style={[themeStyles.fontColorMain, styles.headerText]}>
                         You have {this.props.pending.length} pending badge
-                        {this.props.pending.length != 1 ? 's' : ''}
+                        {this.props.pending.length !== 1 ? 's' : ''}
                     </Text>
 
                     <CloutFeedButton styles={[styles.headerButton]} title={'View Pending'} onPress={this.goToPendingPage.bind(this)} />

@@ -22,8 +22,6 @@ interface State {
 
 export class BitBadgesListCardComponent extends React.Component<Props, State> {
 
-    private _isMounted = false;
-
     private _valid = Date.now() < this.props.badge.validDateEnd;
 
     constructor(props: Props) {
@@ -40,16 +38,8 @@ export class BitBadgesListCardComponent extends React.Component<Props, State> {
         this.formatIssuerString = this.formatIssuerString.bind(this);
     }
 
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
-
     shouldComponentUpdate(nextProps: Props) {
-        return nextProps.badge.issuer != this.props.badge.issuer;
+        return nextProps.badge.issuer !== this.props.badge.issuer;
     }
 
     private goToBadgePage() {
@@ -116,7 +106,7 @@ export class BitBadgesListCardComponent extends React.Component<Props, State> {
                 <View style={styles.expirationContainer}>
                     <Text style={[styles.expirationText, themeStyles.fontColorMain]}>
                         {
-                            this.props.badge.validDateEnd == 8640000000000000
+                            this.props.badge.validDateEnd === 8640000000000000
                                 ? 'Valid Forever'
                                 : new Date(this.props.badge.validDateStart).toLocaleDateString() +
                                 ' - ' +

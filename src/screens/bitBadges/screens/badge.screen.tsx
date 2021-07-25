@@ -45,11 +45,11 @@ export class BadgeScreen extends React.Component<Props, State> {
         this.loadIssuer = this.loadIssuer.bind(this);
         this.openOnIpfs = this.openOnIpfs.bind(this);
 
-        if (!this.props.route.params.issuerString || this.props.route.params.issuerString == 'Loading...') {
+        if (!this.props.route.params.issuerString || this.props.route.params.issuerString === 'Loading...') {
             this.loadIssuer();
         }
 
-        if (!this.props.route.params.recipientString || this.props.route.params.recipientString == 'Loading...') {
+        if (!this.props.route.params.recipientString || this.props.route.params.recipientString === 'Loading...') {
             this.loadRecipients();
         }
     }
@@ -63,9 +63,8 @@ export class BadgeScreen extends React.Component<Props, State> {
     }
 
     shouldComponentUpdate(p_nextProps: Props, p_nextState: State) {
-        return p_nextState.issuer != this.state.issuer ||
-            p_nextState.recipients != this.state.recipients ||
-            p_nextState.recipientsStr != this.state.recipientsStr;
+        return p_nextState.issuer !== this.state.issuer ||
+            p_nextState.recipientsStr !== this.state.recipientsStr;
     }
 
     private async loadRecipients() {

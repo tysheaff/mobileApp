@@ -18,7 +18,7 @@ export class FormInput extends React.Component<Props> {
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
-        return this.props.value != p_nextProps.value;
+        return this.props.value !== p_nextProps.value;
     }
 
     render() {
@@ -49,9 +49,9 @@ const styles = StyleSheet.create(
         textInput: {
             borderColor: 'gray',
             borderBottomWidth: 1,
-            margin: 0,
-            marginBottom: 16,
-            padding: 0,
-        },
+            paddingVertical: 4,
+            width: '100%',
+            marginBottom: 16
+        }
     }
 );

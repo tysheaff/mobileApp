@@ -96,7 +96,7 @@ export class PendingScreen extends React.Component<Props, State> {
             const pending = this.state.pending;
 
             for (const badge of pending) {
-                const issuerProfile = profiles.find(elem => elem.PublicKeyBase58Check == badge.issuer)?.Username;
+                const issuerProfile = profiles.find(elem => elem.PublicKeyBase58Check === badge.issuer)?.Username;
                 if (issuerProfile) {
                     badge.issuerUsername = issuerProfile;
                 } else {
@@ -105,7 +105,7 @@ export class PendingScreen extends React.Component<Props, State> {
 
                 const recipienstUsernames: string[] = [];
                 for (const recipient of badge.recipients) {
-                    const recipientProfile = profiles.find(elem => elem.PublicKeyBase58Check == recipient)?.Username;
+                    const recipientProfile = profiles.find(elem => elem.PublicKeyBase58Check === recipient)?.Username;
                     if (recipientProfile) {
                         recipienstUsernames.push(recipientProfile);
                     }

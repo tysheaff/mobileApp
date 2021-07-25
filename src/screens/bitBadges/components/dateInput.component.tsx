@@ -47,7 +47,7 @@ export class DateInput extends React.Component<Props, State> {
     }
 
     showModal() {
-        if (this._isMounted && Platform.OS == 'android') {
+        if (this._isMounted && Platform.OS === 'android') {
             this.setState({ showDateModalAndroid: true });
         }
     }
