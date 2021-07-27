@@ -11,11 +11,11 @@ interface Props {
     goToStats: () => void;
     removable: boolean;
     onRemove: (index: number) => void;
-    selectedImageIndex: number;
+    selectedImageIndex?: number;
 }
 
 export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemove, selectedImageIndex }: Props): JSX.Element {
-    let mount = true;
+    const isMounted = useRef<boolean>(true);
     const scrollRef = useRef<ScrollView>(null);
     const [internalIndex, setInternalIndex] = useState(0);
     const [imageWidth, setImageWidth] = useState(0);
@@ -25,7 +25,7 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
         const nativeEvent = event.nativeEvent;
         const slide = Math.round(nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width);
         if (slide !== internalIndex && slide >= 0 && slide < imageUrls.length) {
-            if (mount) {
+            if (isMounted) {
                 setInternalIndex(slide);
             }
         }
@@ -34,7 +34,7 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
     useEffect(
         () => {
             return () => {
-                mount = false;
+                isMounted.current = false;
             };
         },
         []
@@ -44,7 +44,7 @@ export function ImageGalleryComponent({ imageUrls, goToStats, removable, onRemov
         () => {
             selectedImageIndex = selectedImageIndex != null ? selectedImageIndex : 0;
 
-            if (mount) {
+            if (isMounted) {
                 setInternalIndex(selectedImageIndex);
                 if (scrollRef.current) {
                     scrollRef.current.scrollTo({ x: Dimensions.get('window').width * selectedImageIndex });

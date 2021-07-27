@@ -12,7 +12,7 @@ import { EventType, Post, Profile } from '@types';
 import { PostComponent } from './post/post.component';
 import { useNavigation, useRoute } from '@react-navigation/core';
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types';
-import { MentionInput, replaceMentionValues } from 'react-native-controlled-mentions';
+import { MentionInput, MentionSuggestionsProps, replaceMentionValues } from 'react-native-controlled-mentions';
 import { UserSuggestionList } from './userSuggestionList.component';
 import { parseVideoLinkAsync } from '@services/videoLinkParser';
 import { CloutTagSuggestionList } from './cloutTagSuggestionList.component';
@@ -20,22 +20,59 @@ import CloutFeedVideoComponent from './post/cloutFeedVideo.component';
 import { eventManager } from '@globals/injector';
 import { wait } from '@services/promiseHelper';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import { ParamListBase } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+interface Props {
+    profile: Profile,
+    postText: string,
+    setPostText: (postText: string) => void,
+    editedPostImageUrls: string[],
+    setImagesBase64: (prevState: (imageUri: string[]) => void) => void,
+    recloutedPost?: Post,
+    videoLink: string,
+    setVideoLink: (link: string) => void
+}
 
 export function CreatePostComponent(
-    { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }:
-        { profile: Profile, postText: string, setPostText: any, editedPostImageUrls: string[], setImagesBase64: any, recloutedPost?: Post, videoLink: string, setVideoLink: any }
-) {
-    const navigation = useNavigation();
+    { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }: Props) {
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
     const route = useRoute();
 
-    let mount = true;
+    const mentionPartTypes = [
+        {
+            trigger: '@',
+            renderSuggestions: UserSuggestionList,
+            isBottomMentionSuggestionsRender: true,
+            isInsertSpaceAfterMention: true,
+            allowedSpacesCount: 0,
+            textStyle: [styles.link, themeStyles.linkColor]
+        },
+        {
+            trigger: '#',
+            renderSuggestions: CloutTagSuggestionList as (props: MentionSuggestionsProps) => React.ReactNode,
+            isBottomMentionSuggestionsRender: true,
+            isInsertSpaceAfterMention: true,
+            allowedSpacesCount: 0,
+            textStyle: [styles.link, themeStyles.linkColor]
+        },
+        {
+            trigger: '$',
+            renderSuggestions: UserSuggestionList,
+            isBottomMentionSuggestionsRender: true,
+            isInsertSpaceAfterMention: true,
+            allowedSpacesCount: 0,
+            textStyle: [styles.link, themeStyles.linkColor]
+        }
+    ];
+    const isMounted = useRef<boolean>(true);
     const [internalPostText, setInternalPostText] = useState(postText);
     const [imageUrls, setImageUrls] = useState<string[]>(editedPostImageUrls);
     const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
     const [insertVideo, setInsertVideo] = useState<boolean>(!!videoLink);
     const [internalVideoLink, setInternalVideoLink] = useState<string>(videoLink);
-    const scrollViewRef = useRef<any>();
 
+    const scrollViewRef = useRef<ScrollView>(null);
     let inputRef: any;
 
     const inputAccessoryViewId = Platform.OS === 'ios' ? 'inputAccessoryViewID' : undefined;
@@ -43,23 +80,23 @@ export function CreatePostComponent(
     useEffect(
         () => {
             return () => {
-                mount = false;
+                isMounted.current = false;
             };
         },
         []
     );
 
-    const pickImage = async () => {
+    function pickImage(): void {
 
         if (imageUrls?.length === 5) {
             alert('You have reached the maximum number of images you can attach per post.');
             return;
         }
+        let result: ImagePicker.ImagePickerResult;
 
         const options = ['Camera', 'Gallery', 'Cancel'];
-        const callback = async (p_optionIndex: number) => {
-            let result: any;
-            switch (p_optionIndex) {
+        const callback = async (optionIndex: number) => {
+            switch (optionIndex) {
                 case 0:
                     if (Platform.OS !== 'web') {
                         const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -97,10 +134,10 @@ export function CreatePostComponent(
             }
             if (!result.cancelled) {
                 if (result.type === 'image') {
-                    if (mount) {
+                    if (isMounted) {
                         const uri = (result as ImageInfo).uri;
-                        setImageUrls(p_previous => [...p_previous, uri]);
-                        setImagesBase64((p_previous: any) => [...p_previous, uri]);
+                        setImageUrls(previous => [...previous, uri]);
+                        setImagesBase64((previous: string[]) => [...previous, uri]);
                         setSelectedImageIndex(imageUrls.length);
                     }
                 } else {
@@ -116,26 +153,26 @@ export function CreatePostComponent(
                 config: { options, callback, destructiveButtonIndex: [] }
             }
         );
-    };
+    }
 
-    function onRemoveImage(p_index: number) {
+    function onRemoveImage(index: number): void {
         setImageUrls(
-            (p_previous: any) => {
-                const copy = p_previous.slice(0);
-                copy.splice(p_index, 1);
+            (previous: string[]) => {
+                const copy: string[] = previous.slice(0);
+                copy.splice(index, 1);
                 return copy;
             }
         );
         setImagesBase64(
-            (p_previous: any) => {
-                const copy = p_previous.slice(0);
-                copy.splice(p_index, 1);
+            (previous: string[]) => {
+                const copy = previous.slice(0);
+                copy.splice(index, 1);
                 return copy;
             }
         );
     }
 
-    async function onPasteVideoLink() {
+    async function onPasteVideoLink(): Promise<void> {
         const videoLink = await Clipboard.getStringAsync();
         if (!videoLink) {
             Alert.alert('Clipboard is empty!', 'Please make sure you copied the link correctly.');
@@ -145,7 +182,7 @@ export function CreatePostComponent(
         const parsedVideoLink = await parseVideoLinkAsync(videoLink);
 
         if (parsedVideoLink) {
-            if (mount) {
+            if (isMounted) {
                 setInternalVideoLink(parsedVideoLink);
                 setVideoLink(parsedVideoLink);
             }
@@ -155,8 +192,15 @@ export function CreatePostComponent(
         }
     }
 
+    function onMentionChange(value: string): void {
+        const replaceMention = replaceMentionValues(value, ({ name, trigger }) => `${trigger}${name}`);
+        setPostText(replaceMention);
+        setInternalPostText(value);
+        inputRef?.focus();
+    }
+
     return <ScrollView
-        ref={p_ref => scrollViewRef.current = p_ref}
+        ref={scrollViewRef}
         bounces={false}
         keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
@@ -170,7 +214,7 @@ export function CreatePostComponent(
         </View>
 
         <MentionInput
-            inputRef={p_ref => { inputRef = p_ref; }}
+            inputRef={ref => inputRef = ref}
             style={[styles.textInput, themeStyles.fontColorMain]}
             placeholder="Share your ideas with the world..."
             placeholderTextColor={themeStyles.fontColorSub.color}
@@ -179,48 +223,18 @@ export function CreatePostComponent(
             value={internalPostText}
             autoFocus
             inputAccessoryViewID={inputAccessoryViewId}
-            onChange={(p_value) => {
-                const replaceMention = replaceMentionValues(p_value, ({ name, trigger }) => `${trigger}${name}`);
-                setPostText(replaceMention);
-                setInternalPostText(p_value);
-                inputRef?.focus();
-            }}
+            onChange={(value) => onMentionChange(value)}
             keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
-            partTypes={[
-                {
-                    trigger: '@',
-                    renderSuggestions: UserSuggestionList,
-                    isBottomMentionSuggestionsRender: true,
-                    isInsertSpaceAfterMention: true,
-                    allowedSpacesCount: 0,
-                    textStyle: [styles.link, themeStyles.linkColor]
-                },
-                {
-                    trigger: '#',
-                    renderSuggestions: CloutTagSuggestionList,
-                    isBottomMentionSuggestionsRender: true,
-                    isInsertSpaceAfterMention: true,
-                    allowedSpacesCount: 0,
-                    textStyle: [styles.link, themeStyles.linkColor]
-                },
-                {
-                    trigger: '$',
-                    renderSuggestions: UserSuggestionList,
-                    isBottomMentionSuggestionsRender: true,
-                    isInsertSpaceAfterMention: true,
-                    allowedSpacesCount: 0,
-                    textStyle: [styles.link, themeStyles.linkColor]
-                }
-            ]}
-        ></MentionInput>
+            partTypes={mentionPartTypes}
+        />
         {
-            imageUrls?.length > 0 ?
-                <ImageGalleryComponent
-                    imageUrls={imageUrls}
-                    removable={true}
-                    onRemove={onRemoveImage}
-                    selectedImageIndex={selectedImageIndex}></ImageGalleryComponent> :
-                undefined
+            imageUrls?.length > 0 &&
+            <ImageGalleryComponent
+                goToStats={() => undefined}
+                imageUrls={imageUrls}
+                removable={true}
+                onRemove={onRemoveImage}
+                selectedImageIndex={selectedImageIndex} />
         }
 
         {
@@ -302,14 +316,13 @@ export function CreatePostComponent(
                 </KeyboardAvoidingView>
         }
 
-        <View style={{ height: 500 }}></View>
+        <View style={styles.emptyView} />
     </ScrollView>;
 }
 
 const styles = StyleSheet.create(
     {
         headerContainer: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             paddingLeft: 10,
@@ -327,8 +340,7 @@ const styles = StyleSheet.create(
             maxWidth: Dimensions.get('window').width * 0.6
         },
         textInput: {
-            marginRight: 10,
-            marginLeft: 10,
+            marginHorizontal: 10,
             fontSize: 16,
             width: Dimensions.get('window').width - 20,
             minHeight: 40,
@@ -337,14 +349,12 @@ const styles = StyleSheet.create(
         },
         inputAccessory: {
             paddingLeft: 16,
-            paddingTop: 8,
-            paddingBottom: 8,
+            paddingVertical: 8,
             borderTopWidth: 1,
             flexDirection: 'row',
             alignItems: 'center'
         },
         inputAccessoryButton: {
-            display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             marginRight: 16
@@ -370,17 +380,12 @@ const styles = StyleSheet.create(
             marginTop: 10
         },
         recloutedPostContainer: {
-            marginLeft: 10,
-            marginRight: 10,
+            marginHorizontal: 10,
             borderWidth: 1,
             padding: 10,
             paddingBottom: 4,
             borderRadius: 8,
             marginTop: 10
-        },
-        videoContainer: {
-            height: 400,
-            width: '100%'
         },
         removeButtonContainer: {
             backgroundColor: '#c42326',
@@ -390,7 +395,6 @@ const styles = StyleSheet.create(
             position: 'absolute',
             top: 10,
             right: 10,
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 8,
@@ -399,12 +403,14 @@ const styles = StyleSheet.create(
         removeButton: {
             width: 30,
             height: 30,
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
         },
         link: {
             fontWeight: '500'
+        },
+        emptyView: {
+            height: 500
         }
     }
 );

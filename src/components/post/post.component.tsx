@@ -79,7 +79,7 @@ export class PostComponent extends React.Component<Props, State> {
             || this.state.isHeartShowed !== p_nextState.isHeartShowed;
     }
 
-    private goToStats() {
+    private goToStats(): void {
         this.props.navigation.push(
             'PostStatsTabNavigator',
             {
@@ -90,7 +90,7 @@ export class PostComponent extends React.Component<Props, State> {
         hapticsManager.customizedImpact();
     }
 
-    private goToProfile() {
+    private goToProfile(): void {
         if (!this.props.disableProfileNavigation) {
             this.props.navigation.push(
                 'UserProfile',
@@ -103,7 +103,7 @@ export class PostComponent extends React.Component<Props, State> {
         }
     }
 
-    private goToPost() {
+    private goToPost(): void {
         if (this.props.disablePostNavigate !== true) {
             this.props.navigation.push(
                 'Post',
@@ -115,7 +115,7 @@ export class PostComponent extends React.Component<Props, State> {
         }
     }
 
-    private goToRecloutedPost() {
+    private goToRecloutedPost(): void {
         if (this.props.disablePostNavigate !== true) {
             this.props.navigation.push(
                 'Post',
@@ -177,14 +177,14 @@ export class PostComponent extends React.Component<Props, State> {
                 themeStyles.borderColor]}>
                 {
                     this.props.isParentPost &&
-                    <View style={{ flex: 1, paddingLeft: 10 }}>
+                    <View style={styles.parentPostSubContainer}>
                         <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
                             <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
                         </TouchableOpacity>
                         <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
                     </View>
                 }
-                <View style={this.props.isParentPost ? { flex: 11 } : {}}>
+                <View style={this.props.isParentPost ? styles.isParentPostContainer : {}}>
                     <View
                         style={[
                             styles.contentContainer,
@@ -219,7 +219,7 @@ export class PostComponent extends React.Component<Props, State> {
                                 <View style={styles.headerRightContainer}>
                                     {
                                         this.props.isPinned &&
-                                        <Entypo style={{ marginRight: 6 }} name="pin" size={16} color={themeStyles.fontColorMain.color} />
+                                        <Entypo style={styles.pinIcon} name="pin" size={16} color={themeStyles.fontColorMain.color} />
                                     }
 
                                     <View style={[styles.coinPriceContainer, themeStyles.chipColor]}>
@@ -247,7 +247,12 @@ export class PostComponent extends React.Component<Props, State> {
 
                         {
                             this.props.post.ImageURLs?.length > 0 &&
-                            <ImageGalleryComponent imageUrls={this.props.post.ImageURLs} goToStats={() => this.goToStats()} />
+                            <ImageGalleryComponent
+                                removable={false}
+                                onRemove={() => undefined}
+                                imageUrls={this.props.post.ImageURLs}
+                                goToStats={() => this.goToStats()}
+                            />
                         }
 
                         {
@@ -307,6 +312,13 @@ const styles = StyleSheet.create(
             flex: 1,
             flexDirection: 'row',
             justifyContent: 'center'
+        },
+        parentPostSubContainer: {
+            flex: 1,
+            paddingLeft: 10
+        },
+        isParentPostContainer: {
+            flex: 11
         },
         parentConnector: {
             borderRightWidth: 2,
@@ -373,16 +385,12 @@ const styles = StyleSheet.create(
             fontWeight: '600'
         },
         recloutedPostContainer: {
-            marginLeft: 10,
-            marginRight: 10,
+            marginHorizontal: 10,
             borderWidth: 1,
             padding: 10,
             paddingBottom: 4,
             borderRadius: 8,
             marginTop: 10
-        },
-        link: {
-            fontWeight: '500'
         },
         floatingHeart: {
             position: 'absolute',
@@ -392,6 +400,9 @@ const styles = StyleSheet.create(
             bottom: 0,
             justifyContent: 'center',
             alignItems: 'center'
+        },
+        pinIcon: {
+            marginRight: 6
         }
     }
 );

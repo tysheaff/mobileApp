@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, StyleSheet, Linking, Alert, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { globals } from '@globals';
@@ -23,7 +23,7 @@ export function CreatePostScreen({ navigation, route }: any) {
         newPost: boolean, comment: boolean, reclout: boolean, editPost: boolean, parentPost: Post, recloutedPost: Post, editedPost: Post
     } = route.params;
 
-    let mount = true;
+    const isMounted = useRef<boolean>(true);
 
     globals.createPost = async () => {
         if (!canCreateProfile) {
@@ -33,7 +33,7 @@ export function CreatePostScreen({ navigation, route }: any) {
         let images = imagesBase64 ?? [];
 
         if (postText || ((reclout || !!editedPost?.RecloutedPostEntryResponse) && images.length === 0 && !videoLink)) {
-            if (mount) {
+            if (isMounted) {
                 setLoading(true);
             }
 
@@ -64,13 +64,13 @@ export function CreatePostScreen({ navigation, route }: any) {
                     imageUrls = imageUrls.concat(responses.map((p_response: any) => p_response.ImageURL));
                     fnCreatePost(postText, imageUrls);
                 } else {
-                    if (mount) {
+                    if (isMounted) {
                         setLoading(false);
                     }
                     Alert.alert('Error', 'Something went wrong! Please try again.');
                 }
             } catch (p_exception) {
-                if (mount) {
+                if (isMounted) {
                     setLoading(false);
                 }
                 globals.defaultHandleError(p_exception);
@@ -99,7 +99,7 @@ export function CreatePostScreen({ navigation, route }: any) {
                 const transactionHex = p_response.TransactionHex;
                 const signedTransaction = await signing.signTransaction(transactionHex);
 
-                await api.submitTransaction(signedTransaction ).then(
+                await api.submitTransaction(signedTransaction).then(
                     p_response => {
                         if (newPost || reclout) {
                             handleNewPostSuccess(p_response);
@@ -116,7 +116,7 @@ export function CreatePostScreen({ navigation, route }: any) {
                     p_error => {
                         globals.defaultHandleError(p_error);
 
-                        if (mount) {
+                        if (isMounted) {
                             setLoading(false);
                         }
                     }
@@ -126,7 +126,7 @@ export function CreatePostScreen({ navigation, route }: any) {
             p_error => {
                 globals.defaultHandleError(p_error);
 
-                if (mount) {
+                if (isMounted) {
                     setLoading(false);
                 }
             }
@@ -200,13 +200,13 @@ export function CreatePostScreen({ navigation, route }: any) {
                     }
 
                     if (profile) {
-                        if (mount) {
+                        if (isMounted) {
                             setProfile(profile);
                             setLoading(false);
                             setCanCreateProfile(true);
                         }
                     } else {
-                        if (mount) {
+                        if (isMounted) {
                             setLoading(false);
                             setCanCreateProfile(false);
                         }
@@ -215,7 +215,7 @@ export function CreatePostScreen({ navigation, route }: any) {
             ).catch(p_error => globals.defaultHandleError(p_error));
 
             return () => {
-                mount = false;
+                isMounted.current = false;
             };
         },
         []
