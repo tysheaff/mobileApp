@@ -28,17 +28,14 @@ import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 
 const ProfileStack = createStackNavigator();
 
 export default function ProfileStackScreen() {
 
-    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
-
     return <ProfileStack.Navigator
-        screenOptions={() => ({
+        screenOptions={({ navigation }: any) => ({
             ...stackConfig,
             headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
             headerStyle: {
