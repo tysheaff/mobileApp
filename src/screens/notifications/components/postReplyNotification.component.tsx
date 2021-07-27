@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Profile, Post, Notification } from '@types';
 import { globalStyles } from '@styles/globalStyles';
 import { FontAwesome } from '@expo/vector-icons';
+import { notificationsStyles } from '../styles/notificationStyles';
 
 interface Props {
     profile: Profile;
@@ -11,7 +12,6 @@ interface Props {
     goToProfile: (p_userKey: string, p_username: string) => void;
     goToPost: (parentPoshHashHex: string, postHashCode: string) => void;
     postHashHex: string;
-    styles: any;
     notification: Notification;
 }
 
@@ -28,27 +28,27 @@ export class PostReplyNotificationComponent extends React.Component<Props> {
         const parentPoshHashHex = this.props.notification.Metadata.SubmitPostTxindexMetadata?.ParentPostHashHex as string;
         return (
             <TouchableOpacity
-                style={[this.props.styles.notificationContainer, this.props.styles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
+                style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
                 activeOpacity={1}
                 onPress={() => this.props.goToPost(parentPoshHashHex, this.props.postHashHex)}>
                 <TouchableOpacity
-                    style={this.props.styles.centerTextVertically}
+                    style={notificationsStyles.centerTextVertically}
                     onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
                     activeOpacity={1}>
-                    <Image style={this.props.styles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
+                    <Image style={notificationsStyles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
                 </TouchableOpacity>
-                <View style={[this.props.styles.iconContainer, { backgroundColor: '#3599d4' }]}>
+                <View style={[notificationsStyles.iconContainer, { backgroundColor: '#3599d4' }]}>
                     <FontAwesome style={[{ marginLeft: 1 }]} name="comment" size={12} color="white" />
                 </View>
-                <View style={this.props.styles.textContainer}>
+                <View style={notificationsStyles.textContainer}>
                     <TouchableOpacity
-                        style={this.props.styles.centerTextVertically}
+                        style={notificationsStyles.centerTextVertically}
                         onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
                         activeOpacity={1}>
-                        <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
+                        <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
                     </TouchableOpacity>
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>replied to your post: </Text>
-                    <Text style={[this.props.styles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.Body}</Text>
+                    <Text style={[notificationsStyles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.Body}</Text>
                 </View>
             </TouchableOpacity>
         );

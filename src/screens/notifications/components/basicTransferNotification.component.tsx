@@ -6,11 +6,11 @@ import { Profile, Notification } from '@types';
 import { globalStyles } from '@styles/globalStyles';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { globals } from '@globals/globals';
+import { notificationsStyles } from '../styles/notificationStyles';
 
 interface Props {
     profile: Profile;
     goToProfile: (p_userKey: string, p_username: string) => void;
-    styles: any;
     notification: Notification;
 }
 
@@ -33,37 +33,37 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
 
         if (output) {
             bitCloutAmount = (output.AmountNanos / 1000000000).toFixed(2);
-            usdAmount = calculateAndFormatBitCloutInUsd(output.AmountNanos );
+            usdAmount = calculateAndFormatBitCloutInUsd(output.AmountNanos);
         }
 
         return (
             <TouchableOpacity
-                style={[this.props.styles.notificationContainer, this.props.styles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
+                style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
                 onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
                 activeOpacity={1}>
                 <TouchableOpacity
-                    style={this.props.styles.centerTextVertically}
+                    style={notificationsStyles.centerTextVertically}
                     onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
                     activeOpacity={1}>
-                    <Image style={this.props.styles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
+                    <Image style={notificationsStyles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
                 </TouchableOpacity>
 
-                <View style={[this.props.styles.iconContainer, { backgroundColor: '#00803c' }]}>
+                <View style={[notificationsStyles.iconContainer, { backgroundColor: '#00803c' }]}>
                     <FontAwesome style={[{ marginLeft: 1 }]} name="dollar" size={14} color="white" />
                 </View>
 
-                <View style={this.props.styles.textContainer}>
+                <View style={notificationsStyles.textContainer}>
                     <TouchableOpacity
-                        style={this.props.styles.centerTextVertically}
+                        style={notificationsStyles.centerTextVertically}
                         onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
                         activeOpacity={1}>
-                        <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
+                        <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
                     </TouchableOpacity>
 
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>sent you</Text>
-                    <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} </Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} </Text>
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>BitClout!</Text>
-                    <Text style={[this.props.styles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount})</Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount})</Text>
                 </View>
             </TouchableOpacity>
         );
