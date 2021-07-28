@@ -451,11 +451,6 @@ function sendMessage(p_senderPublicKey: string, p_recipientPublicKey: string, p_
     );
 }
 
-function getTicker() {
-    const route = 'https://blockchain.info/ticker';
-    return get(route, false, true);
-}
-
 function getExchangeRate() {
     const route = 'get-exchange-rate';
     return get(route, true, true);
@@ -676,7 +671,6 @@ export const api = {
     getNotifications,
     getMessages,
     sendMessage,
-    getTicker,
     getExchangeRate,
     getSinglePost,
     createFollow,

@@ -279,7 +279,7 @@ export class PostActionsRow extends React.Component<Props, State> {
             </TouchableOpacity>
 
             {
-                Platform.OS !== 'ios' || true ?
+                Platform.OS !== 'ios' ?
                     <TouchableOpacity style={styles.actionButton} activeOpacity={0.5} onPress={() => this.onSendDiamonds()} onLongPress={() => this.goToStats('Diamonds')}>
                         <FontAwesome name='diamond' size={18} color={this.state.diamondLevel != null && this.state.diamondLevel > 0 ? themeStyles.diamondColor.color : '#a1a1a1'} />
                         <Text style={styles.actionText}>{this.props.post.DiamondCount}</Text>

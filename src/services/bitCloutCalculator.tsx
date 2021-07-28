@@ -3,26 +3,18 @@ import { api } from './api/api';
 import { formatNumber } from './helpers';
 
 export async function loadTickersAndExchangeRate() {
-    await Promise.all(
-        [
-            api.getTicker(),
-            api.getExchangeRate()
-        ]
-    ).then(
-        p_responses => {
-            globals.tickers = p_responses[0];
-            globals.exchangeRate = p_responses[1];
-        }
-    ).catch(p_error => globals.defaultHandleError(p_error));
+    await api.getExchangeRate()
+        .then(
+            p_response => {
+                globals.exchangeRate = p_response;
+            }
+        ).catch(p_error => globals.defaultHandleError(p_error));
     return true;
 }
 
 export function calculateBitCloutInUSD(p_nanos: number) {
-    if (globals.tickers.USD && globals.exchangeRate) {
-        const usdExchangeRate = globals.tickers.USD.last;
-        const satoshiExchangeRate = globals.exchangeRate.SatoshisPerBitCloutExchangeRate;
-        const dollarPerSatoshi = usdExchangeRate / 100000000;
-        const dollarPerBitClout = satoshiExchangeRate * dollarPerSatoshi;
+    if (globals.exchangeRate) {
+        const dollarPerBitClout = globals.exchangeRate.USDCentsPerBitCloutExchangeRate / 100;
         const dollarPerNano = dollarPerBitClout / 1000000000;
         let result = dollarPerNano * p_nanos;
         result = Math.round((result + Number.EPSILON) * 100) / 100;

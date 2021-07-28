@@ -36,6 +36,7 @@ module.exports = {
         'react-native/no-unused-styles': 1,
         'react-native/no-inline-styles': 1,
         'eol-last': ['warn', 'always'],
-        'react-native/no-inline-styles': 'off'
+        'react-native/no-inline-styles': 'off',
+        '@typescript-eslint/no-empty-function': 'off'
     }
 };
