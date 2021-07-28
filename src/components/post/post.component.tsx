@@ -1,18 +1,19 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Animated } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
 import { Post } from '../../types';
-import { Dimensions } from 'react-native';
-import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, Entypo } from '@expo/vector-icons';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { ImageGalleryComponent } from '../imageGallery.component';
 import { TextWithLinks } from '../textWithLinks.component';
 import { globals, hapticsManager } from '@globals';
-import { api, calculateAndFormatBitCloutInUsd, calculateDurationUntilNow } from '@services';
+import { calculateAndFormatBitCloutInUsd, calculateDurationUntilNow } from '@services';
 import { themeStyles } from '@styles';
 import { PostOptionsComponent } from './postOptions.components';
 import { PostActionsRow } from './postActionsRow.component';
 import CloutFeedVideoComponent from '@components/post/cloutFeedVideo.component';
 import { StackNavigationProp } from '@react-navigation/stack';
+import ProfileInfoImageComponent from '@components/profileInfo/profileInfoImage.component';
+import ProfileInfoUsernameComponent from '@components/profileInfo/profileInfoUsername.component';
 
 interface Props {
     navigation: StackNavigationProp<ParamListBase>;
@@ -31,7 +32,6 @@ interface State {
     coinPrice: string;
     durationUntilNow: string;
     actionsDisabled: boolean;
-    profilePic: string;
     isHeartShowed: boolean;
 }
 
@@ -58,7 +58,6 @@ export class PostComponent extends React.Component<Props, State> {
             coinPrice,
             durationUntilNow,
             actionsDisabled: this.props.actionsDisabled || globals.readonly,
-            profilePic: api.getSingleProfileImage(this.props.post.ProfileEntryResponse.PublicKeyBase58Check),
             isHeartShowed: false
         };
 
@@ -179,7 +178,10 @@ export class PostComponent extends React.Component<Props, State> {
                     this.props.isParentPost &&
                     <View style={styles.parentPostSubContainer}>
                         <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
-                            <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
+                            <ProfileInfoImageComponent
+                                imageSize={35}
+                                publicKey={this.props.post.ProfileEntryResponse?.PublicKeyBase58Check}
+                            />
                         </TouchableOpacity>
                         <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
                     </View>
@@ -197,17 +199,19 @@ export class PostComponent extends React.Component<Props, State> {
                                 {
                                     !this.props.isParentPost && (
                                         <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
-                                            <Image style={styles.profilePic} source={{ uri: this.state.profilePic }}></Image>
+                                            <ProfileInfoImageComponent
+                                                imageSize={35}
+                                                publicKey={this.props.post.ProfileEntryResponse?.PublicKeyBase58Check}
+                                            />
                                         </TouchableOpacity>
                                     )
                                 }
                                 <View>
-                                    <TouchableOpacity style={styles.usernameContainer} activeOpacity={1} onPress={() => this.goToProfile()}>
-                                        <Text style={[styles.username, themeStyles.fontColorMain]} >{this.props.post.ProfileEntryResponse?.Username}</Text>
-                                        {
-                                            this.props.post.ProfileEntryResponse?.IsVerified &&
-                                            <MaterialIcons name="verified" size={16} color="#007ef5" />
-                                        }
+                                    <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
+                                        <ProfileInfoUsernameComponent
+                                            username={this.props.post.ProfileEntryResponse?.Username}
+                                            verified={this.props.post.ProfileEntryResponse?.IsVerified}
+                                        />
                                     </TouchableOpacity>
 
                                     <TouchableOpacity style={styles.actionButton} activeOpacity={1}>
@@ -306,7 +310,7 @@ const styles = StyleSheet.create(
     {
         containerVerticalPaddings: {
             paddingTop: 24,
-            paddingBottom: 10,
+            paddingBottom: 10
         },
         parentPostContainer: {
             flex: 1,
@@ -330,17 +334,12 @@ const styles = StyleSheet.create(
             flex: 1,
             width: '100%'
         },
-        profilePic: {
-            width: 35,
-            height: 35,
-            borderRadius: 8,
-            marginRight: 10
-        },
+
         headerContainer: {
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginBottom: 10,
-            paddingHorizontal: 10,
+            paddingHorizontal: 10
         },
         headerRightContainer: {
             flexDirection: 'row',
@@ -349,23 +348,14 @@ const styles = StyleSheet.create(
         bodyText: {
             fontSize: 15,
             paddingHorizontal: 10,
-            marginBottom: 10,
-        },
-        usernameContainer: {
-            flexDirection: 'row',
-            alignItems: 'center'
-        },
-        username: {
-            fontWeight: 'bold',
-            maxWidth: Dimensions.get('window').width / 2 + 20,
-            marginBottom: 2,
-            marginRight: 6
+            marginBottom: 10
         },
         actionButton: {
             flex: 1,
             flexDirection: 'row',
             alignItems: 'center',
             marginRight: 10,
+            marginTop: 2,
         },
         actionText: {
             marginLeft: 4,
