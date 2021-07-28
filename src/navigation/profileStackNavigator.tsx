@@ -29,11 +29,12 @@ import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 
 const ProfileStack = createStackNavigator();
 
 export default function ProfileStackScreen() {
-
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
     return <ProfileStack.Navigator
         screenOptions={({ navigation }: any) => ({
             ...stackConfig,
