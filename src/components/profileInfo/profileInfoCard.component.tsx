@@ -13,6 +13,8 @@ interface Props {
     verified: boolean;
     duration?: string;
     isProfileManager?: boolean;
+    ìsDarkMode?: boolean;
+    imageSize?: number;
 }
 
 export default class ProfileInfoCardComponent extends React.Component<Props> {
@@ -28,13 +30,23 @@ export default class ProfileInfoCardComponent extends React.Component<Props> {
     }
 
     render(): JSX.Element {
-        return <View style={[styles.container]}>
-            <ProfileInfoImageComponent publicKey={this.props.publicKey} />
+        return <View style={styles.container}>
+            <ProfileInfoImageComponent imageSize={this.props.imageSize} publicKey={this.props.publicKey} />
             <View>
-                <ProfileInfoUsernameComponent verified={this.props.verified} username={this.props.username} />
+                <ProfileInfoUsernameComponent
+                    verified={this.props.verified}
+                    isDarkMode={this.props.ìsDarkMode}
+                    username={this.props.username}
+                />
+
                 <View style={styles.bottomRow}>
                     {
-                        !!this.props.coinPrice && <CoinPriceComponent isProfileManager={this.props.isProfileManager} price={this.props.coinPrice} />
+                        !!this.props.coinPrice &&
+                        <CoinPriceComponent
+                            isDarkMode={this.props.ìsDarkMode}
+                            isProfileManager={this.props.isProfileManager}
+                            price={this.props.coinPrice}
+                        />
                     }
                     {
                         this.props.duration &&

@@ -39,6 +39,7 @@ export function ChatHeaderComponent(
                 username={contactWithMessages.ProfileEntryResponse?.Username}
                 verified={contactWithMessages.ProfileEntryResponse?.IsVerified}
                 isLarge
+                imageSize={30}
             />
         </TouchableOpacity>
     </View>;

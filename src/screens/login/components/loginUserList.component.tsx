@@ -1,10 +1,10 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Image, Text, Dimensions } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Text, Dimensions } from 'react-native';
 import { User } from '@types';
 import { api } from '@services';
-import { MaterialIcons } from '@expo/vector-icons';
 import { calculateAndFormatBitCloutInUsd, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
 import { getAnonymousProfile } from '@services/helpers';
+import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
 
 interface Props {
     standardPublicKey: string;
@@ -101,25 +101,13 @@ export class LoginUserListComponent extends React.Component<Props, State> {
                                     onPress={() => this.props.selectAccount(user.PublicKeyBase58Check)}
                                     activeOpacity={0.6} key={user.PublicKeyBase58Check + String(index)}>
                                     <View style={[styles.profileListCard]}>
-                                        <Image style={styles.profileImage}
-                                            source={{ uri: user.ProfileEntryResponse?.ProfilePic }}></Image>
-
-                                        <View>
-                                            <View style={styles.usernameContainer}>
-                                                <Text style={[styles.username]}>{user.ProfileEntryResponse?.Username}</Text>
-                                                {
-                                                    user.ProfileEntryResponse?.IsVerified ?
-                                                        <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
-                                                }
-                                            </View>
-
-                                            <View style={[styles.profileCoinPriceContainer]}>
-                                                <Text
-                                                    style={[styles.profileCoinPriceText]}
-                                                >~${calculateAndFormatBitCloutInUsd(user.ProfileEntryResponse?.CoinPriceBitCloutNanos)}
-                                                </Text>
-                                            </View>
-                                        </View>
+                                        <ProfileInfoCardComponent
+                                            publicKey={user.ProfileEntryResponse?.PublicKeyBase58Check}
+                                            username={user.ProfileEntryResponse?.Username}
+                                            coinPrice={calculateAndFormatBitCloutInUsd(user.ProfileEntryResponse?.CoinPriceBitCloutNanos)}
+                                            verified={user.ProfileEntryResponse?.IsVerified}
+                                            ìsDarkMode={true}
+                                        />
                                     </View>
                                 </TouchableOpacity>
                             )
@@ -150,49 +138,15 @@ const styles = StyleSheet.create(
             marginTop: '25%'
         },
         profileListCard: {
-            display: 'flex',
             flexDirection: 'row',
             paddingTop: 16,
             paddingBottom: 16,
-            paddingLeft: 10,
-            paddingRight: 10,
+            paddingHorizontal: 10,
             borderBottomWidth: 1,
             width: Dimensions.get('window').width,
             alignItems: 'center',
             backgroundColor: 'black',
             borderColor: '#262626'
-        },
-        profileImage: {
-            width: 40,
-            height: 40,
-            borderRadius: 6,
-            marginRight: 12
-        },
-        usernameContainer: {
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-        },
-        username: {
-            fontWeight: '700',
-            maxWidth: Dimensions.get('window').width / 2,
-            marginRight: 6,
-            color: '#ebebeb'
-        },
-        profileCoinPriceContainer: {
-            borderRadius: 12,
-            paddingRight: 10,
-            paddingLeft: 10,
-            justifyContent: 'center',
-            height: 20,
-            alignSelf: 'flex-start',
-            marginTop: 6,
-            backgroundColor: '#262525'
-        },
-        profileCoinPriceText: {
-            fontSize: 10,
-            fontWeight: '600',
-            color: '#ebebeb'
         },
         backText: {
             color: '#b0b3b8',

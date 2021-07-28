@@ -12,6 +12,7 @@ interface Props {
     duration?: string;
     showCreatorCoinHolding?: boolean;
     isLarge: boolean;
+    imageSize?: number;
 }
 
 export default class MessageInfoCardComponent extends React.Component<Props> {
@@ -27,7 +28,7 @@ export default class MessageInfoCardComponent extends React.Component<Props> {
 
     render(): JSX.Element {
         return <View style={styles.container}>
-            <ProfileInfoImageComponent isLarge={this.props.isLarge} publicKey={this.props.publicKey} />
+            <ProfileInfoImageComponent imageSize={this.props.imageSize} publicKey={this.props.publicKey} />
             <View>
                 <ProfileInfoUsernameComponent
                     isLarge={this.props.isLarge}

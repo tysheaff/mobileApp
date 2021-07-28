@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Image, InputAccessoryView, Platform, Dimensions, KeyboardAvoidingView, Alert } from 'react-native';
+import { Text, View, StyleSheet, InputAccessoryView, Platform, Dimensions, KeyboardAvoidingView, Alert } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import * as Clipboard from 'expo-clipboard';
 import { Fontisto, Feather, Ionicons } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageGalleryComponent } from './imageGallery.component';
 import { themeStyles } from '@styles';
@@ -20,6 +19,7 @@ import CloutFeedVideoComponent from './post/cloutFeedVideo.component';
 import { eventManager } from '@globals/injector';
 import { wait } from '@services/promiseHelper';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
 import { ParamListBase } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -205,12 +205,12 @@ export function CreatePostComponent(
         keyboardShouldPersistTaps={'always'}
         showsVerticalScrollIndicator={false}>
         <View style={styles.headerContainer}>
-            <Image style={styles.profilePic} source={{ uri: profile.ProfilePic }}></Image>
-            <Text style={[styles.username, themeStyles.fontColorMain]}>{profile.Username}</Text>
-            {
-                profile.IsVerified ?
-                    <MaterialIcons name="verified" size={16} color="#007ef5" /> : undefined
-            }
+            <ProfileInfoCardComponent
+                publicKey={profile?.PublicKeyBase58Check}
+                username={profile?.Username}
+                verified={profile?.IsVerified}
+                imageSize={30}
+            />
         </View>
 
         <MentionInput
@@ -323,21 +323,8 @@ export function CreatePostComponent(
 const styles = StyleSheet.create(
     {
         headerContainer: {
-            flexDirection: 'row',
-            alignItems: 'center',
+            paddingTop: 10,
             paddingLeft: 10,
-            paddingTop: 10
-        },
-        profilePic: {
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            marginRight: 10
-        },
-        username: {
-            fontWeight: 'bold',
-            marginRight: 6,
-            maxWidth: Dimensions.get('window').width * 0.6
         },
         textInput: {
             marginHorizontal: 10,

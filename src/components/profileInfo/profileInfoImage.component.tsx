@@ -4,7 +4,7 @@ import { api } from '@services';
 
 interface Props {
     publicKey: string;
-    isLarge?: boolean;
+    imageSize?: number;
 }
 
 interface State {
@@ -36,7 +36,6 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         return this.props.publicKey !== nextProps.publicKey ||
-            this.props.isLarge !== nextProps.isLarge ||
             this.state.imageUri !== nextState.imageUri;
     }
 
@@ -52,7 +51,15 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
 
     render(): JSX.Element {
         return <Image
-            style={this.props.isLarge ? styles.chatImage : styles.image}
+            style={
+                [
+                    styles.image,
+                    !!this.props.imageSize && {
+                        width: this.props.imageSize,
+                        height: this.props.imageSize
+                    }
+                ]
+            }
             source={{ uri: this.state.imageUri }}
         />;
     }
@@ -65,12 +72,6 @@ const styles = StyleSheet.create(
             height: 40,
             borderRadius: 6,
             marginRight: 12
-        },
-        chatImage: {
-            width: 30,
-            height: 30,
-            borderRadius: 6,
-            marginHorizontal: 12
         },
     }
 );
