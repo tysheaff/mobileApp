@@ -71,6 +71,7 @@ export interface Post {
     ParentPosts: Post;
     PosterPublicKeyBase58Check: string;
     StakeMultipleBasisPoints: number;
+    QuoteRecloutCount: number;
 }
 
 export enum NotificationType {
