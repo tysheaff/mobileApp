@@ -1,9 +1,11 @@
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Profile, Post, Notification } from '@types';
 import { globalStyles } from '@styles/globalStyles';
+import ProfileInfoImageComponent from '@components/profileInfo/profileInfoImage.component';
+import ProfileInfoUsernameComponent from '@components/profileInfo/profileInfoUsername.component';
 import { notificationsStyles } from '../styles/notificationStyles';
 
 interface Props {
@@ -33,9 +35,9 @@ export class LikeNotificationComponent extends React.Component<Props> {
                 onPress={() => this.props.goToPost(postHashHex)}>
                 <TouchableOpacity
                     style={notificationsStyles.centerTextVertically}
-                    onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                    onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                     activeOpacity={1}>
-                    <Image style={notificationsStyles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
+                    <ProfileInfoImageComponent publicKey={this.props.profile?.PublicKeyBase58Check} />
                 </TouchableOpacity>
                 <View style={[notificationsStyles.iconContainer, { backgroundColor: '#eb1b0c' }]}>
                     <Ionicons style={[{ marginLeft: 1, marginTop: 1 }]} name={'ios-heart-sharp'} size={13} color={'white'} />
@@ -43,11 +45,14 @@ export class LikeNotificationComponent extends React.Component<Props> {
                 <View style={notificationsStyles.textContainer}>
                     <TouchableOpacity
                         style={notificationsStyles.centerTextVertically}
-                        onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                        onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                         activeOpacity={1}>
-                        <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
+                        <ProfileInfoUsernameComponent
+                            username={this.props.profile?.Username}
+                            verified={this.props.profile?.IsVerified}
+                        />
                     </TouchableOpacity>
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>{likedText} your post: </Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> {likedText} your post: </Text>
                     <Text style={[[notificationsStyles.postText, themeStyles.fontColorSub]]} numberOfLines={1}>{this.props.post?.Body}</Text>
                 </View>
             </TouchableOpacity>

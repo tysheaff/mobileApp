@@ -1,10 +1,12 @@
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { formatNumber } from '@services';
 import { Profile, Post, Notification } from '@types';
 import { globalStyles } from '@styles/globalStyles';
 import { FontAwesome } from '@expo/vector-icons';
+import ProfileInfoUsernameComponent from '@components/profileInfo/profileInfoUsername.component';
+import ProfileInfoImageComponent from '@components/profileInfo/profileInfoImage.component';
 import { notificationsStyles } from '../styles/notificationStyles';
 
 interface Props {
@@ -34,13 +36,13 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
         return (
             <TouchableOpacity
                 style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
-                onPress={() => diamondLevel === 0 ? this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username) : this.props.goToPost(postHashHex)}
+                onPress={() => diamondLevel === 0 ? this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username) : this.props.goToPost(postHashHex)}
                 activeOpacity={1}>
                 <TouchableOpacity
                     style={notificationsStyles.centerTextVertically}
-                    onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                    onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                     activeOpacity={1}>
-                    <Image style={notificationsStyles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
+                    <ProfileInfoImageComponent publicKey={this.props.profile?.PublicKeyBase58Check} />
                 </TouchableOpacity>
 
                 {
@@ -57,22 +59,28 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
                 <View style={notificationsStyles.textContainer}>
                     <TouchableOpacity
                         style={notificationsStyles.centerTextVertically}
-                        onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                        onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                         activeOpacity={1}>
-                        <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
+                        <ProfileInfoUsernameComponent
+                            username={this.props.profile?.Username}
+                            verified={this.props.profile?.IsVerified}
+                        />
                     </TouchableOpacity>
 
                     {
                         diamondLevel > 0 ?
                             <>
-                                <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>gave your post </Text>
+                                <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> gave your post </Text>
                                 <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>
-                                    {diamondLevel} {diamondLevel === 1 ? 'diamond' : 'diamonds'}: </Text>
-                                <Text style={[notificationsStyles.postText, themeStyles.fontColorSub]} numberOfLines={1}> {this.props.post?.Body}</Text>
+                                    {diamondLevel} {diamondLevel === 1 ? 'diamond' : 'diamonds'}{this.props.post?.Body && ': '}</Text>
+                                {
+                                    !!this.props.post?.Body &&
+                                    <Text style={[notificationsStyles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.Body}</Text>
+                                }
                             </>
                             :
                             <Text>
-                                <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>sent you </Text>
+                                <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> sent you </Text>
                                 <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{formattedCreatorCoinAmount} </Text>
                                 <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{creatorCoinUsername} </Text>
                                 <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>coins</Text>

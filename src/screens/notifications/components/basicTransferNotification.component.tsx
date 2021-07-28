@@ -1,11 +1,13 @@
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Profile, Notification } from '@types';
 import { globalStyles } from '@styles/globalStyles';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { globals } from '@globals/globals';
+import ProfileInfoImageComponent from '@components/profileInfo/profileInfoImage.component';
+import ProfileInfoUsernameComponent from '@components/profileInfo/profileInfoUsername.component';
 import { notificationsStyles } from '../styles/notificationStyles';
 
 interface Props {
@@ -39,13 +41,13 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
         return (
             <TouchableOpacity
                 style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
-                onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                 activeOpacity={1}>
                 <TouchableOpacity
                     style={notificationsStyles.centerTextVertically}
-                    onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                    onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                     activeOpacity={1}>
-                    <Image style={notificationsStyles.profilePic} source={{ uri: this.props.profile.ProfilePic }} />
+                    <ProfileInfoImageComponent publicKey={this.props.profile?.PublicKeyBase58Check} />
                 </TouchableOpacity>
 
                 <View style={[notificationsStyles.iconContainer, { backgroundColor: '#00803c' }]}>
@@ -55,12 +57,15 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
                 <View style={notificationsStyles.textContainer}>
                     <TouchableOpacity
                         style={notificationsStyles.centerTextVertically}
-                        onPress={() => this.props.goToProfile(this.props.profile.PublicKeyBase58Check, this.props.profile.Username)}
+                        onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
                         activeOpacity={1}>
-                        <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>{this.props.profile.Username} </Text>
+                        <ProfileInfoUsernameComponent
+                            username={this.props.profile?.Username}
+                            verified={this.props.profile?.IsVerified}
+                        />
                     </TouchableOpacity>
 
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>sent you</Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> sent you</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} </Text>
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>BitClout!</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount})</Text>
