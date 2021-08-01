@@ -12,7 +12,8 @@ export enum EventType {
     ToggleActionSheet = 6,
     UnsavePost = 7,
     ToggleCloutCastFeed = 8,
-    RemovePendingBadges = 9
+    RemovePendingBadges = 9,
+    RefreshMessages = 10
 }
 
 export interface ChangeFollowersEvent {

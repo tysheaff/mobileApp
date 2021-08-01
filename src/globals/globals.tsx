@@ -29,5 +29,6 @@ export const globals = {
                 }
             ).catch(() => Alert.alert('Error', 'Something went wrong! Please try again later.'));
         }
-    }
+    },
+    dispatchRefreshMessagesEvent: () => { 0; }
 };

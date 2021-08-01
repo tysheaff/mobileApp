@@ -11,6 +11,7 @@ import { api } from '@services';
 import { getAnonymousProfile } from '@services';
 import { ContactMessagesListCardComponent } from '@screens/messages/components/contactMessagesListCard.component';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { messagesService } from '@services/messagesServices';
 
 interface State {
     isLoading: boolean;
@@ -43,7 +44,7 @@ export class MessagesScreen extends React.Component<Record<string, never>, State
             noMoreMessages: false
         };
 
-        this.getMessageSettings().then(
+        messagesService.getMessageSettings().then(
             ({ messagesFilter, messagesSort }) => {
                 this.loadMessages(messagesFilter, messagesSort);
 
@@ -68,6 +69,8 @@ export class MessagesScreen extends React.Component<Record<string, never>, State
     }
 
     componentWillUnmount(): void {
+        globals.dispatchRefreshMessagesEvent();
+
         for (const unsubscribe of this._subscriptions) {
             unsubscribe();
         }
@@ -86,12 +89,17 @@ export class MessagesScreen extends React.Component<Record<string, never>, State
             this.setState({ isLoading: true });
         }
 
-        this.getMessagesCallback(messageFilter, messageSort, '').then(
+        messagesService.getMessagesCallback(messageFilter, 25, messageSort, '').then(
             response => {
                 const contacts = this.processData(response);
-
                 if (this._isMounted) {
-                    this.setState({ contacts, isLoading: false, noMoreMessages: contacts.length < 25 });
+                    this.setState(
+                        {
+                            contacts,
+                            isLoading: false,
+                            noMoreMessages: contacts.length < 25
+                        }
+                    );
                 }
             }
         );
@@ -108,29 +116,20 @@ export class MessagesScreen extends React.Component<Record<string, never>, State
 
         const lastPublicKey = this.state.contacts[this.state.contacts.length - 1].PublicKeyBase58Check;
 
-        this.getMessagesCallback(messageFilter, messageSort, lastPublicKey).then(
+        messagesService.getMessagesCallback(messageFilter, 25, messageSort, lastPublicKey).then(
             response => {
                 const contacts = this.processData(response);
 
                 if (this._isMounted) {
-                    this.setState({ contacts: this.state.contacts.concat(contacts), isLoadingMore: false, noMoreMessages: contacts.length < 25 });
+                    this.setState(
+                        {
+                            contacts: this.state.contacts.concat(contacts),
+                            isLoadingMore: false,
+                            noMoreMessages: contacts.length < 25
+                        }
+                    );
                 }
             }
-        );
-    }
-
-    private getMessagesCallback(messageFilter: MessageFilter[], messageSort: MessageSort, lastPublicKey: string): Promise<any> {
-        messageFilter = messageFilter ? messageFilter : [];
-
-        return api.getMessages(
-            globals.user.publicKey,
-            messageFilter.indexOf(MessageFilter.Followers) !== -1,
-            messageFilter.indexOf(MessageFilter.Following) !== -1,
-            messageFilter.indexOf(MessageFilter.Holders) !== -1,
-            messageFilter.indexOf(MessageFilter.Holding) !== -1,
-            25,
-            messageSort,
-            lastPublicKey
         );
     }
 
@@ -149,32 +148,6 @@ export class MessagesScreen extends React.Component<Record<string, never>, State
         }
 
         return contactsWithMessages;
-    }
-
-    private async getMessageSettings(): Promise<{ messagesFilter: MessageFilter[], messagesSort: MessageSort }> {
-        let messagesFilter: MessageFilter[] = [];
-        let messagesSort: MessageSort = MessageSort.MostRecent;
-
-        const messageFilterKey = globals.user.publicKey + constants.localStorage_messagesFilter;
-        const messageFilterString = await SecureStore.getItemAsync(messageFilterKey);
-
-        if (messageFilterString) {
-            try {
-                const messagesFilterValue = JSON.parse(messageFilterString);
-                if (messagesFilterValue.constructor === Array) {
-                    messagesFilter = messagesFilterValue;
-                }
-            } catch { undefined; }
-        }
-
-        const messageSortKey = globals.user.publicKey + constants.localStorage_messagesSort;
-        const messageSortValue = await SecureStore.getItemAsync(messageSortKey) as MessageSort;
-
-        if (messageSortValue && this.validSort(messageSortValue)) {
-            messagesSort = messageSortValue;
-        }
-
-        return { messagesFilter, messagesSort };
     }
 
     private toggleMessagesFilter(): void {
@@ -204,13 +177,6 @@ export class MessagesScreen extends React.Component<Record<string, never>, State
                 this.loadMessages(filter, sort);
             }
         } catch { undefined; }
-    }
-
-    private validSort(value: MessageSort): boolean {
-        return value === MessageSort.MostRecent ||
-            value === MessageSort.MostFollowed ||
-            value === MessageSort.MostClout ||
-            value === MessageSort.LargestHolder;
     }
 
     render(): JSX.Element {

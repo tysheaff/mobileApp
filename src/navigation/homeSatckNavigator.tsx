@@ -1,12 +1,12 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, Platform, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { PostScreen } from '@screens/post.screen';
 import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
-import { globals } from '@globals';
+import { eventManager, globals } from '@globals';
 import { themeStyles } from '@styles';
 import { IdentityScreen } from '@screens/login/identity.screen';
 import { HomeScreen } from '@screens/home/home.screen';
@@ -26,10 +26,34 @@ import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
+import { EventType } from '@types';
 
 const HomeStack = createStackNavigator();
 
 export default function HomeStackScreen(): JSX.Element {
+
+    const [messagesCount, setMessagesCount] = useState<number>(0);
+
+    const isMounted = useRef<boolean>(true);
+
+    useEffect(
+        () => {
+            const unsubscribeRefreshMessages = eventManager.addEventListener(
+                EventType.RefreshMessages,
+                (count: number) => {
+                    if (isMounted) {
+                        setMessagesCount(count);
+                    }
+                }
+            );
+            return () => {
+                isMounted.current = false;
+                unsubscribeRefreshMessages();
+            };
+        },
+        []
+    );
+
     return (
         <HomeStack.Navigator
             screenOptions={({ navigation }: any) => ({
@@ -64,6 +88,18 @@ export default function HomeStackScreen(): JSX.Element {
                                     onPress={() => navigation.navigate('MessageStack')}
                                 >
                                     <Feather name="send" size={26} color={themeStyles.fontColorMain.color} />
+                                    {
+                                        messagesCount > 0 &&
+                                        <View style={styles.messagesBadge}>
+                                            <Text style={styles.messagesCount}>
+                                                {
+                                                    messagesCount > 9 ?
+                                                        9 + '+'
+                                                        : messagesCount
+                                                }
+                                            </Text>
+                                        </View>
+                                    }
                                 </TouchableOpacity>
                             </View>
                         ),
@@ -242,21 +278,33 @@ export default function HomeStackScreen(): JSX.Element {
                 component={PendingScreen}
             />
         </HomeStack.Navigator>
-    )
-};
+    );
+}
 
 const styles = StyleSheet.create(
     {
         postButton: {
             marginRight: 10,
         },
-        postButtonText: {
-            color: 'white'
-        },
         identityHeader: {
             backgroundColor: '#121212',
             shadowRadius: 0,
             shadowOffset: { height: 0, width: 0 }
+        },
+        messagesBadge: {
+            width: 14,
+            height: 14,
+            borderRadius: 9,
+            position: 'absolute',
+            right: 2,
+            top: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#eb1b0c'
+        },
+        messagesCount: {
+            fontSize: 10,
+            color: 'white',
         }
     }
 );

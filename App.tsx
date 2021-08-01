@@ -1,6 +1,6 @@
 import { NavigationContainer, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
@@ -10,6 +10,7 @@ import { constants } from './src/globals/constants';
 import { SnackbarComponent } from './src/components/snackbarComponent';
 import { cache, initCache } from './src/services/dataCaching/cache';
 import { notificationsService } from './src/services/notificationsService';
+import { messagesService } from './src/services/messagesServices';
 import { LoginNavigator } from './src/navigation/loginNavigator';
 import { ActionSheet } from './src/components/actionSheet.component';
 import { DiamondAnimationComponent } from '@components/diamondAnimation.component';
@@ -27,11 +28,14 @@ import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { stackConfig } from './src/navigation/stackNavigationConfig';
 import CloutFeedIntroduction from '@screens/introduction/cloutFeedIntroduction.screen';
 import TermsConditionsScreen from '@screens/login/termsAndConditions.screen';
+import { AppState } from 'react-native';
+
 enableScreens();
 
 const Stack = createStackNavigator();
 
 export default function App(): JSX.Element {
+
   const [isLoading, setLoading] = useState(true);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [areTermsAccepted, setTermsAccepted] = useState(false);
@@ -39,15 +43,19 @@ export default function App(): JSX.Element {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
   const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
-
-  let mount = true;
+  const appState = useRef(AppState.currentState);
+  const backgroundMessageInterval = useRef(0);
+  const initialMessageInterval = useRef(0);
+  const isMounted = useRef<boolean>(true);
+  const intervalTiming = 30000;
 
   useEffect(
     () => {
+
       const unsubscribeProfileManager = eventManager.addEventListener(
         EventType.ToggleProfileManager,
         (event: ToggleProfileManagerEvent) => {
-          if (mount) {
+          if (isMounted) {
             setShowProfileManager(event.visible);
             setNavigation(event.navigation);
           }
@@ -56,7 +64,7 @@ export default function App(): JSX.Element {
       const unsubscribeActionSheet = eventManager.addEventListener(
         EventType.ToggleActionSheet,
         (event: ToggleActionSheetEvent) => {
-          if (mount) {
+          if (isMounted) {
             setActionSheetConfig(event.config);
             setShowActionSheet(event.visible);
           }
@@ -68,14 +76,53 @@ export default function App(): JSX.Element {
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
-        mount = false;
+        isMounted.current = false;
       };
     },
     []
   );
 
+  useEffect(
+    () => {
+      AppState.addEventListener('change', handleAppStateChange);
+
+      return () => {
+        window.clearInterval(backgroundMessageInterval.current);
+        AppState.removeEventListener('change', handleAppStateChange);
+      };
+    },
+    []
+  );
+
+  globals.dispatchRefreshMessagesEvent = () => {
+    messagesService.getUnreadMessages()
+      .then(
+        (response: number) => {
+          eventManager.dispatchEvent(EventType.RefreshMessages, response);
+        }
+      ).catch(() => undefined);
+  };
+
+  function handleAppStateChange(nextAppState: any) {
+    if (globals.readonly) {
+      return;
+    }
+    if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+      window.clearInterval(initialMessageInterval.current);
+      backgroundMessageInterval.current = window.setInterval(
+        globals.dispatchRefreshMessagesEvent,
+        intervalTiming
+      );
+    } else {
+      window.clearInterval(backgroundMessageInterval.current);
+    }
+
+    appState.current = nextAppState;
+  }
+
   async function checkAuthenticatedUser() {
     try {
+
       const publicKey = await SecureStore.getItemAsync(constants.localStorage_publicKey);
       if (publicKey) {
         const cloutFeedIdentity = await SecureStore.getItemAsync(constants.localStorage_cloutFeedIdentity);
@@ -91,7 +138,7 @@ export default function App(): JSX.Element {
           await SecureStore.deleteItemAsync(constants.localStorage_publicKey);
           await SecureStore.deleteItemAsync(constants.localStorage_readonly);
 
-          if (mount) {
+          if (isMounted) {
             setTermsAccepted(true);
             setLoading(false);
           }
@@ -99,7 +146,7 @@ export default function App(): JSX.Element {
       } else {
         const termsAccepted = await SecureStore.getItemAsync(constants.localStorage_termsAccepted);
 
-        if (mount) {
+        if (isMounted) {
           setTermsAccepted(termsAccepted === 'true');
           setLoading(false);
         }
@@ -110,14 +157,15 @@ export default function App(): JSX.Element {
   }
 
   globals.acceptTermsAndConditions = () => {
-    if (mount) {
+    if (isMounted) {
       setTermsAccepted(true);
     }
   };
 
   globals.onLoginSuccess = () => {
     cache.user.reset();
-    if (mount) {
+
+    if (isMounted) {
       setLoading(true);
     }
     initCache();
@@ -136,13 +184,17 @@ export default function App(): JSX.Element {
 
         if (globals.readonly === false) {
           notificationsService.registerPushToken().catch(() => undefined);
+          initialMessageInterval.current = window.setInterval(
+            globals.dispatchRefreshMessagesEvent, intervalTiming
+          );
+          globals.dispatchRefreshMessagesEvent();
         }
         await setTheme();
         await hapticsManager.init();
       }
     ).catch(() => undefined).finally(
       () => {
-        if (mount) {
+        if (isMounted) {
           setLoggedIn(true);
           setTermsAccepted(true);
           setLoading(false);
@@ -152,13 +204,16 @@ export default function App(): JSX.Element {
   };
 
   globals.onLogout = async () => {
-    if (mount) {
+    if (isMounted) {
       setLoading(true);
     }
+
     await SecureStore.deleteItemAsync(constants.localStorage_publicKey);
     await SecureStore.deleteItemAsync(constants.localStorage_readonly);
 
     if (globals.readonly === false) {
+      window.clearInterval(backgroundMessageInterval.current);
+      window.clearInterval(initialMessageInterval.current);
       const jwt = await signing.signJWT();
       cloutFeedApi.unregisterNotificationsPushToken(globals.user.publicKey, jwt).catch(() => undefined);
       await authentication.removeAuthenticatedUser(globals.user.publicKey);
@@ -181,7 +236,7 @@ export default function App(): JSX.Element {
     globals.followerFeatures = false;
     globals.readonly = true;
 
-    if (mount) {
+    if (isMounted) {
       setLoggedIn(false);
       setTermsAccepted(true);
       setLoading(false);
