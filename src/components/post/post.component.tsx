@@ -62,7 +62,18 @@ export class PostComponent extends React.Component<Props, State> {
         };
 
         if (this.props.post.ImageURLs?.length > 0) {
-            this.props.post.ImageURLs = this.props.post.ImageURLs.filter(image => image.startsWith('https://images.bitclout.com/'));
+            const imageUrls: string[] = [];
+
+            for (const imageUrl of this.props.post.ImageURLs) {
+                if (imageUrl.startsWith('https://images.bitclout.com/') || imageUrl.startsWith('https://arweave.net/')) {
+                    imageUrls.push(imageUrl);
+                } else if (imageUrl.startsWith('https://i.imgur.com')) {
+                    const mappedImage = imageUrl.replace('https://i.imgur.com', 'https://images.bitclout.com/i.imgur.com');
+                    imageUrls.push(mappedImage);
+                }
+            }
+
+            this.props.post.ImageURLs = imageUrls;
         }
 
         this.goToProfile = this.goToProfile.bind(this);
