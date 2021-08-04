@@ -1,13 +1,12 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { StyleSheet, Platform, Text } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
 import { NotificationsScreen } from '@screens/notifications/notifications.screen';
 import { ProfileScreen } from '@screens/profile/profile.screen';
 import EditProfileScreen from '@screens/profile/editProfile.screen';
-import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
@@ -24,6 +23,7 @@ import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
+import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 
 const NotificationStack = createStackNavigator();
 
@@ -80,8 +80,8 @@ export default function NotificationStackScreen() {
                         }
                     )
                 }
-                name="ProfileFollowers"
-                component={ProfileFollowersScreen}
+                name="ProfileFollowersTab"
+                component={ProfileFollowersTab}
             ></NotificationStack.Screen>
 
             <NotificationStack.Screen

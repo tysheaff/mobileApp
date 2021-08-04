@@ -12,7 +12,6 @@ import { IdentityScreen } from '@screens/login/identity.screen';
 import { HomeScreen } from '@screens/home/home.screen';
 import { ProfileScreen } from '@screens/profile/profile.screen';
 import EditProfileScreen from '@screens/profile/editProfile.screen';
-import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
@@ -26,6 +25,7 @@ import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
+import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import { EventType } from '@types';
 
 const HomeStack = createStackNavigator();
@@ -149,8 +149,8 @@ export default function HomeStackScreen(): JSX.Element {
                         }
                     )
                 }
-                name="ProfileFollowers"
-                component={ProfileFollowersScreen}
+                name="ProfileFollowersTab"
+                component={ProfileFollowersTab}
             />
 
             <HomeStack.Screen

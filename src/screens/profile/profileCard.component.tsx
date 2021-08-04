@@ -145,12 +145,15 @@ export class ProfileCard extends React.Component<Props, State> {
     }
 
     private goToFollowersScreen(selectedTab: string): void {
+
         this.props.navigation.push(
-            'ProfileFollowers',
+            'ProfileFollowersTab',
             {
                 publicKey: this.props.profile.PublicKeyBase58Check,
                 username: this.props.profile.Username,
-                selectedTab: selectedTab
+                selectedTab: selectedTab,
+                followersNumber: this.state.followersNumber,
+                followingNumber: this.state.followingNumber
             }
         );
     }
@@ -236,7 +239,7 @@ export class ProfileCard extends React.Component<Props, State> {
                     <TouchableOpacity
                         style={styles.infoButton}
                         activeOpacity={1}
-                        onPress={() => this.goToFollowersScreen('followers')}>
+                        onPress={() => this.goToFollowersScreen('Followers')}>
                         <Text style={[styles.infoTextLabel, themeStyles.fontColorSub]}>Followers</Text>
                         {
                             this.state.followersNumber != null ?
@@ -253,7 +256,7 @@ export class ProfileCard extends React.Component<Props, State> {
                     <TouchableOpacity
                         style={styles.infoButton}
                         activeOpacity={1}
-                        onPress={() => this.goToFollowersScreen('following')}>
+                        onPress={() => this.goToFollowersScreen('Following')}>
                         <Text style={[styles.infoTextLabel, themeStyles.fontColorSub]}>Following</Text>
                         {
                             this.state.followingNumber != null ?

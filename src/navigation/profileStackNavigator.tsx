@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { AppearanceScreen } from '@screens/appearance.screen';
 import { ProfileScreen } from '@screens/profile/profile.screen';
-import { ProfileFollowersScreen } from '@screens/profileFollowers.screen';
 import { SettingsScreen } from '@screens/settings/settings.screen';
 import { globals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
@@ -30,6 +29,7 @@ import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
+import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 
 const ProfileStack = createStackNavigator();
 
@@ -117,8 +117,8 @@ export default function ProfileStackScreen() {
                     }
                 )
             }
-            name="ProfileFollowers"
-            component={ProfileFollowersScreen}
+            name="ProfileFollowersTab"
+            component={ProfileFollowersTab}
         />
         <ProfileStack.Screen
             options={
