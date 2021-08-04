@@ -10,11 +10,10 @@ import { constants } from './src/globals/constants';
 import { SnackbarComponent } from './src/components/snackbarComponent';
 import { cache, initCache } from './src/services/dataCaching/cache';
 import { notificationsService } from './src/services/notificationsService';
-import { messagesService } from './src/services/messagesServices';
 import { LoginNavigator } from './src/navigation/loginNavigator';
 import { ActionSheet } from './src/components/actionSheet.component';
 import { DiamondAnimationComponent } from '@components/diamondAnimation.component';
-import { cloutFeedApi } from '@services';
+import { api, cloutFeedApi } from '@services';
 import { enableScreens } from 'react-native-screens';
 import { signing } from '@services/authorization/signing';
 import { authentication } from '@services/authorization/authentication';
@@ -29,7 +28,7 @@ import { stackConfig } from './src/navigation/stackNavigationConfig';
 import CloutFeedIntroduction from '@screens/introduction/cloutFeedIntroduction.screen';
 import TermsConditionsScreen from '@screens/login/termsAndConditions.screen';
 import { AppState } from 'react-native';
-
+import { messagesService } from './src/services/messagesServices';
 enableScreens();
 
 const Stack = createStackNavigator();
@@ -43,11 +42,43 @@ export default function App(): JSX.Element {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
   const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
-  const appState = useRef(AppState.currentState);
+  const initialNotificationInterval = useRef(0);
+  const backgroundNotificationInterval = useRef(0);
   const backgroundMessageInterval = useRef(0);
   const initialMessageInterval = useRef(0);
+  const appState = useRef(AppState.currentState);
   const isMounted = useRef<boolean>(true);
   const intervalTiming = 30000;
+
+  function handleAppStateChange(nextAppState: any) {
+    if (globals.readonly) {
+      return;
+    }
+    if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+      window.clearInterval(initialNotificationInterval.current);
+      backgroundNotificationInterval.current = window.setInterval(notificationListener, intervalTiming);
+      backgroundMessageInterval.current = window.setInterval(globals.dispatchRefreshMessagesEvent, intervalTiming);
+    } else {
+      window.clearInterval(backgroundNotificationInterval.current);
+      window.clearInterval(initialMessageInterval.current);
+
+    }
+    appState.current = nextAppState;
+  }
+
+  useEffect(
+    () => {
+      AppState.addEventListener('change', handleAppStateChange);
+
+      return () => {
+        window.clearInterval(backgroundNotificationInterval.current);
+        window.clearInterval(backgroundMessageInterval.current);
+        AppState.removeEventListener('change', handleAppStateChange);
+      };
+
+    },
+    []
+  );
 
   useEffect(
     () => {
@@ -76,48 +107,33 @@ export default function App(): JSX.Element {
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
+        window.clearInterval(initialNotificationInterval.current);
+        window.clearInterval(initialMessageInterval.current);
         isMounted.current = false;
       };
     },
     []
   );
 
-  useEffect(
-    () => {
-      AppState.addEventListener('change', handleAppStateChange);
-
-      return () => {
-        window.clearInterval(backgroundMessageInterval.current);
-        AppState.removeEventListener('change', handleAppStateChange);
-      };
-    },
-    []
-  );
-
-  globals.dispatchRefreshMessagesEvent = () => {
-    messagesService.getUnreadMessages()
-      .then(
-        (response: number) => {
-          eventManager.dispatchEvent(EventType.RefreshMessages, response);
-        }
-      ).catch(() => undefined);
-  };
-
-  function handleAppStateChange(nextAppState: any) {
-    if (globals.readonly) {
-      return;
-    }
-    if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-      window.clearInterval(initialMessageInterval.current);
-      backgroundMessageInterval.current = window.setInterval(
-        globals.dispatchRefreshMessagesEvent,
-        intervalTiming
-      );
-    } else {
-      window.clearInterval(backgroundMessageInterval.current);
-    }
-
-    appState.current = nextAppState;
+  function notificationListener() {
+    api.getNotifications(globals.user.publicKey, -1, 5).then(
+      (response: any) => {
+        const newSeenNotificationIndex: number = response.Notifications[0].Index;
+        SecureStore.getItemAsync('lastNotificationIndex').then(
+          (prevStoredIndex: string | null) => {
+            if (newSeenNotificationIndex > parseInt(prevStoredIndex as string)) {
+              eventManager.dispatchEvent(
+                EventType.RefreshNotifications,
+                newSeenNotificationIndex
+              );
+            } else {
+              eventManager.dispatchEvent(EventType.RefreshNotifications, -1);
+            }
+          }
+        )
+          .catch(() => undefined);
+      }
+    ).catch(() => undefined);
   }
 
   async function checkAuthenticatedUser() {
@@ -156,6 +172,15 @@ export default function App(): JSX.Element {
     }
   }
 
+  globals.dispatchRefreshMessagesEvent = () => {
+    messagesService.getUnreadMessages()
+      .then(
+        (response: number) => {
+          eventManager.dispatchEvent(EventType.RefreshMessages, response);
+        }
+      ).catch(() => undefined);
+  };
+
   globals.acceptTermsAndConditions = () => {
     if (isMounted) {
       setTermsAccepted(true);
@@ -164,7 +189,6 @@ export default function App(): JSX.Element {
 
   globals.onLoginSuccess = () => {
     cache.user.reset();
-
     if (isMounted) {
       setLoading(true);
     }
@@ -184,10 +208,11 @@ export default function App(): JSX.Element {
 
         if (globals.readonly === false) {
           notificationsService.registerPushToken().catch(() => undefined);
-          initialMessageInterval.current = window.setInterval(
-            globals.dispatchRefreshMessagesEvent, intervalTiming
-          );
+          notificationListener();
           globals.dispatchRefreshMessagesEvent();
+
+          initialNotificationInterval.current = window.setInterval(notificationListener, intervalTiming);
+          initialMessageInterval.current = window.setInterval(globals.dispatchRefreshMessagesEvent, intervalTiming);
         }
         await setTheme();
         await hapticsManager.init();
@@ -212,12 +237,11 @@ export default function App(): JSX.Element {
     await SecureStore.deleteItemAsync(constants.localStorage_readonly);
 
     if (globals.readonly === false) {
-      window.clearInterval(backgroundMessageInterval.current);
-      window.clearInterval(initialMessageInterval.current);
       const jwt = await signing.signJWT();
       cloutFeedApi.unregisterNotificationsPushToken(globals.user.publicKey, jwt).catch(() => undefined);
       await authentication.removeAuthenticatedUser(globals.user.publicKey);
-
+      window.clearInterval(initialNotificationInterval.current);
+      window.clearInterval(backgroundNotificationInterval.current);
       const loggedInPublicKeys = await authentication.getAuthenticatedUserPublicKeys();
 
       if (loggedInPublicKeys?.length > 0) {

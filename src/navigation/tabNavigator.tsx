@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { EmitterSubscription, Image, Keyboard, Platform, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -30,10 +30,11 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
     const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     const [profilePic, setProfilePic] = useState('https://i.imgur.com/vZ2mB1W.png');
+    const [hasBadge, setHasBadge] = useState(false);
 
     let iconColor = themeStyles.fontColorMain.color;
     let icon;
-    let mount = true;
+    const isMounted = useRef<boolean>(true);
 
     if (selectedTab === tab.name) {
         iconColor = '#4287f5';
@@ -46,7 +47,12 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
     } else if (tab.name === 'CreatePostStack') {
         icon = <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />;
     } else if (tab.name === 'NotificationStack') {
-        icon = <Ionicons name="md-notifications-outline" size={28} color={iconColor} />;
+        icon = <>
+            <Ionicons name="md-notifications-outline" size={28} color={iconColor} />
+            {
+                hasBadge && <View style={styles.notificationBadge} />
+            }
+        </>;
     } else if (tab.name === 'ProfileStack') {
         icon = <Image
             style={[
@@ -58,10 +64,23 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
 
     useEffect(
         () => {
+            const unsubscribeLastNotificationIndex = eventManager.addEventListener(
+                EventType.RefreshNotifications,
+                (newLastSeenIndex: number) => {
+                    if (isMounted) {
+                        if (newLastSeenIndex > 0) {
+                            setHasBadge(true);
+                        } else {
+                            setHasBadge(false);
+                        }
+                    }
+                }
+            );
+
             if (tab.name === 'ProfileStack') {
                 cache.user.getData().then(
                     (user) => {
-                        if (mount && user.ProfileEntryResponse) {
+                        if (isMounted && user.ProfileEntryResponse) {
                             setProfilePic(user.ProfileEntryResponse.ProfilePic + '?' + new Date().toISOString());
                         }
                     }
@@ -69,7 +88,8 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
             }
 
             return () => {
-                mount = false;
+                isMounted.current = false;
+                unsubscribeLastNotificationIndex();
             };
         },
         []
@@ -189,7 +209,7 @@ export function TabNavigator() {
     return (
         <Tab.Navigator
             sceneContainerStyle={themeStyles.containerColorMain}
-            tabBar={props => <TabBar {...props}></TabBar>}>
+            tabBar={props => <TabBar {...props} />}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="WalletStack" component={WalletStackScreen} />
             <Tab.Screen name="NotificationStack" component={NotificationStackScreen} />
@@ -212,7 +232,18 @@ const styles = StyleSheet.create(
         profileImage: {
             width: 30,
             height: 30,
-            borderRadius: 30,
+            borderRadius: 30
+        },
+        notificationBadge: {
+            width: 12,
+            height: 12,
+            backgroundColor: '#eb1b0c',
+            position: 'absolute',
+            top: 5,
+            right: 7,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 9
         }
     }
 );

@@ -142,16 +142,24 @@ export class NotificationsScreen extends React.Component<Props, State> {
         api.getNotifications(globals.user.publicKey, -1, 50)
             .then(
                 response => {
+                    const newSeenNotificationIndex = response.Notifications[0].Index;
+                    SecureStore.setItemAsync('lastNotificationIndex', String(newSeenNotificationIndex))
+                        .then(
+                            () => eventManager.dispatchEvent(EventType.RefreshNotifications, -1)
+                        )
+                        .catch(() => undefined);
                     loadTickersAndExchangeRate().then(
                         () => {
                             if (this._isMounted) {
-                                this.setState({
-                                    notifications: response.Notifications ? response.Notifications : [],
-                                    profiles: response.ProfilesByPublicKey,
-                                    isLoading: false,
-                                    refreshing: false,
-                                    posts: response.PostsByHash
-                                });
+                                this.setState(
+                                    {
+                                        notifications: response.Notifications ? response.Notifications : [],
+                                        profiles: response.ProfilesByPublicKey,
+                                        isLoading: false,
+                                        refreshing: false,
+                                        posts: response.PostsByHash
+                                    }
+                                );
                             }
 
                             if (filterSet) {
@@ -190,15 +198,19 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         response => {
                             if (this._isMounted) {
                                 const allNotifications = this.state.notifications.concat(response.Notifications);
-                                this.setState((previousValue) => ({
-                                    notifications: allNotifications,
-                                    lastNotificationIndex: newLastNotificationIndex,
-                                    isLoading: false,
-                                    refreshing: false,
-                                    profiles: Object.assign(previousValue.profiles, response.ProfilesByPublicKey),
-                                    posts: Object.assign(previousValue.posts, response.PostsByHash),
-                                    noMoreNotifications: response.Notifications?.length === 0
-                                }));
+                                this.setState(
+                                    (previousValue) => (
+                                        {
+                                            notifications: allNotifications,
+                                            lastNotificationIndex: newLastNotificationIndex,
+                                            isLoading: false,
+                                            refreshing: false,
+                                            profiles: Object.assign(previousValue.profiles, response.ProfilesByPublicKey),
+                                            posts: Object.assign(previousValue.posts, response.PostsByHash),
+                                            noMoreNotifications: response.Notifications?.length === 0
+                                        }
+                                    )
+                                );
                             }
                         }
                     ).catch(error => globals.defaultHandleError(error)).finally(
@@ -242,6 +254,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
         if (!profile) {
             profile = getAnonymousProfile(notification.Metadata.TransactorPublicKeyBase58Check);
         }
+
         return profile;
     }
 
