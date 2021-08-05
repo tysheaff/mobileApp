@@ -235,12 +235,12 @@ const styles = StyleSheet.create(
             borderRadius: 30
         },
         notificationBadge: {
-            width: 12,
-            height: 12,
+            width: 6,
+            height: 6,
             backgroundColor: '#eb1b0c',
             position: 'absolute',
             top: 5,
-            right: 7,
+            right: 11,
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 9

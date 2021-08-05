@@ -294,7 +294,7 @@ const styles = StyleSheet.create(
         messagesBadge: {
             width: 14,
             height: 14,
-            borderRadius: 9,
+            borderRadius: 10,
             position: 'absolute',
             right: 2,
             top: 0,
@@ -305,6 +305,8 @@ const styles = StyleSheet.create(
         messagesCount: {
             fontSize: 10,
             color: 'white',
+            fontWeight: '600',
+            marginLeft: 1
         }
     }
 );
