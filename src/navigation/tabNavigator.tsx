@@ -8,7 +8,7 @@ import { eventManager, globals, hapticsManager, navigatorGlobals, settingsGlobal
 import { themeStyles } from '@styles';
 import { cache } from '@services/dataCaching';
 import { EventType } from '@types';
-import HomeStackScreen from './homeSatckNavigator';
+import HomeStackScreen from './homeStackNavigator';
 import ProfileStackScreen from './profileStackNavigator';
 import NotificationStackScreen from './notificationStackNavigator';
 import WalletStackScreen from './walletStackNavigator';
