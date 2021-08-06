@@ -5,7 +5,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { PostScreen } from '@screens/post.screen';
-import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
 import { eventManager, globals } from '@globals';
 import { themeStyles } from '@styles';
 import { IdentityScreen } from '@screens/login/identity.screen';
@@ -15,7 +14,6 @@ import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
-import SearchTabNavigator from './searchTabNavigator';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
@@ -27,17 +25,33 @@ import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import { EventType } from '@types';
+import { NotificationsScreen } from '@screens/notifications/notifications.screen';
+import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 
 const HomeStack = createStackNavigator();
 
 export default function HomeStackScreen(): JSX.Element {
 
     const [messagesCount, setMessagesCount] = useState<number>(0);
+    const [hasBadge, setHasBadge] = useState<boolean>(false);
 
     const isMounted = useRef<boolean>(true);
 
     useEffect(
         () => {
+            const unsubscribeLastNotificationIndex = eventManager.addEventListener(
+                EventType.RefreshNotifications,
+                (newLastSeenIndex: number) => {
+                    if (isMounted) {
+                        if (newLastSeenIndex > 0) {
+                            setHasBadge(true);
+                        } else {
+                            setHasBadge(false);
+                        }
+                    }
+                }
+            );
+
             const unsubscribeRefreshMessages = eventManager.addEventListener(
                 EventType.RefreshMessages,
                 (count: number) => {
@@ -49,6 +63,7 @@ export default function HomeStackScreen(): JSX.Element {
             return () => {
                 isMounted.current = false;
                 unsubscribeRefreshMessages();
+                unsubscribeLastNotificationIndex();
             };
         },
         []
@@ -79,9 +94,14 @@ export default function HomeStackScreen(): JSX.Element {
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
                                     style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
-                                    onPress={() => navigation.navigate('SearchTabNavigator')}
+                                    onPress={() => navigation.navigate('Notifications')}
                                 >
-                                    <Ionicons name="ios-search" size={26} color={themeStyles.fontColorMain.color} />
+                                    <>
+                                        <Ionicons name="md-notifications-outline" size={28} color={themeStyles.fontColorMain.color} />
+                                        {
+                                            hasBadge && <View style={styles.notificationBadge} />
+                                        }
+                                    </>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
@@ -208,19 +228,6 @@ export default function HomeStackScreen(): JSX.Element {
                 options={
                     ({ route }) => (
                         {
-                            headerTitle: ' ',
-                            headerLeft: () => <SearchHeaderComponent />,
-                            headerBackTitle: ' ',
-                        }
-                    )}
-                name="SearchTabNavigator"
-                component={SearchTabNavigator}
-            />
-
-            <HomeStack.Screen
-                options={
-                    ({ route }) => (
-                        {
                             headerTitle: `#${(route.params as any).cloutTag}`,
                             headerBackTitle: ' ',
                         }
@@ -278,6 +285,19 @@ export default function HomeStackScreen(): JSX.Element {
                 name="Pending"
                 component={PendingScreen}
             />
+            <HomeStack.Screen
+                options={
+                    {
+                        headerBackTitle: ' ',
+                        headerTitleStyle: {
+                            textAlign: 'center',
+                        },
+                        headerRight: () => <NotificationsHeaderComponent />
+                    }
+                }
+                name="Notifications"
+                component={NotificationsScreen}
+            />
         </HomeStack.Navigator>
     );
 }
@@ -308,6 +328,17 @@ const styles = StyleSheet.create(
             color: 'white',
             fontWeight: '600',
             marginLeft: 1
+        },
+        notificationBadge: {
+            width: 6,
+            height: 6,
+            backgroundColor: '#eb1b0c',
+            position: 'absolute',
+            left: 24,
+            top: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 9
         }
     }
 );

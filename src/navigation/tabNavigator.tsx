@@ -10,11 +10,11 @@ import { cache } from '@services/dataCaching';
 import { EventType } from '@types';
 import HomeStackScreen from './homeStackNavigator';
 import ProfileStackScreen from './profileStackNavigator';
-import NotificationStackScreen from './notificationStackNavigator';
 import WalletStackScreen from './walletStackNavigator';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/core';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import SearchStackScreen from './searchStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,14 +23,13 @@ const firstScreen: any = {
     ProfileStack: 'Profile',
     WalletStack: 'Wallet',
     CreatePostStack: 'CreatePost',
-    NotificationStack: 'Notifications'
+    SearchTabNavigator: 'SearchTabNavigator'
 };
 
 const TabElement = ({ tab, onPress, selectedTab }: any) => {
     const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     const [profilePic, setProfilePic] = useState('https://i.imgur.com/vZ2mB1W.png');
-    const [hasBadge, setHasBadge] = useState(false);
 
     let iconColor = themeStyles.fontColorMain.color;
     let icon;
@@ -46,13 +45,8 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
         icon = <Ionicons name="wallet-outline" size={28} color={iconColor} />;
     } else if (tab.name === 'CreatePostStack') {
         icon = <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />;
-    } else if (tab.name === 'NotificationStack') {
-        icon = <>
-            <Ionicons name="md-notifications-outline" size={28} color={iconColor} />
-            {
-                hasBadge && <View style={styles.notificationBadge} />
-            }
-        </>;
+    } else if (tab.name === 'SearchStack') {
+        icon = <Ionicons name="ios-search" size={26} color={iconColor} />;
     } else if (tab.name === 'ProfileStack') {
         icon = <Image
             style={[
@@ -64,18 +58,6 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
 
     useEffect(
         () => {
-            const unsubscribeLastNotificationIndex = eventManager.addEventListener(
-                EventType.RefreshNotifications,
-                (newLastSeenIndex: number) => {
-                    if (isMounted) {
-                        if (newLastSeenIndex > 0) {
-                            setHasBadge(true);
-                        } else {
-                            setHasBadge(false);
-                        }
-                    }
-                }
-            );
 
             if (tab.name === 'ProfileStack') {
                 cache.user.getData().then(
@@ -89,7 +71,6 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
 
             return () => {
                 isMounted.current = false;
-                unsubscribeLastNotificationIndex();
             };
         },
         []
@@ -148,8 +129,6 @@ const TabBar = ({ state }: any) => {
         if (selectedTab === p_screenName) {
             if (selectedTab === 'HomeStack' && (focusedRouteName === 'Home' || focusedRouteName === undefined)) {
                 navigatorGlobals.refreshHome();
-            } else if (p_screenName === 'NotificationStack' && (focusedRouteName === 'Notifications' || focusedRouteName === undefined)) {
-                navigatorGlobals.refreshNotifications();
             } else if (p_screenName === 'WalletStack' && (focusedRouteName === 'Wallet' || focusedRouteName === undefined)) {
                 navigatorGlobals.refreshWallet();
             } else if (p_screenName === 'ProfileStack' && (focusedRouteName === 'Profile' || focusedRouteName === undefined)) {
@@ -211,8 +190,8 @@ export function TabNavigator() {
             sceneContainerStyle={themeStyles.containerColorMain}
             tabBar={props => <TabBar {...props} />}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
+            <Tab.Screen name="SearchStack" component={SearchStackScreen} />
             <Tab.Screen name="WalletStack" component={WalletStackScreen} />
-            <Tab.Screen name="NotificationStack" component={NotificationStackScreen} />
             <Tab.Screen name="ProfileStack" component={ProfileStackScreen} />
         </Tab.Navigator>
     );
@@ -233,17 +212,6 @@ const styles = StyleSheet.create(
             width: 30,
             height: 30,
             borderRadius: 30
-        },
-        notificationBadge: {
-            width: 6,
-            height: 6,
-            backgroundColor: '#eb1b0c',
-            position: 'absolute',
-            top: 5,
-            right: 11,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 9
         }
     }
 );

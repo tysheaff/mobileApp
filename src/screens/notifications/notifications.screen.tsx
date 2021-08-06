@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, Text, View, StyleSheet, ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
-import { constants, eventManager, globals, navigatorGlobals } from '@globals';
+import { constants, eventManager, globals } from '@globals';
 import { EventType, Notification, NotificationType, Post, Profile } from '@types';
 import { api, getAnonymousProfile, loadTickersAndExchangeRate } from '@services';
 import { themeStyles } from '@styles';
@@ -77,13 +77,6 @@ export class NotificationsScreen extends React.Component<Props, State> {
 
         this._flatListRef = React.createRef();
         this.initScreen();
-        navigatorGlobals.refreshNotifications = () => {
-            if (this._currentScrollPosition > 0 || !this._flatListRef.current) {
-                (this._flatListRef.current as any)?.scrollToOffset({ animated: true, offset: 0 });
-            } else {
-                this.loadNotifications(false);
-            }
-        };
 
         this.loadNotifications = this.loadNotifications.bind(this);
         this.loadMoreNotifications = this.loadMoreNotifications.bind(this);

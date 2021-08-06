@@ -4,7 +4,6 @@ import { StyleSheet, Platform } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { themeStyles } from '@styles';
-import { NotificationsScreen } from '@screens/notifications/notifications.screen';
 import { ProfileScreen } from '@screens/profile/profile.screen';
 import EditProfileScreen from '@screens/profile/editProfile.screen';
 import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
@@ -12,8 +11,6 @@ import { PostScreen } from '@screens/post.screen';
 import { CreatePostScreen } from '@screens/createPost.screen';
 import { globals } from '@globals/globals';
 import { IdentityScreen } from '@screens/login/identity.screen';
-import { LogoHeaderComponent } from '@components/logoHeader.component';
-import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
 import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
@@ -24,54 +21,64 @@ import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
+import SearchTabNavigator from './searchTabNavigator';
+import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
 
-const NotificationStack = createStackNavigator();
+const SearchStack = createStackNavigator();
 
-export default function NotificationStackScreen() {
+export default function SearchStackScreen() {
     return (
-        <NotificationStack.Navigator
-            screenOptions={({ navigation }: any) => ({
-                ...stackConfig,
-                headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
-                headerStyle: {
-                    backgroundColor: themeStyles.containerColorMain.backgroundColor,
-                    shadowOpacity: 0,
-                    elevation: 0
-                },
-                headerLeft: () => <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
-                    <Ionicons name="chevron-back" size={32} color="#007ef5" />
-                </TouchableOpacity>
-            })}
+        <SearchStack.Navigator
+            screenOptions={
+                ({ navigation }: any) => (
+                    {
+                        ...stackConfig,
+                        headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
+                        headerStyle: {
+                            backgroundColor: themeStyles.containerColorMain.backgroundColor,
+                            shadowOpacity: 0,
+                            elevation: 0
+                        },
+                        headerLeft: () => <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
+                            <Ionicons name="chevron-back" size={32} color="#007ef5" />
+                        </TouchableOpacity>
+                    }
+                )
+            }
         >
-            <NotificationStack.Screen
-                options={{
-                    headerTitle: ' ',
-                    headerBackTitle: ' ',
-                    headerLeft: () => <LogoHeaderComponent></LogoHeaderComponent>,
-                    headerRight: () => <NotificationsHeaderComponent></NotificationsHeaderComponent>
-                }}
-                name="Notifications"
-                component={NotificationsScreen}
+            <SearchStack.Screen
+                options={
+                    () => (
+                        {
+                            headerLeft: () => <></>,
+                            headerBackTitle: '',
+                            headerTitleAlign: 'center',
+                            headerTitle: () => <SearchHeaderComponent />,
+                        }
+                    )
+                }
+                name="SearchTabNavigator"
+                component={SearchTabNavigator}
             />
-            <NotificationStack.Screen
-                options={{
-                    headerTitle: 'CloutFeed',
-                    headerBackTitle: ' '
-                }}
+            <SearchStack.Screen
+                options={
+                    {
+                        headerTitle: 'CloutFeed',
+                        headerBackTitle: ' '
+                    }
+                }
                 name="UserProfile"
                 component={ProfileScreen}
-            ></NotificationStack.Screen>
-
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={{
                     headerTitle: 'Edit Profile',
                     headerBackTitle: ' '
                 }}
                 name="EditProfile"
                 component={EditProfileScreen}
-            ></NotificationStack.Screen>
-
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -82,9 +89,8 @@ export default function NotificationStackScreen() {
                 }
                 name="ProfileFollowersTab"
                 component={ProfileFollowersTab}
-            ></NotificationStack.Screen>
-
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -96,27 +102,25 @@ export default function NotificationStackScreen() {
                 }
                 name="CreatorCoin"
                 component={CreatorCoinScreen}
-            ></NotificationStack.Screen>
-
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
                 name="Post"
                 component={PostScreen}
-            ></NotificationStack.Screen>
+            />
 
-            <NotificationStack.Screen
+            <SearchStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',
                     headerBackTitle: ' '
                 }}
                 name="PostStatsTabNavigator"
                 component={postStatsTabNavigator}
-            ></NotificationStack.Screen>
-
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -133,9 +137,8 @@ export default function NotificationStackScreen() {
                     )}
                 name="CreatePost"
                 component={CreatePostScreen}
-            ></NotificationStack.Screen>
-
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -145,8 +148,8 @@ export default function NotificationStackScreen() {
                     )}
                 name="CloutTagPosts"
                 component={CloutTagPostsScreen}
-            ></NotificationStack.Screen>
-            <NotificationStack.Screen
+            />
+            <SearchStack.Screen
                 options={
                     ({ route }) => (
                         {
@@ -158,8 +161,7 @@ export default function NotificationStackScreen() {
                 name="UserWallet"
                 component={WalletScreen}
             />
-
-            <NotificationStack.Screen
+            <SearchStack.Screen
                 options={{
                     headerStyle: {
                         backgroundColor: '#121212',
@@ -171,8 +173,7 @@ export default function NotificationStackScreen() {
                 name="Identity"
                 component={IdentityScreen}
             />
-
-            <NotificationStack.Screen
+            <SearchStack.Screen
                 options={({ route }) => (
                     {
                         title: route.params ? (route.params as any).username : 'BitBadges',
@@ -182,8 +183,7 @@ export default function NotificationStackScreen() {
                 name="BitBadges"
                 component={BadgesScreen}
             />
-
-            <NotificationStack.Screen
+            <SearchStack.Screen
                 options={
                     {
                         headerTitle: 'Issue Badge',
@@ -193,8 +193,7 @@ export default function NotificationStackScreen() {
                 name="Issue"
                 component={IssueBadgeScreen}
             />
-
-            <NotificationStack.Screen
+            <SearchStack.Screen
                 options={({ route }) => (
                     {
                         title: route.params ? (route.params as any).username : 'Badge',
@@ -204,8 +203,7 @@ export default function NotificationStackScreen() {
                 name="Badge"
                 component={BadgeScreen}
             />
-
-            <NotificationStack.Screen
+            <SearchStack.Screen
                 options={({ route }) => (
                     {
                         title: route.params ? (route.params as any).username : 'Pending',
@@ -215,7 +213,7 @@ export default function NotificationStackScreen() {
                 name="Pending"
                 component={PendingScreen}
             />
-        </NotificationStack.Navigator>
+        </SearchStack.Navigator>
     );
 }
 const styles = StyleSheet.create(
