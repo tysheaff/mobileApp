@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
-import { updateThemeStyles } from './styles/globalColors';
+import { themeStyles, updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
 import { constants } from './src/globals/constants';
 import { SnackbarComponent } from './src/components/snackbarComponent';
@@ -19,7 +19,6 @@ import { signing } from '@services/authorization/signing';
 import { authentication } from '@services/authorization/authentication';
 import { ProfileManagerComponent } from '@components/profileManager.component';
 import { eventManager, hapticsManager } from '@globals/injector';
-import { StatusBar } from 'expo-status-bar';
 import { TabNavigator } from './src/navigation/tabNavigator';
 import MessageStackScreen from './src/navigation/messageStackNavigator';
 import { ActionSheetConfig } from '@services/actionSheet';
@@ -27,6 +26,8 @@ import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { stackConfig } from './src/navigation/stackNavigationConfig';
 import CloutFeedIntroduction from '@screens/introduction/cloutFeedIntroduction.screen';
 import TermsConditionsScreen from '@screens/login/termsAndConditions.screen';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
+import { Platform, StatusBar, View } from 'react-native';
 import { AppState } from 'react-native';
 import { messagesService } from './src/services/messagesServices';
 enableScreens();
@@ -42,6 +43,7 @@ export default function App(): JSX.Element {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
   const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
+  const [isThemeSet, setIsThemeSet] = useState<boolean>(false);
   const initialNotificationInterval = useRef(0);
   const backgroundNotificationInterval = useRef(0);
   const backgroundMessageInterval = useRef(0);
@@ -146,7 +148,7 @@ export default function App(): JSX.Element {
         if (cloutFeedIdentity) {
           globals.user.publicKey = publicKey;
           await setTheme(true);
-
+          setIsThemeSet(true);
           const readonlyValue = await SecureStore.getItemAsync(constants.localStorage_readonly);
           globals.readonly = readonlyValue !== 'false';
           globals.onLoginSuccess();
@@ -292,7 +294,6 @@ export default function App(): JSX.Element {
 
   async function setTheme(p_force = false) {
     settingsGlobals.darkMode = false;
-
     const key = globals.user.publicKey + constants.localStorage_appearance;
     if (globals.followerFeatures || p_force) {
       const theme = await SecureStore.getItemAsync(key);
@@ -304,56 +305,65 @@ export default function App(): JSX.Element {
     updateThemeStyles();
   }
 
-  return isLoading ?
-    <CloutFeedLoader />
-    :
-    <NavigationContainer>
-      <StatusBar style={settingsGlobals.darkMode ? 'light' : 'dark'} hidden={false} />
-      <Stack.Navigator
-        screenOptions={stackConfig}>
-        {
-          !isLoggedIn ?
-            areTermsAccepted ?
-              <Stack.Screen
-                options={{
-                  headerShown: false,
-                }}
-                name="LoginNavigator" component={LoginNavigator} />
-              :
-              <>
-                <Stack.Screen options={{
-                  headerStyle: { elevation: 0, shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
-                  headerTitleStyle: { alignSelf: 'center', fontSize: 20 }
-                }} name="Introduction" component={CloutFeedIntroduction} />
-                <Stack.Screen options={{ headerShown: false }} name="TermsConditions" component={TermsConditionsScreen} />
-              </>
-            :
-            <React.Fragment>
-              <Stack.Screen
-                name="TabNavigator"
-                component={TabNavigator}
-                options={{
-                  headerShown: false,
-                }}
-              />
+  return <View style={[{ flex: 1 }, themeStyles.containerColorMain]}>
+    {
+      settingsGlobals.darkMode ?
+        Platform.OS == 'ios' ? <ExpoStatusBar style='light' /> :
+          <StatusBar barStyle={'light-content'} /> :
+        <ExpoStatusBar style='dark' />
+    }
 
-              <Stack.Screen
-                name="MessageStack"
-                component={MessageStackScreen}
-                options={{
-                  headerShown: false,
-                }}
-              />
-            </React.Fragment>
-        }
-      </Stack.Navigator >
-      <DiamondAnimationComponent />
-      {showActionSheet && actionSheetConfig && <ActionSheet config={actionSheetConfig} />}
-      <SnackbarComponent />
-      {
-        showProfileManager ?
-          <ProfileManagerComponent navigation={navigation as NavigationProp<ParamListBase>}></ProfileManagerComponent> : undefined
-      }
-    </NavigationContainer >
-    ;
+    {
+      isLoading ?
+        isThemeSet ? <CloutFeedLoader /> : <></>
+        :
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={stackConfig}>
+            {
+              !isLoggedIn ?
+                areTermsAccepted ?
+                  <Stack.Screen
+                    options={{
+                      headerShown: false,
+                    }}
+                    name="LoginNavigator" component={LoginNavigator} />
+                  :
+                  <>
+                    <Stack.Screen options={{
+                      headerStyle: { elevation: 0, shadowRadius: 0, shadowOffset: { height: 0, width: 0 } },
+                      headerTitleStyle: { alignSelf: 'center', fontSize: 20 }
+                    }} name="Introduction" component={CloutFeedIntroduction} />
+                    <Stack.Screen options={{ headerShown: false }} name="TermsConditions" component={TermsConditionsScreen} />
+                  </>
+                :
+                <React.Fragment>
+                  <Stack.Screen
+                    name="TabNavigator"
+                    component={TabNavigator}
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
+
+                  <Stack.Screen
+                    name="MessageStack"
+                    component={MessageStackScreen}
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
+                </React.Fragment>
+            }
+          </Stack.Navigator >
+          <DiamondAnimationComponent />
+          {showActionSheet && actionSheetConfig && <ActionSheet config={actionSheetConfig} />}
+          <SnackbarComponent />
+          {
+            showProfileManager ?
+              <ProfileManagerComponent navigation={navigation as NavigationProp<ParamListBase>}></ProfileManagerComponent> : undefined
+          }
+        </NavigationContainer>
+    }
+  </View>;
 }
