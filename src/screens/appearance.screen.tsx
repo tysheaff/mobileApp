@@ -38,8 +38,9 @@ export function AppearanceScreen({ navigation }: Props) {
     async function initScreen() {
         const key = globals.user.publicKey + constants.localStorage_appearance;
         const response = await SecureStore.getItemAsync(key).catch(() => undefined) as CloutFeedTheme;
+        const appearance = response === null ? CloutFeedTheme.Light : response;
         if (isMounted) {
-            setSelectedTheme(response);
+            setSelectedTheme(appearance);
         }
     }
 
