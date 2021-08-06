@@ -120,6 +120,7 @@ export default function NotificationStackScreen() {
                 options={
                     ({ route }) => (
                         {
+                            headerTitleStyle: { textAlign: 'center' },
                             headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
                                 (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
                             headerBackTitle: 'Cancel',

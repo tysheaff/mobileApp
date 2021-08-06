@@ -48,6 +48,7 @@ export default function MessageStackScreen() {
         >
             <MessageStack.Screen
                 options={{
+                    headerTitleStyle: { textAlign: 'center' },
                     headerRight: () => <MessagesHeaderComponent />,
                 }}
                 name="Messages"
@@ -141,6 +142,7 @@ export default function MessageStackScreen() {
                 options={
                     ({ route }) => (
                         {
+                            headerTitleStyle: { textAlign: 'center' },
                             headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
                                 (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
                             headerBackTitle: 'Cancel',
