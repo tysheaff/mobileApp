@@ -204,7 +204,7 @@ export function ChatScreen({ route }: Props) {
         }
 
         todaySection.data.push(message);
-        setSections(sections);
+        setSections(() => sections);
 
         try {
             const encryptedMessage = await signing.encryptShared(contactWithMessages.PublicKeyBase58Check, messageText);
