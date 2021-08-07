@@ -73,11 +73,15 @@ export default function HomeStackScreen(): JSX.Element {
         <HomeStack.Navigator
             screenOptions={({ navigation }: any) => ({
                 ...stackConfig,
-                headerTitleStyle: { alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
+                headerTitleStyle: {
+                    alignSelf: 'center',
+                    marginRight: Platform.OS === 'ios' ? 0 : 50,
+                    color: themeStyles.fontColorMain.color
+                },
                 headerStyle: {
                     backgroundColor: themeStyles.containerColorMain.backgroundColor,
                     shadowOpacity: 0,
-                    elevation: 0
+                    elevation: 0,
                 },
                 headerLeft: () => <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
                     <Ionicons name="chevron-back" size={32} color="#007ef5" />
@@ -93,7 +97,7 @@ export default function HomeStackScreen(): JSX.Element {
                         headerRight: () => (
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
-                                    style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
+                                    style={styles.headerIcon}
                                     onPress={() => navigation.navigate('Notifications')}
                                 >
                                     <>
@@ -104,7 +108,7 @@ export default function HomeStackScreen(): JSX.Element {
                                     </>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={{ marginRight: 8, paddingRight: 4, paddingLeft: 4 }}
+                                    style={styles.headerIcon}
                                     onPress={() => navigation.navigate('MessageStack')}
                                 >
                                     <Feather name="send" size={26} color={themeStyles.fontColorMain.color} />
@@ -191,7 +195,10 @@ export default function HomeStackScreen(): JSX.Element {
                 options={
                     ({ route }) => (
                         {
-                            headerTitleStyle: { textAlign: 'center' },
+                            headerTitleStyle: {
+                                alignSelf: 'center',
+                                color: themeStyles.fontColorMain.color
+                            },
                             headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
                                 (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
                             headerBackTitle: 'Cancel',
@@ -288,10 +295,11 @@ export default function HomeStackScreen(): JSX.Element {
             <HomeStack.Screen
                 options={
                     {
-                        headerBackTitle: ' ',
                         headerTitleStyle: {
-                            textAlign: 'center',
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
                         },
+                        headerBackTitle: ' ',
                         headerRight: () => <NotificationsHeaderComponent />
                     }
                 }
@@ -339,6 +347,10 @@ const styles = StyleSheet.create(
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 9
+        },
+        headerIcon: {
+            marginRight: 8,
+            paddingHorizontal: 4
         }
     }
 );

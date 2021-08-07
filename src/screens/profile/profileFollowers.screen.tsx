@@ -182,7 +182,11 @@ export default class ProfileFollowers extends React.Component<Props, State> {
 
         return this.state.profiles.length === 0 ?
             <Text style={[themeStyles.fontColorSub, styles.emptyFollowers]}>
-                {this.props.username} has no followers yet!
+                {
+                    this.props.selectedTab === 'followers ' ?
+                        `${this.props.username} has no followers yet!` :
+                        `${this.props.username} is not following anyone yet!`
+                }
             </Text>
 
             : <FlatList

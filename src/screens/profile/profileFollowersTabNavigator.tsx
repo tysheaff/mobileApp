@@ -44,6 +44,7 @@ export default class ProfileFollowersTab extends React.Component<Props> {
             <TopTab.Screen
                 options={
                     {
+                        title: 'Followers',
                         tabBarLabel: `${this.props.route.params?.followersNumber ?
                             formatNumber(this.props.route.params?.followersNumber, false) : 0} Followers`
                     }
@@ -63,7 +64,7 @@ export default class ProfileFollowersTab extends React.Component<Props> {
                 options={
                     {
                         tabBarLabel: `${this.props.route.params?.followingNumber ?
-                            formatNumber(this.props.route.params?.followingNumber, false) : 0} Followers`
+                            formatNumber(this.props.route.params?.followingNumber, false) : 0} Following`
                     }
                 }
                 name="Following" children={
