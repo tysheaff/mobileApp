@@ -153,10 +153,10 @@ export class NotificationsScreen extends React.Component<Props, State> {
                                         posts: response.PostsByHash
                                     }
                                 );
-                            }
 
-                            if (filterSet) {
-                                this.onFilterChanged(this.state.filter as NotificationsFilter);
+                                if (filterSet) {
+                                    this.onFilterChanged(this.state.filter as NotificationsFilter);
+                                }
                             }
                         }
                     );

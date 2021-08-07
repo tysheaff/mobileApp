@@ -101,7 +101,7 @@ export default function HomeStackScreen(): JSX.Element {
                                     onPress={() => navigation.navigate('Notifications')}
                                 >
                                     <>
-                                        <Ionicons name="md-notifications-outline" size={28} color={themeStyles.fontColorMain.color} />
+                                        <Ionicons name="md-notifications-outline" size={27} color={themeStyles.fontColorMain.color} />
                                         {
                                             hasBadge && <View style={styles.notificationBadge} />
                                         }
@@ -111,7 +111,7 @@ export default function HomeStackScreen(): JSX.Element {
                                     style={styles.headerIcon}
                                     onPress={() => navigation.navigate('MessageStack')}
                                 >
-                                    <Feather name="send" size={26} color={themeStyles.fontColorMain.color} />
+                                    <Feather name="send" size={25} color={themeStyles.fontColorMain.color} />
                                     {
                                         messagesCount > 0 &&
                                         <View style={styles.messagesBadge}>
@@ -342,8 +342,8 @@ const styles = StyleSheet.create(
             height: 6,
             backgroundColor: '#eb1b0c',
             position: 'absolute',
-            left: 24,
-            top: 1,
+            left: 22,
+            top: 0,
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 9

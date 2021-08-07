@@ -46,7 +46,7 @@ const TabElement = ({ tab, onPress, selectedTab }: any) => {
     } else if (tab.name === 'CreatePostStack') {
         icon = <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />;
     } else if (tab.name === 'SearchStack') {
-        icon = <Ionicons name="ios-search" size={26} color={iconColor} />;
+        icon = <Ionicons name="ios-search" size={28} color={iconColor} />;
     } else if (tab.name === 'ProfileStack') {
         icon = <Image
             style={[

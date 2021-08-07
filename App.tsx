@@ -44,10 +44,8 @@ export default function App(): JSX.Element {
   const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
   const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
   const [isThemeSet, setIsThemeSet] = useState<boolean>(false);
-  const initialNotificationInterval = useRef(0);
-  const backgroundNotificationInterval = useRef(0);
-  const backgroundMessageInterval = useRef(0);
-  const initialMessageInterval = useRef(0);
+  const notificationsInterval = useRef(0);
+  const messagesInterval = useRef(0);
   const appState = useRef(AppState.currentState);
   const isMounted = useRef<boolean>(true);
   const intervalTiming = 30000;
@@ -57,13 +55,11 @@ export default function App(): JSX.Element {
       return;
     }
     if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-      window.clearInterval(initialNotificationInterval.current);
-      backgroundNotificationInterval.current = window.setInterval(notificationListener, intervalTiming);
-      backgroundMessageInterval.current = window.setInterval(globals.dispatchRefreshMessagesEvent, intervalTiming);
+      notificationsInterval.current = window.setInterval(notificationListener, intervalTiming);
+      messagesInterval.current = window.setInterval(globals.dispatchRefreshMessagesEvent, intervalTiming);
     } else {
-      window.clearInterval(backgroundNotificationInterval.current);
-      window.clearInterval(initialMessageInterval.current);
-
+      window.clearInterval(notificationsInterval.current);
+      window.clearInterval(messagesInterval.current);
     }
     appState.current = nextAppState;
   }
@@ -71,19 +67,6 @@ export default function App(): JSX.Element {
   useEffect(
     () => {
       AppState.addEventListener('change', handleAppStateChange);
-
-      return () => {
-        window.clearInterval(backgroundNotificationInterval.current);
-        window.clearInterval(backgroundMessageInterval.current);
-        AppState.removeEventListener('change', handleAppStateChange);
-      };
-
-    },
-    []
-  );
-
-  useEffect(
-    () => {
 
       const unsubscribeProfileManager = eventManager.addEventListener(
         EventType.ToggleProfileManager,
@@ -109,8 +92,8 @@ export default function App(): JSX.Element {
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
-        window.clearInterval(initialNotificationInterval.current);
-        window.clearInterval(initialMessageInterval.current);
+        window.clearInterval(notificationsInterval.current);
+        window.clearInterval(messagesInterval.current);
         isMounted.current = false;
       };
     },
@@ -213,8 +196,10 @@ export default function App(): JSX.Element {
           notificationListener();
           globals.dispatchRefreshMessagesEvent();
 
-          initialNotificationInterval.current = window.setInterval(notificationListener, intervalTiming);
-          initialMessageInterval.current = window.setInterval(globals.dispatchRefreshMessagesEvent, intervalTiming);
+          window.clearInterval(notificationsInterval.current);
+          window.clearInterval(messagesInterval.current);
+          notificationsInterval.current = window.setInterval(notificationListener, intervalTiming);
+          messagesInterval.current = window.setInterval(globals.dispatchRefreshMessagesEvent, intervalTiming);
         }
         await setTheme();
         await hapticsManager.init();
@@ -242,8 +227,8 @@ export default function App(): JSX.Element {
       const jwt = await signing.signJWT();
       cloutFeedApi.unregisterNotificationsPushToken(globals.user.publicKey, jwt).catch(() => undefined);
       await authentication.removeAuthenticatedUser(globals.user.publicKey);
-      window.clearInterval(initialNotificationInterval.current);
-      window.clearInterval(backgroundNotificationInterval.current);
+      window.clearInterval(notificationsInterval.current);
+      window.clearInterval(messagesInterval.current);
       const loggedInPublicKeys = await authentication.getAuthenticatedUserPublicKeys();
 
       if (loggedInPublicKeys?.length > 0) {
