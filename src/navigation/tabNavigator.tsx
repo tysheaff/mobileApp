@@ -23,7 +23,7 @@ const firstScreen: any = {
     ProfileStack: 'Profile',
     WalletStack: 'Wallet',
     CreatePostStack: 'CreatePost',
-    SearchTabNavigator: 'SearchTabNavigator'
+    SearchStack: 'SearchTabNavigator'
 };
 
 const TabElement = ({ tab, onPress, selectedTab }: any) => {
