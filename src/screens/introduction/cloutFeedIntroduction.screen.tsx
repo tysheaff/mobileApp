@@ -114,9 +114,10 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
             }).start();
         }
 
-        return <View style={[styles.container, themeStyles.containerColorMain]}>
-            <View>
+        return <ScrollView style={[styles.container, themeStyles.containerColorMain]}>
+            <View style={{ flex: 1 }}>
                 <ScrollView
+                    style={styles.scrollViewStyle}
                     ref={(ref) => { this._scrollViewRef = ref; }}
                     horizontal
                     pagingEnabled
@@ -157,7 +158,7 @@ export default class CloutFeedIntroduction extends React.Component<Props, State>
                     </TouchableOpacity>
                 </Animated.View>
             </View>
-        </View>;
+        </ScrollView>;
     }
 }
 
@@ -166,11 +167,14 @@ const styles = StyleSheet.create(
         container: {
             flex: 1,
             paddingVertical: 0,
+        },
+        scrollViewStyle: {
             paddingTop: 20
         },
         buttonContainer: {
             alignItems: 'center',
             marginHorizontal: 50,
+            marginBottom: 20
         },
         button: {
             padding: 10,
@@ -188,10 +192,6 @@ const styles = StyleSheet.create(
         dotsContainer: {
             alignItems: 'center',
             marginBottom: 15,
-        },
-        dotsContentContainerStyle: {
-            justifyContent: 'center',
-            alignItems: 'center',
         },
         dot: {
             marginRight: 4

@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, Dimensions, ImageSourcePropType } from 'react-native';
 import { themeStyles } from '@styles/globalColors';
-import { ScrollView } from 'react-native-gesture-handler';
 
 interface Props {
     title: string;
@@ -21,11 +20,9 @@ export default class introSlideComponent extends React.Component<Props> {
         return <View style={[styles.container]}>
             <Image style={styles.image} source={(this.props.imageUri as ImageSourcePropType)} />
             <Text style={[styles.title, themeStyles.fontColorMain]}>{this.props.title}</Text>
-            <ScrollView
-                style={styles.descriptionContainer}
-                bounces={false}>
+            <View style={styles.descriptionContainer} >
                 <Text style={[styles.description, themeStyles.fontColorMain]}>{this.props.description}</Text>
-            </ScrollView>
+            </View>
         </View>;
     }
 }
@@ -38,8 +35,9 @@ const styles = StyleSheet.create(
             padding: 20
         },
         image: {
-            width: 150,
-            height: 150,
+            width: screenWidth * 0.2,
+            height: screenHeight * 0.2,
+            aspectRatio: 1,
             marginBottom: 20
         },
         title: {
