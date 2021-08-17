@@ -3,16 +3,19 @@ import { Dimensions, StyleSheet, View, Text } from 'react-native';
 import ProfileInfoImageComponent from './profileInfoImage.component';
 import ProfileInfoUsernameComponent from './profileInfoUsername.component';
 import { themeStyles } from '@styles/globalColors';
+import { Profile } from '@types';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
-    publicKey: string;
-    username: string;
-    verified: boolean;
+    profile: Profile;
+    navigation: StackNavigationProp<ParamListBase>;
     lastMessage?: string;
     duration?: string;
     showCreatorCoinHolding?: boolean;
     isLarge: boolean;
     imageSize?: number;
+    peekDisabled?: boolean;
 }
 
 export default class MessageInfoCardComponent extends React.Component<Props> {
@@ -22,18 +25,26 @@ export default class MessageInfoCardComponent extends React.Component<Props> {
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        return this.props.publicKey !== nextProps.publicKey ||
+        return this.props.profile !== nextProps.profile ||
             this.props.lastMessage !== nextProps.lastMessage;
     }
 
     render(): JSX.Element {
         return <View style={styles.container}>
-            <ProfileInfoImageComponent imageSize={this.props.imageSize} publicKey={this.props.publicKey} />
+            <ProfileInfoImageComponent
+                peekDisabled={this.props.peekDisabled}
+                navigation={this.props.navigation}
+                imageSize={this.props.imageSize}
+                profile={this.props.profile} />
             <View>
                 <ProfileInfoUsernameComponent
+                    peekDisabled={this.props.peekDisabled}
                     isLarge={this.props.isLarge}
                     showCreatorCoinHolding={this.props.showCreatorCoinHolding}
-                    verified={this.props.verified} username={this.props.username} />
+                    profile={this.props.profile}
+                    navigation={this.props.navigation}
+
+                />
                 {
                     !!this.props.lastMessage &&
                     <View style={styles.bottomRow}>

@@ -6,12 +6,15 @@ import { api } from '@services';
 import { themeStyles } from '@styles/globalColors';
 import { Profile } from '@types';
 import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 
 let lastKeyword;
 
 export function UserSuggestionList({ keyword, onSuggestionPress }: { keyword: string, onSuggestionPress: (name: Profile) => void }): JSX.Element | null {
     const [suggestedMentions, setSuggestedMentions] = useState<Profile[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
     const isMounted = useRef<boolean>(true);
 
@@ -75,18 +78,17 @@ export function UserSuggestionList({ keyword, onSuggestionPress }: { keyword: st
                 <ActivityIndicator style={styles.activityIndicator} color={themeStyles.fontColorMain.color}></ActivityIndicator>
                 :
                 suggestedMentions.map(
-                    mention => (
+                    (mention: Profile) =>
                         <TouchableOpacity
                             key={mention.Username}
                             onPress={() => { onSuggestionPress(mention); }}
                             style={styles.userMentionCard}>
                             <ProfileInfoCardComponent
-                                publicKey={mention?.PublicKeyBase58Check}
-                                username={mention?.Username}
-                                verified={mention?.IsVerified}
+                                profile={mention}
+                                navigation={navigation}
+                                noCoinPrice={true}
                             />
                         </TouchableOpacity>
-                    )
                 )
         }
     </ScrollView>;

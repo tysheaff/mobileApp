@@ -68,18 +68,18 @@ export function CreatorCoinHODLerComponent({ creatorCoinPrice, userWhoHODL: user
         }
     }
 
-    return <TouchableOpacity onPress={goToProfile} activeOpacity={1}>
-        <View style={[styles.userWhoHODLCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
-            <ProfileInfoCardComponent
-                verified={userWhoHODL.ProfileEntryResponse?.IsVerified}
-                publicKey={isHolder ? userWhoHODL?.HODLerPublicKeyBase58Check : userWhoHODL?.CreatorPublicKeyBase58Check}
-                username={userWhoHODL.ProfileEntryResponse?.Username}
-                coinPrice={hodlerCoinPriceUSD}
-            />
-            <View style={styles.HODLerAmountContainer}>
-                <Text style={[styles.hodlerAmountCoins, themeStyles.fontColorMain]}>{hodlerAmountCoins}</Text>
-                <Text style={[styles.hodlerAmountUSD, themeStyles.fontColorMain]}>~${hodlerAmountUSD}</Text>
-            </View>
+    return <TouchableOpacity
+        activeOpacity={1}
+        onPress={goToProfile}
+        style={[styles.userWhoHODLCard, themeStyles.containerColorMain, themeStyles.borderColor]}
+    >
+        <ProfileInfoCardComponent
+            navigation={navigation}
+            profile={userWhoHODL.ProfileEntryResponse}
+        />
+        <View style={styles.HODLerAmountContainer}>
+            <Text style={[styles.hodlerAmountCoins, themeStyles.fontColorMain]}>{hodlerAmountCoins}</Text>
+            <Text style={[styles.hodlerAmountUSD, themeStyles.fontColorMain]}>~${hodlerAmountUSD}</Text>
         </View>
     </TouchableOpacity>;
 }
@@ -93,28 +93,6 @@ const styles = StyleSheet.create(
             borderBottomWidth: 1,
             width: Dimensions.get('window').width
 
-        },
-        profileImage: {
-            width: 40,
-            height: 40,
-            borderRadius: 6,
-            marginRight: 12
-        },
-        username: {
-            fontWeight: '700',
-            maxWidth: Dimensions.get('window').width / 2
-        },
-        hodlerCoinPriceContainer: {
-            borderRadius: 12,
-            paddingHorizontal: 10,
-            justifyContent: 'center',
-            height: 20,
-            alignSelf: 'flex-start',
-            marginTop: 6
-        },
-        HODLerCoinPriceText: {
-            fontSize: 10,
-            fontWeight: '600'
         },
         HODLerAmountContainer: {
             marginLeft: 'auto',

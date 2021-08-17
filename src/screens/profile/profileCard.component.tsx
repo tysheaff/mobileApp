@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, Image, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image, Text, Dimensions, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { ParamListBase } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { TextWithLinks } from '@components/textWithLinks.component';
 import { api, cache, formatNumber } from '@services';
 import { eventManager, globals, settingsGlobals } from '@globals';
@@ -26,7 +25,7 @@ interface State {
 
 export class ProfileCard extends React.Component<Props, State> {
 
-    private _isMounted = true;
+    private _isMounted = false;
 
     private _unsubscribes: (() => void)[] = [];
 
@@ -85,16 +84,11 @@ export class ProfileCard extends React.Component<Props, State> {
             }
         );
 
+        this.goToFollowersScreen = this.goToFollowersScreen.bind(this);
+
         this._unsubscribes.push(unsubscribeIncreaseFollowers, unsubscribeDecreaseFollowers);
 
         this.loadFollowers();
-
-        this.goToFollowersScreen = this.goToFollowersScreen.bind(this);
-    }
-
-    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        return this.props.profile?.PublicKeyBase58Check !== nextProps.profile?.PublicKeyBase58Check ||
-            this.state.followersNumber !== nextState.followersNumber;
     }
 
     componentDidMount(): void {
@@ -145,45 +139,62 @@ export class ProfileCard extends React.Component<Props, State> {
     }
 
     private goToFollowersScreen(selectedTab: string): void {
-
-        this.props.navigation.push(
-            'ProfileFollowersTab',
-            {
-                publicKey: this.props.profile.PublicKeyBase58Check,
-                username: this.props.profile.Username,
-                selectedTab: selectedTab,
-                followersNumber: this.state.followersNumber,
-                followingNumber: this.state.followingNumber
-            }
-        );
+        if (this.props.profile.Username !== 'anonymous') {
+            eventManager.dispatchEvent(EventType.ToggleProfileInfoModal, { visible: false });
+            this.props.navigation.push(
+                'ProfileFollowersTab',
+                {
+                    publicKey: this.props.profile.PublicKeyBase58Check,
+                    username: this.props.profile.Username,
+                    selectedTab: selectedTab,
+                    followersNumber: this.state.followersNumber,
+                    followingNumber: this.state.followingNumber
+                }
+            );
+        }
     }
 
     private goToCreatorCoinScreen(): void {
-        this.props.navigation.push(
-            'CreatorCoin',
-            {
-                publicKey: this.props.profile.PublicKeyBase58Check,
-                username: this.props.profile.Username,
-                profilePic: this.props.profile.ProfilePic,
-                isVerified: this.props.profile.IsVerified,
-                currentCoinPrice: this.props.coinPrice
-            }
-        );
+        if (this.props.profile.Username !== 'anonymous') {
+
+            eventManager.dispatchEvent(EventType.ToggleProfileInfoModal, { visible: false });
+            this.props.navigation.push(
+                'CreatorCoin',
+                {
+                    publicKey: this.props.profile.PublicKeyBase58Check,
+                    username: this.props.profile.Username,
+                    profilePic: this.props.profile.ProfilePic,
+                    isVerified: this.props.profile.IsVerified,
+                    currentCoinPrice: this.props.coinPrice
+                }
+            );
+        }
     }
 
-    private goToBitBadgesScreen(p_selectedTab: string) {
-        this.props.navigation.push('BitBadges',
-            {
-                publicKey: this.props.profile.PublicKeyBase58Check,
-                username: this.props.profile.Username,
-                selectedTab: p_selectedTab,
-            }
-        );
+    private goToBitBadgesScreen(p_selectedTab: string): void {
+        if (this.props.profile.Username !== 'anonymous') {
+            eventManager.dispatchEvent(EventType.ToggleProfileInfoModal, { visible: false });
+            this.props.navigation.push('BitBadges',
+                {
+                    publicKey: this.props.profile.PublicKeyBase58Check,
+                    username: this.props.profile.Username,
+                    selectedTab: p_selectedTab,
+                }
+            );
+        }
     }
 
     render(): JSX.Element {
-        return <View style={[styles.container, themeStyles.containerColorMain, themeStyles.shadowColor]}>
-            <View style={[styles.headerContainer]}>
+        return <View
+            style={
+                [
+                    styles.container,
+                    themeStyles.containerColorMain,
+                    themeStyles.shadowColor
+                ]
+            }
+        >
+            <View style={styles.headerContainer}>
                 <View style={[styles.bitBadgesContainer]}>
                     <TouchableOpacity
                         onPress={() => this.goToBitBadgesScreen('received')}
@@ -233,7 +244,6 @@ export class ProfileCard extends React.Component<Props, State> {
                     text={this.props.profile.Description}
                 />
             </View>
-
             <View style={styles.infoContainer}>
                 <View style={styles.infoTextContainer}>
                     <TouchableOpacity
@@ -297,7 +307,7 @@ const styles = StyleSheet.create(
             },
             shadowOpacity: 1,
             shadowRadius: 1,
-            elevation: 1
+            elevation: 1,
         },
         profilePic: {
             marginBottom: 16,
@@ -372,8 +382,7 @@ const styles = StyleSheet.create(
             width: Dimensions.get('window').width,
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingLeft: 12,
-            paddingRight: 12,
+            paddingHorizontal: 12,
         },
         bitBadgesLogo: {
             width: 14,
@@ -385,10 +394,8 @@ const styles = StyleSheet.create(
             borderRadius: 4,
         },
         bitBadgesButton: {
-            paddingTop: 5,
-            paddingBottom: 5,
-            paddingRight: 6,
-            paddingLeft: 6,
+            paddingVertical: 5,
+            paddingHorizontal: 6,
             borderRadius: 4,
             flexDirection: 'row',
             justifyContent: 'center',

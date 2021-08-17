@@ -1,8 +1,8 @@
 import { NavigationContainer, NavigationProp, ParamListBase } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, } from './src/types';
+import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, ToggleProfileInfoModalEvent, Profile, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
 import { themeStyles, updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
@@ -26,10 +26,12 @@ import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { stackConfig } from './src/navigation/stackNavigationConfig';
 import CloutFeedIntroduction from '@screens/introduction/cloutFeedIntroduction.screen';
 import TermsConditionsScreen from '@screens/login/termsAndConditions.screen';
+import ProfileInfoModalComponent from '@components/profileInfo/profileInfoModal.component';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Platform, StatusBar, View } from 'react-native';
 import { AppState } from 'react-native';
 import { messagesService } from './src/services/messagesServices';
+
 enableScreens();
 
 const Stack = createStackNavigator();
@@ -43,6 +45,9 @@ export default function App(): JSX.Element {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
   const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
+  const [showProfileInfo, setShowProfileInfo] = useState(false);
+  const [profile, setProfile] = useState<Profile>();
+  const [coinPrice, setCoinPrice] = useState<number>();
   const [isThemeSet, setIsThemeSet] = useState<boolean>(false);
   const notificationsInterval = useRef(0);
   const messagesInterval = useRef(0);
@@ -86,12 +91,24 @@ export default function App(): JSX.Element {
           }
         }
       );
+      const unsubscribeProfileInfo = eventManager.addEventListener(
+        EventType.ToggleProfileInfoModal,
+        (event: ToggleProfileInfoModalEvent) => {
+          if (isMounted) {
+            setProfile(event.profile);
+            setCoinPrice(event.coinPrice);
+            setNavigation(event.navigation);
+            setShowProfileInfo(event.visible);
+          }
+        }
+      );
 
       checkAuthenticatedUser().then(() => undefined).catch(() => undefined);
 
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
+        unsubscribeProfileInfo();
         window.clearInterval(notificationsInterval.current);
         window.clearInterval(messagesInterval.current);
         isMounted.current = false;
@@ -346,7 +363,14 @@ export default function App(): JSX.Element {
           <SnackbarComponent />
           {
             showProfileManager ?
-              <ProfileManagerComponent navigation={navigation as NavigationProp<ParamListBase>}></ProfileManagerComponent> : undefined
+              <ProfileManagerComponent navigation={navigation as StackNavigationProp<ParamListBase>}></ProfileManagerComponent> : undefined
+          }
+          {
+            showProfileInfo && <ProfileInfoModalComponent
+              navigation={navigation as any}
+              profile={profile as Profile}
+              coinPrice={coinPrice as number}
+            />
           }
         </NavigationContainer>
     }

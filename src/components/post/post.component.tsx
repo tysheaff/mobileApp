@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
-import { Post } from '../../types';
+import { Post } from '@types';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { ImageGalleryComponent } from '../imageGallery.component';
@@ -76,7 +76,6 @@ export class PostComponent extends React.Component<Props, State> {
             this.props.post.ImageURLs = imageUrls;
         }
 
-        this.goToProfile = this.goToProfile.bind(this);
         this.goToStats = this.goToStats.bind(this);
         this.goToPost = this.goToPost.bind(this);
         this.goToRecloutedPost = this.goToRecloutedPost.bind(this);
@@ -98,19 +97,6 @@ export class PostComponent extends React.Component<Props, State> {
         );
 
         hapticsManager.customizedImpact();
-    }
-
-    private goToProfile(): void {
-        if (!this.props.disableProfileNavigation) {
-            this.props.navigation.push(
-                'UserProfile',
-                {
-                    publicKey: this.props.post.ProfileEntryResponse.PublicKeyBase58Check,
-                    username: this.props.post.ProfileEntryResponse.Username,
-                    key: 'Profile_' + this.props.post.ProfileEntryResponse.PublicKeyBase58Check
-                }
-            );
-        }
     }
 
     private goToPost(): void {
@@ -188,12 +174,11 @@ export class PostComponent extends React.Component<Props, State> {
                 {
                     this.props.isParentPost &&
                     <View style={styles.parentPostSubContainer}>
-                        <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
-                            <ProfileInfoImageComponent
-                                imageSize={35}
-                                publicKey={this.props.post.ProfileEntryResponse?.PublicKeyBase58Check}
-                            />
-                        </TouchableOpacity>
+                        <ProfileInfoImageComponent
+                            imageSize={35}
+                            profile={this.props.post.ProfileEntryResponse}
+                            navigation={this.props.navigation}
+                        />
                         <View style={[styles.parentConnector, themeStyles.recloutBorderColor]} />
                     </View>
                 }
@@ -206,24 +191,21 @@ export class PostComponent extends React.Component<Props, State> {
                             themeStyles.borderColor
                         ]}>
                         <TouchableOpacity onPress={() => this.goToPost()} onLongPress={() => this.goToStats()} activeOpacity={1}>
-                            <View style={styles.headerContainer}>
+                            <View style={styles.headerContainer} >
                                 {
                                     !this.props.isParentPost && (
-                                        <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
-                                            <ProfileInfoImageComponent
-                                                imageSize={35}
-                                                publicKey={this.props.post.ProfileEntryResponse?.PublicKeyBase58Check}
-                                            />
-                                        </TouchableOpacity>
+                                        <ProfileInfoImageComponent
+                                            imageSize={35}
+                                            profile={this.props.post.ProfileEntryResponse}
+                                            navigation={this.props.navigation}
+                                        />
                                     )
                                 }
                                 <View>
-                                    <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile()}>
-                                        <ProfileInfoUsernameComponent
-                                            username={this.props.post.ProfileEntryResponse?.Username}
-                                            verified={this.props.post.ProfileEntryResponse?.IsVerified}
-                                        />
-                                    </TouchableOpacity>
+                                    <ProfileInfoUsernameComponent
+                                        profile={this.props.post.ProfileEntryResponse}
+                                        navigation={this.props.navigation}
+                                    />
 
                                     <TouchableOpacity style={styles.actionButton} activeOpacity={1}>
                                         <Ionicons name="ios-time-outline" size={14} color="#a1a1a1" />

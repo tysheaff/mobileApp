@@ -4,12 +4,12 @@ import { CreatorCoinTransaction, Profile } from '@types';
 import { themeStyles } from '@styles/globalColors';
 import { calculateDurationUntilNow, formatNumber, getAnonymousProfile } from '@services/helpers';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { NavigationProp } from '@react-navigation/native';
-import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import { ParamListBase } from '@react-navigation/native';
 import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     creatorCoinTransaction: CreatorCoinTransaction;
     publicKey: string;
     profile: Profile | null;
@@ -39,15 +39,12 @@ export class CreatorCoinTransactionComponent extends React.Component<Props> {
     render() {
 
         const profile = this.props.profile ?? getAnonymousProfile(this.props.publicKey);
-        const formattedCoinPrice = calculateAndFormatBitCloutInUsd(profile.CoinPriceBitCloutNanos);
 
         return <TouchableOpacity onPress={() => this.goToProfile(profile)} activeOpacity={1}>
             <View style={[styles.profileListCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
                 <ProfileInfoCardComponent
-                    publicKey={this.props.publicKey}
-                    username={profile?.Username}
-                    coinPrice={formattedCoinPrice}
-                    verified={profile?.IsVerified}
+                    profile={this.props.profile as Profile}
+                    navigation={this.props.navigation}
                     duration={calculateDurationUntilNow(this.props.creatorCoinTransaction.timeStamp * 1000000000)}
                 />
 

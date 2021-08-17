@@ -206,10 +206,11 @@ export function CreatePostComponent(
         showsVerticalScrollIndicator={false}>
         <View style={styles.headerContainer}>
             <ProfileInfoCardComponent
-                publicKey={profile?.PublicKeyBase58Check}
-                username={profile?.Username}
-                verified={profile?.IsVerified}
+                profile={profile}
+                noCoinPrice={true}
+                navigation={navigation}
                 imageSize={30}
+                peekDisabled={true}
             />
         </View>
 

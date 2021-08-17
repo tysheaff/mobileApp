@@ -1,4 +1,4 @@
-import { View, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Image, Text, Dimensions } from 'react-native';
+import { View, ActivityIndicator, FlatList, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
 import { Profile } from '@types';
@@ -6,9 +6,10 @@ import { api } from '@services';
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface DiamondSender {
     DiamondLevel: number;
@@ -84,8 +85,7 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
                 this.setState({ diamondSenders: newDiamondSenders, isLoading: false, isLoadingMore: false });
             }
 
-        } catch {
-        }
+        } catch { }
     }
 
     private goToProfile(p_profile: Profile) {
@@ -102,13 +102,11 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
     render() {
 
         const keyExtractor = (item: DiamondSender, index: number) => item.DiamondSenderProfile.PublicKeyBase58Check + index;
-        const renderItem = ({ item }: { item: DiamondSender }) => <TouchableOpacity onPress={() => this.goToProfile(item.DiamondSenderProfile)} activeOpacity={1}>
-            <View style={[styles.diamondSenderCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
+        const renderItem = ({ item }: { item: DiamondSender }) =>
+            <TouchableOpacity activeOpacity={1} onPress={() => this.goToProfile(item.DiamondSenderProfile)} style={[styles.diamondSenderCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
                 <ProfileInfoCardComponent
-                    publicKey={item.DiamondSenderProfile?.PublicKeyBase58Check}
-                    username={item.DiamondSenderProfile?.Username}
-                    coinPrice={item.DiamondSenderProfile?.FormattedCoinPriceUSD as string}
-                    verified={item.DiamondSenderProfile?.IsVerified}
+                    profile={item.DiamondSenderProfile}
+                    navigation={this.props.navigation as StackNavigationProp<ParamListBase>}
                 />
                 <View style={styles.diamondsContainer}>
                     {
@@ -118,8 +116,7 @@ export class PostDiamondStatsComponent extends React.Component<Props, State> {
                         )
                     }
                 </View>
-            </View>
-        </TouchableOpacity>;
+            </TouchableOpacity>;
 
         const renderFooter = this.state.isLoadingMore && !this.state.isLoading
             ? <ActivityIndicator color={themeStyles.fontColorMain.color} />
@@ -161,38 +158,10 @@ const styles = StyleSheet.create(
             borderBottomWidth: 1,
             width: Dimensions.get('window').width
         },
-        profileImage: {
-            width: 40,
-            height: 40,
-            borderRadius: 6,
-            marginRight: 12
-        },
-        username: {
-            fontWeight: '700',
-            width: Dimensions.get('window').width / 2
-        },
-        diamondSenderCoinPriceContainer: {
-            borderRadius: 12,
-            paddingRight: 10,
-            paddingLeft: 10,
-            justifyContent: 'center',
-            height: 20,
-            alignSelf: 'flex-start',
-            marginTop: 6
-        },
-        diamondSenderCoinPriceText: {
-            fontSize: 10,
-            fontWeight: '600'
-        },
         diamondsContainer: {
             flexDirection: 'row',
             alignItems: 'center',
             marginLeft: 'auto'
-        },
-        totalDiamonds: {
-            marginLeft: 10,
-            fontSize: 18,
-            fontWeight: '600'
         },
         emptyText: {
             fontSize: 16,

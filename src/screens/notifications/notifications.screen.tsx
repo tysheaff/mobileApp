@@ -12,18 +12,19 @@ import { CreatorCoinTransferNotificationComponent } from './components/creatorCo
 import { PostReplyNotificationComponent } from './components/postReplyNotification.component';
 import { PostMentionNotificationComponent } from './components/postMentionNotification.component';
 import { PostRecloutNotificationComponent } from './components/postRecloutNotification.component';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
 import { NotificationsFilter, NotificationsFilterComponent } from './components/notificationsFilter.component';
 import { filterNotifications } from './notificaitonFilterHelper';
 import * as SecureStore from 'expo-secure-store';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
     standardPublicKey: string;
     nonStandardPublicKey?: string;
     back: () => void;
     selectAccount: (publicKey: string) => void;
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -266,7 +267,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                     post={post}
                     notification={notification}
                     goToPost={this.goToPost}
-                    goToProfile={this.goToProfile}
+                    navigation={this.props.navigation}
                     profile={profile}
                     postHashHex={postHashHex}
                 />;
@@ -282,9 +283,9 @@ export class NotificationsScreen extends React.Component<Props, State> {
                 if (parentPost && parentPost.ProfileEntryResponse.PublicKeyBase58Check === globals.user.publicKey) {
                     return <PostReplyNotificationComponent
                         notification={notification}
+                        navigation={this.props.navigation}
                         profile={profile}
                         post={post}
-                        goToProfile={this.goToProfile}
                         goToPost={this.goToPost}
                         postHashHex={postHashHex}
                     />;
@@ -317,7 +318,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
             <PostMentionNotificationComponent
                 profile={profile}
                 post={post}
-                goToProfile={this.goToProfile}
+                navigation={this.props.navigation}
                 goToPost={this.goToPost}
                 notification={notification}
                 postHashHex={postHashHex}
@@ -333,12 +334,14 @@ export class NotificationsScreen extends React.Component<Props, State> {
             switch (notification.Metadata.TxnType) {
                 case NotificationType.Follow:
                     return <FollowNotificationComponent
+                        navigation={this.props.navigation}
                         profile={profile}
                         goToProfile={this.goToProfile}
                         notification={notification}
                     />;
                 case NotificationType.BasicTransfer:
                     return <BasicTransferNotificationComponent
+                        navigation={this.props.navigation}
                         notification={notification}
                         goToProfile={this.goToProfile}
                         profile={profile}
@@ -347,21 +350,23 @@ export class NotificationsScreen extends React.Component<Props, State> {
                     const postHashHex = notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;
                     return <LikeNotificationComponent
                         post={this.state.posts[postHashHex]}
+                        navigation={this.props.navigation}
                         notification={notification}
                         goToPost={this.goToPost}
-                        goToProfile={this.goToProfile}
                         profile={profile}
                     />;
                 }
                 case NotificationType.CreatorCoin:
                     return <CreatorCoinNotificationComponent
                         notification={notification}
+                        navigation={this.props.navigation}
                         goToProfile={this.goToProfile}
                         profile={profile} />;
 
                 case NotificationType.CreatorCoinTransfer:
                     return <CreatorCoinTransferNotificationComponent
                         profile={profile}
+                        navigation={this.props.navigation}
                         post={this.state.posts[notification.Metadata.CreatorCoinTransferTxindexMetadata?.PostHashHex as string]}
                         notification={notification}
                         goToProfile={this.goToProfile}

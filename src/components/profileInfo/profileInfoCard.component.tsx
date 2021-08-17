@@ -5,16 +5,20 @@ import ProfileInfoImageComponent from './profileInfoImage.component';
 import ProfileInfoUsernameComponent from './profileInfoUsername.component';
 import CoinPriceComponent from './coinPrice.component';
 import { Ionicons } from '@expo/vector-icons';
+import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
+import { Profile } from '@types';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
-    publicKey: string;
-    username: string;
-    coinPrice?: string;
-    verified: boolean;
+    profile: Profile;
     duration?: string;
     isProfileManager?: boolean;
     ìsDarkMode?: boolean;
     imageSize?: number;
+    navigation: StackNavigationProp<ParamListBase>;
+    peekDisabled?: boolean;
+    noCoinPrice?: boolean;
 }
 
 export default class ProfileInfoCardComponent extends React.Component<Props> {
@@ -24,28 +28,34 @@ export default class ProfileInfoCardComponent extends React.Component<Props> {
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        return this.props.publicKey !== nextProps.publicKey ||
-            this.props.coinPrice !== nextProps.coinPrice ||
+        return this.props.profile !== nextProps.profile ||
             this.props.duration !== nextProps.duration;
     }
 
     render(): JSX.Element {
+        const coinPrice = calculateAndFormatBitCloutInUsd(this.props.profile?.CoinPriceBitCloutNanos);
         return <View style={styles.container}>
-            <ProfileInfoImageComponent imageSize={this.props.imageSize} publicKey={this.props.publicKey} />
+            <ProfileInfoImageComponent
+                peekDisabled={this.props.peekDisabled}
+                navigation={this.props.navigation}
+                profile={this.props.profile}
+                imageSize={this.props.imageSize}
+            />
             <View>
                 <ProfileInfoUsernameComponent
-                    verified={this.props.verified}
+                    peekDisabled={this.props.peekDisabled}
+                    navigation={this.props.navigation}
                     isDarkMode={this.props.ìsDarkMode}
-                    username={this.props.username}
+                    profile={this.props.profile}
                 />
 
                 <View style={styles.bottomRow}>
                     {
-                        !!this.props.coinPrice &&
+                        !this.props.noCoinPrice &&
                         <CoinPriceComponent
                             isDarkMode={this.props.ìsDarkMode}
                             isProfileManager={this.props.isProfileManager}
-                            price={this.props.coinPrice}
+                            price={coinPrice}
                         />
                     }
                     {

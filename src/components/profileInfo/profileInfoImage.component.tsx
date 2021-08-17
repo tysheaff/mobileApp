@@ -1,10 +1,16 @@
 import React from 'react';
-import { StyleSheet, Image } from 'react-native';
-import { api } from '@services';
+import { StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { api, calculateBitCloutInUSD } from '@services';
+import { EventType, Profile } from '@types';
+import { eventManager, hapticsManager } from '@globals/injector';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
-    publicKey: string;
     imageSize?: number;
+    profile: Profile;
+    navigation: StackNavigationProp<ParamListBase>;
+    peekDisabled?: boolean;
 }
 
 interface State {
@@ -18,11 +24,13 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
     constructor(props: Props) {
         super(props);
 
-        const imageUri = api.getSingleProfileImage(this.props.publicKey) + '?' + new Date().toISOString();
+        const imageUri = api.getSingleProfileImage(this.props.profile?.PublicKeyBase58Check) + '?' + new Date().toISOString();
         this.state = {
             imageUri: imageUri
         };
 
+        this.toggleProfileCardModal = this.toggleProfileCardModal.bind(this);
+        this.goToProfile = this.goToProfile.bind(this);
         this.init(imageUri);
     }
 
@@ -35,7 +43,7 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        return this.props.publicKey !== nextProps.publicKey ||
+        return this.props.profile !== nextProps.profile ||
             this.state.imageUri !== nextState.imageUri;
     }
 
@@ -49,19 +57,56 @@ export default class ProfileInfoImageComponent extends React.Component<Props, St
         }
     }
 
-    render(): JSX.Element {
-        return <Image
-            style={
-                [
-                    styles.image,
-                    !!this.props.imageSize && {
-                        width: this.props.imageSize,
-                        height: this.props.imageSize
-                    }
-                ]
+    private goToProfile(): void {
+        if (this.props.peekDisabled) {
+            return;
+        }
+        if (this.props.profile &&
+            this.props.profile?.Username !== 'anonymous') {
+            this.props.navigation.push(
+                'UserProfile',
+                {
+                    publicKey: this.props.profile?.PublicKeyBase58Check,
+                    username: this.props.profile?.Username,
+                    key: 'Profile_' + this.props.profile?.PublicKeyBase58Check
+                }
+            );
+        }
+    }
+
+    private toggleProfileCardModal(): void {
+        if (this.props.peekDisabled) {
+            return;
+        }
+        hapticsManager.customizedImpact();
+        eventManager.dispatchEvent(EventType.ToggleProfileInfoModal,
+            {
+                visible: true,
+                profile: this.props.profile,
+                coinPrice: calculateBitCloutInUSD(this.props.profile?.CoinPriceBitCloutNanos),
+                navigation: this.props.navigation
             }
-            source={{ uri: this.state.imageUri }}
-        />;
+        );
+    }
+
+    render(): JSX.Element {
+        return <TouchableOpacity
+            onPress={this.goToProfile}
+            onLongPress={this.toggleProfileCardModal}
+            activeOpacity={1}>
+            <Image
+                style={
+                    [
+                        styles.image,
+                        !!this.props.imageSize && {
+                            width: this.props.imageSize,
+                            height: this.props.imageSize
+                        }
+                    ]
+                }
+                source={{ uri: this.state.imageUri }}
+            />
+        </TouchableOpacity>;
     }
 }
 

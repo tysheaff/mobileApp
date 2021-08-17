@@ -156,9 +156,10 @@ export function MessageTopHoldersInputScreen({ route }: Route) {
                     >
                         <View style={styles.headerContainer}>
                             <ProfileInfoCardComponent
-                                publicKey={profile?.PublicKeyBase58Check}
-                                username={profile?.Username}
-                                verified={profile.IsVerified}
+                                noCoinPrice={true}
+                                peekDisabled={true}
+                                profile={profile}
+                                navigation={navigation}
                             />
                         </View>
 
@@ -201,7 +202,7 @@ const styles = StyleSheet.create(
             marginTop: 175
         },
         headerContainer: {
-            paddingTop: 10
+            padding: 10
         },
         textInput: {
             marginHorizontal: 10,

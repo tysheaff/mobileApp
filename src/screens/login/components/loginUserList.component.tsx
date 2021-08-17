@@ -2,15 +2,18 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Text, Dimensions } from 'react-native';
 import { User } from '@types';
 import { api } from '@services';
-import { calculateAndFormatBitCloutInUsd, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
+import { loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
 import { getAnonymousProfile } from '@services/helpers';
 import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
     standardPublicKey: string;
     nonStandardPublicKey?: string;
     back: () => void;
     selectAccount: (publicKey: string) => void;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -102,11 +105,11 @@ export class LoginUserListComponent extends React.Component<Props, State> {
                                     activeOpacity={0.6} key={user.PublicKeyBase58Check + String(index)}>
                                     <View style={[styles.profileListCard]}>
                                         <ProfileInfoCardComponent
-                                            publicKey={user.ProfileEntryResponse?.PublicKeyBase58Check}
-                                            username={user.ProfileEntryResponse?.Username}
-                                            coinPrice={calculateAndFormatBitCloutInUsd(user.ProfileEntryResponse?.CoinPriceBitCloutNanos)}
-                                            verified={user.ProfileEntryResponse?.IsVerified}
+                                            navigation={this.props.navigation}
+                                            profile={user.ProfileEntryResponse}
                                             ìsDarkMode={true}
+                                            isProfileManager={true}
+                                            peekDisabled={true}
                                         />
                                     </View>
                                 </TouchableOpacity>

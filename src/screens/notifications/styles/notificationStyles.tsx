@@ -20,12 +20,6 @@ export const notificationsStyles = StyleSheet.create(
             alignItems: 'center',
             width: Dimensions.get('window').width - 74
         },
-        profilePic: {
-            width: 40,
-            height: 40,
-            borderRadius: 6,
-            marginRight: 12
-        },
         usernameText: {
             fontWeight: '700'
         },

@@ -23,13 +23,13 @@ import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
+import { ChatScreen } from '@screens/chatScreen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import { EventType } from '@types';
 import { NotificationsScreen } from '@screens/notifications/notifications.screen';
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 
 const HomeStack = createStackNavigator();
-
 export default function HomeStackScreen(): JSX.Element {
 
     const [messagesCount, setMessagesCount] = useState<number>(0);
@@ -133,6 +133,20 @@ export default function HomeStackScreen(): JSX.Element {
                 component={HomeScreen}
             />
 
+            <HomeStack.Screen
+                options={({ route }) => (
+                    {
+                        title: ' ',
+                        headerBackTitle: ' ',
+                        headerLeft: () => (
+                            route.params &&
+                            <ChatHeaderComponent contactWithMessages={(route.params as any).contactWithMessages} />
+                        )
+                    }
+                )}
+                name="Chat"
+                component={ChatScreen}
+            />
             <HomeStack.Screen
                 options={{
                     headerTitle: 'CloutFeed',

@@ -7,14 +7,16 @@ import { FontAwesome } from '@expo/vector-icons';
 import ProfileInfoImageComponent from '@components/profileInfo/profileInfoImage.component';
 import ProfileInfoUsernameComponent from '@components/profileInfo/profileInfoUsername.component';
 import { notificationsStyles } from '../styles/notificationStyles';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
     profile: Profile;
     notification: Notification;
-    goToProfile: (p_userKey: string, p_username: string) => void;
     goToPost: (p_postHashHex: string, p_priorityComment: undefined) => void;
     post: Post;
     postHashHex: string;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 export class PostRecloutNotificationComponent extends React.Component<Props> {
@@ -35,25 +37,18 @@ export class PostRecloutNotificationComponent extends React.Component<Props> {
                 style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
                 activeOpacity={1}
                 onPress={() => this.props.goToPost(this.props.postHashHex, undefined)}>
-                <TouchableOpacity
-                    style={notificationsStyles.centerTextVertically}
-                    onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
-                    activeOpacity={1}>
-                    <ProfileInfoImageComponent publicKey={this.props.profile?.PublicKeyBase58Check} />
-                </TouchableOpacity>
+                <ProfileInfoImageComponent
+                    navigation={this.props.navigation}
+                    profile={this.props.profile}
+                />
                 <View style={[notificationsStyles.iconContainer, { backgroundColor: '#5ba358' }]}>
                     <FontAwesome style={{ marginLeft: 1 }} name="retweet" size={13} color="white" />
                 </View>
                 <View style={notificationsStyles.textContainer}>
-                    <TouchableOpacity
-                        style={notificationsStyles.centerTextVertically}
-                        onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
-                        activeOpacity={1}>
-                        <ProfileInfoUsernameComponent
-                            username={this.props.profile?.Username}
-                            verified={this.props.profile?.IsVerified}
-                        />
-                    </TouchableOpacity>
+                    <ProfileInfoUsernameComponent
+                        navigation={this.props.navigation}
+                        profile={this.props.profile}
+                    />
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> reclouted your post: </Text>
                     <Text style={[notificationsStyles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.RecloutedPostEntryResponse?.Body}</Text>
                 </View>

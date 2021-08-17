@@ -1,28 +1,73 @@
 import React from 'react';
-import { Text, StyleSheet, View, Dimensions } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { themeStyles } from '@styles/globalColors';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { EventType, Profile } from '@types';
+import { eventManager, hapticsManager } from '@globals/injector';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
+import { calculateBitCloutInUSD } from '@services/bitCloutCalculator';
 
 interface Props {
-    username: string;
-    verified: boolean;
+    profile: Profile;
     showCreatorCoinHolding?: boolean;
     isLarge?: boolean;
     isDarkMode?: boolean;
+    navigation: StackNavigationProp<ParamListBase>;
+    peekDisabled?: boolean;
 }
 
 export default class ProfileInfoUsernameComponent extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props);
+
+        this.toggleProfileCardModal = this.toggleProfileCardModal.bind(this);
+        this.goToProfile = this.goToProfile.bind(this);
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        return this.props.username !== nextProps.username;
+        return this.props.profile !== nextProps.profile;
+    }
+
+    private goToProfile(): void {
+        if (this.props.peekDisabled) {
+            return;
+        }
+        if (this.props.profile &&
+            this.props.profile?.Username !== 'anonymous') {
+            this.props.navigation.push(
+                'UserProfile',
+                {
+                    publicKey: this.props.profile?.PublicKeyBase58Check,
+                    username: this.props.profile?.Username,
+                    key: 'Profile_' + this.props.profile?.PublicKeyBase58Check
+                }
+            );
+        }
+    }
+
+    private toggleProfileCardModal(): void {
+        if (this.props.peekDisabled) {
+            return;
+        }
+        hapticsManager.customizedImpact();
+        eventManager.dispatchEvent(EventType.ToggleProfileInfoModal,
+            {
+                visible: true,
+                profile: this.props.profile,
+                coinPrice: calculateBitCloutInUSD(this.props.profile?.CoinPriceBitCloutNanos),
+                navigation: this.props.navigation
+            }
+        );
     }
 
     render(): JSX.Element {
-        return <View style={styles.container}>
+        return <TouchableOpacity
+            onPress={this.goToProfile}
+            onLongPress={this.toggleProfileCardModal}
+            activeOpacity={1}
+            style={styles.container}>
             <Text style={
                 [
                     styles.username,
@@ -32,17 +77,17 @@ export default class ProfileInfoUsernameComponent extends React.Component<Props>
                     this.props.isLarge && styles.chatHeaderUsername,
                 ]
             }>
-                {this.props.username}
+                {this.props.profile?.Username}
             </Text>
             {
-                this.props.verified &&
+                this.props.profile?.IsVerified &&
                 <MaterialIcons name="verified" size={16} style={styles.verified} color="#007ef5" />
             }
             {
                 !!this.props.showCreatorCoinHolding &&
                 <AntDesign style={styles.starIcon} name={'star'} size={15} color={'#ffdb58'} />
             }
-        </View>;
+        </TouchableOpacity>;
     }
 }
 

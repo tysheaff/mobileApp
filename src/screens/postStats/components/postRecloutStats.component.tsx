@@ -57,7 +57,7 @@ export class PostRecloutStatsComponent extends React.Component<Props, State> {
     setFollowedByUserMap(p_user: User) {
         const followedByUserMap: any = {};
 
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser ;
+        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
 
         if (followedByUserPublicKeys?.length > 0) {
             for (let i = 0; i < followedByUserPublicKeys.length; i++) {
@@ -132,9 +132,6 @@ const styles = StyleSheet.create(
     {
         container: {
             flex: 1,
-        },
-        activityIndicator: {
-            marginTop: 100
         },
         emptyText: {
             fontSize: 16,

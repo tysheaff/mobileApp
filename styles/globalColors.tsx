@@ -20,7 +20,8 @@ export let themeStyles = StyleSheet.create(
         linkColor: { color: settingsGlobals.darkMode ? '#d1eeff' : '#3f729b' },
         modalBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? '#242424' : '#f7f7f7' },
         disabledButton: { backgroundColor: '#2b2b2b' },
-        likeHeartBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? 'white' : 'black' }
+        peekOptionsContainer: { backgroundColor: settingsGlobals.darkMode ? '#323232' : '#F0F0F0' },
+        peekOptionsBorder: { borderColor: settingsGlobals.darkMode ? '#4c4c4c' : '#cccccc' }
     }
 );
 
@@ -44,7 +45,8 @@ export function updateThemeStyles() {
             linkColor: { color: settingsGlobals.darkMode ? '#d1eeff' : '#3f729b' },
             modalBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? '#242424' : '#f7f7f7' },
             disabledButton: { backgroundColor: '#2b2b2b' },
-            likeHeartBackgroundColor: { backgroundColor: settingsGlobals.darkMode ? 'white' : 'black' }
+            peekOptionsContainer: { backgroundColor: settingsGlobals.darkMode ? '#323232' : '#F0F0F0' },
+            peekOptionsBorder: { borderColor: settingsGlobals.darkMode ? '#4c4c4c' : '#cccccc' }
 
         }
     );

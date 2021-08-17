@@ -7,18 +7,18 @@ import { StyleSheet, TouchableOpacity, View, Text, Dimensions, ActivityIndicator
 import Modal from 'react-native-modal';
 import { Profile } from '@types';
 import { globals } from '@globals/globals';
-import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { AntDesign } from '@expo/vector-icons';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { constants } from '@globals/constants';
 import { eventManager } from '@globals/injector';
 import { EventType } from '@types';
 import { FlatList } from 'react-native-gesture-handler';
 import ProfileInfoCardComponent from './profileInfo/profileInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<ParamListBase>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -83,6 +83,9 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
     }
 
     private async selectAccount(publicKey: string) {
+        if (publicKey === globals.user.publicKey) {
+            return;
+        }
         this.close(false);
         await SecureStore.setItemAsync(constants.localStorage_publicKey, publicKey);
         await SecureStore.setItemAsync(constants.localStorage_readonly, 'false');
@@ -115,11 +118,10 @@ export class ProfileManagerComponent extends React.Component<Props, State> {
                 key={item.PublicKeyBase58Check + String(index)}
             >
                 <ProfileInfoCardComponent
-                    publicKey={item?.PublicKeyBase58Check}
-                    username={item?.Username}
-                    coinPrice={calculateAndFormatBitCloutInUsd(item.CoinPriceBitCloutNanos)}
-                    verified={item?.IsVerified}
+                    profile={item}
+                    navigation={this.props.navigation}
                     isProfileManager={true}
+                    peekDisabled={true}
                 />
                 {
                     item.PublicKeyBase58Check === globals.user.publicKey &&

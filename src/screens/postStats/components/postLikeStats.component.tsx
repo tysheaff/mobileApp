@@ -51,15 +51,13 @@ export class PostLikeStatsComponent extends React.Component<Props, State> {
             const user = await cache.user.getData();
             this.setFollowedByUserMap(user);
             await this.loadLikers(false);
-        } catch {
-
-        }
+        } catch { }
     }
 
     setFollowedByUserMap(p_user: User) {
         const followedByUserMap: any = {};
 
-        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser ;
+        const followedByUserPublicKeys = p_user.PublicKeysBase58CheckFollowedByUser;
 
         if (followedByUserPublicKeys?.length > 0) {
             for (let i = 0; i < followedByUserPublicKeys.length; i++) {
@@ -101,8 +99,7 @@ export class PostLikeStatsComponent extends React.Component<Props, State> {
                 this.setState({ profiles: newProfiles, isLoading: false, isLoadingMore: false });
             }
 
-        } catch {
-        }
+        } catch { }
     }
 
     render() {

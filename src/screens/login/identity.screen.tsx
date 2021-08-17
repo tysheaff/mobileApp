@@ -1,8 +1,8 @@
 import React from 'react';
 import { authentication } from '@services/authorization/authentication';
 import { crypto } from '@services/authorization/crypto';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { LoginUserListComponent } from './components/loginUserList.component';
 import { AuthenticatedUser, AuthenticatedUserEncryptionKey, AuthenticatedUserTypes } from '@types';
 import { constants } from '@globals/constants';
@@ -11,6 +11,7 @@ import * as SecureStore from 'expo-secure-store';
 import { themeStyles } from '@styles/globalColors';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as ScreenCapture from 'expo-screen-capture';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type RouteParams = {
     Identity: {
@@ -19,7 +20,7 @@ type RouteParams = {
 }
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
     route: RouteProp<RouteParams, 'Identity'>;
 }
 
@@ -118,6 +119,7 @@ export class IdentityScreen extends React.Component<Props, State> {
     render() {
         return this.state.accountLoaded ?
             <LoginUserListComponent
+                navigation={this.props.navigation}
                 standardPublicKey={this.state.standardPublicKey}
                 nonStandardPublicKey={this.state.nonStandardPublicKey}
                 back={this.back}

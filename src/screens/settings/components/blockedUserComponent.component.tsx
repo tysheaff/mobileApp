@@ -66,9 +66,9 @@ export default class BlockedUserComponent extends React.Component<Props, State> 
         const publicKey = this.props.profile?.PublicKeyBase58Check;
         return <TouchableOpacity style={[styles.container, themeStyles.borderColor]} onPress={() => this.goToProfile(this.props.profile)} activeOpacity={1}>
             <ProfileInfoCardComponent
-                publicKey={publicKey}
-                username={this.props.profile?.Username}
-                verified={this.props.profile?.IsVerified}
+                navigation={this.props.navigation}
+                profile={this.props.profile}
+                noCoinPrice={true}
             />
             <CloutFeedButton
                 disabled={this.state.isWorking}

@@ -60,10 +60,8 @@ export class DiamondSenderComponent extends React.Component<Props, State> {
 
             <View style={[styles.diamondSenderCard, themeStyles.containerColorMain, themeStyles.borderColor]}>
                 <ProfileInfoCardComponent
-                    publicKey={this.props.diamondSender?.SenderPublicKeyBase58Check}
-                    username={this.props.diamondSender.ProfileEntryResponse?.Username}
-                    coinPrice={this.state.coinPrice}
-                    verified={this.props.diamondSender.ProfileEntryResponse?.IsVerified}
+                    navigation={this.props.navigation}
+                    profile={this.props.diamondSender.ProfileEntryResponse}
                 />
                 <View style={styles.diamondsContainer}>
                     {

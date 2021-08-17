@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { ContactWithMessages } from '../../../types';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { ContactWithMessages } from '@types';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { globals } from '@globals';
 import { api, calculateDurationUntilNow, getMessageText } from '@services';
 import { themeStyles } from '@styles';
 import { signing } from '@services/authorization/signing';
 import MessageInfoCardComponent from '@components/profileInfo/messageInfoCard.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 export function ContactMessagesListCardComponent(
     { contactWithMessages }: { contactWithMessages: ContactWithMessages }
@@ -16,7 +16,7 @@ export function ContactMessagesListCardComponent(
     const [duration, setDuration] = useState<string>('');
     const [showCreatorCoinHolding, setShowCreatorCoinHolding] = useState<boolean>(false);
     const [unreadMessages, setUnreadMessages] = useState<boolean>(false);
-    const navigation = useNavigation();
+    const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
     const isMounted = useRef<boolean>(true);
 
     useEffect(
@@ -78,11 +78,10 @@ export function ContactMessagesListCardComponent(
     return <TouchableOpacity style={[styles.touchableContainer, themeStyles.containerColorMain, themeStyles.borderColor]} activeOpacity={0.8} onPress={goToChat}>
         <View style={styles.container}>
             <MessageInfoCardComponent
-                publicKey={contactWithMessages.ProfileEntryResponse?.PublicKeyBase58Check}
-                username={contactWithMessages.ProfileEntryResponse?.Username}
+                navigation={navigation}
+                profile={contactWithMessages.ProfileEntryResponse}
                 lastMessage={lastMessageText}
                 duration={duration}
-                verified={contactWithMessages.ProfileEntryResponse?.IsVerified}
                 showCreatorCoinHolding={showCreatorCoinHolding}
                 isLarge={false}
             />

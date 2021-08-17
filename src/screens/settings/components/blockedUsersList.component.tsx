@@ -4,14 +4,15 @@ import BlockedUserComponent from './blockedUserComponent.component';
 import { Profile } from '@types';
 import { cache } from '@services/dataCaching';
 import { api, snackbar } from '@services';
-import { NavigationProp } from '@react-navigation/native';
+import { ParamListBase } from '@react-navigation/native';
 import { signing } from '@services/authorization/signing';
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<any>;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 interface State {
@@ -108,7 +109,7 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
     async unblockUser(publicKey: string) {
         const jwt = await signing.signJWT();
         try {
-            await api.blockUser(globals.user.publicKey, publicKey, jwt , true);
+            await api.blockUser(globals.user.publicKey, publicKey, jwt, true);
         }
         catch {
             Alert.alert('Error', 'Something went wrong! Please try again.');
@@ -131,7 +132,8 @@ export default class BlockedUsersListComponent extends React.Component<Props, St
             <BlockedUserComponent
                 unblockUser={this.unblockUser}
                 navigation={this.props.navigation}
-                profile={p_item} />;
+                profile={p_item}
+            />;
 
         const renderFooter = this.state.isLoadingMore && !this.state.isLoading
             ? <ActivityIndicator color={themeStyles.fontColorMain.color} />

@@ -1,6 +1,6 @@
 import { NavigationProp } from '@react-navigation/core';
 import { ActionSheetConfig } from '@services/actionSheet';
-import { Post } from './models';
+import { Post, Profile } from './models';
 
 export enum EventType {
     IncreaseFollowers = 0,
@@ -13,8 +13,9 @@ export enum EventType {
     UnsavePost = 7,
     ToggleCloutCastFeed = 8,
     RemovePendingBadges = 9,
-    RefreshNotifications = 10,
-    RefreshMessages = 11
+    ToggleProfileInfoModal = 10,
+    RefreshNotifications = 11,
+    RefreshMessages = 12
 }
 
 export interface ChangeFollowersEvent {
@@ -50,4 +51,11 @@ export interface UnsavePostEvent {
 
 export interface RemovePendingBadges {
     badgesToRemove: string[];
+}
+
+export interface ToggleProfileInfoModalEvent {
+    visible: boolean;
+    profile: Profile;
+    coinPrice: number;
+    navigation: NavigationProp<any>;
 }

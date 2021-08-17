@@ -12,36 +12,18 @@ export function ChatHeaderComponent(
 ): JSX.Element {
     const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
 
-    function goToProfile(): void {
-        if (
-            contactWithMessages.ProfileEntryResponse &&
-            contactWithMessages.ProfileEntryResponse.Username !== 'anonymous') {
-            navigation.push(
-                'UserProfile',
-                {
-                    publicKey: contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check,
-                    username: contactWithMessages.ProfileEntryResponse.Username,
-                    Key: 'Profile_' + contactWithMessages.ProfileEntryResponse.PublicKeyBase58Check
-                }
-            );
-        }
-    }
-
     return <View style={[styles.container, themeStyles.containerColorMain, themeStyles.borderColor]}>
 
         <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
             <Ionicons name="chevron-back" size={32} color="#007ef5" />
         </TouchableOpacity>
 
-        <TouchableOpacity activeOpacity={1} onPress={goToProfile}>
-            <MessageInfoCardComponent
-                publicKey={contactWithMessages.ProfileEntryResponse?.PublicKeyBase58Check}
-                username={contactWithMessages.ProfileEntryResponse?.Username}
-                verified={contactWithMessages.ProfileEntryResponse?.IsVerified}
-                isLarge
-                imageSize={30}
-            />
-        </TouchableOpacity>
+        <MessageInfoCardComponent
+            navigation={navigation}
+            profile={contactWithMessages.ProfileEntryResponse}
+            isLarge
+            imageSize={30}
+        />
     </View>;
 }
 

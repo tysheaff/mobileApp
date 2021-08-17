@@ -8,6 +8,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import ProfileInfoUsernameComponent from '@components/profileInfo/profileInfoUsername.component';
 import ProfileInfoImageComponent from '@components/profileInfo/profileInfoImage.component';
 import { notificationsStyles } from '../styles/notificationStyles';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 
 interface Props {
     profile: Profile;
@@ -15,6 +17,7 @@ interface Props {
     goToProfile: (p_userKey: string, p_username: string) => void;
     goToPost: (postHashCode: string) => void;
     post: Post;
+    navigation: StackNavigationProp<ParamListBase>;
 }
 
 export class CreatorCoinTransferNotificationComponent extends React.Component<Props> {
@@ -38,13 +41,10 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
                 style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
                 onPress={() => diamondLevel === 0 ? this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username) : this.props.goToPost(postHashHex)}
                 activeOpacity={1}>
-                <TouchableOpacity
-                    style={notificationsStyles.centerTextVertically}
-                    onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
-                    activeOpacity={1}>
-                    <ProfileInfoImageComponent publicKey={this.props.profile?.PublicKeyBase58Check} />
-                </TouchableOpacity>
-
+                <ProfileInfoImageComponent
+                    navigation={this.props.navigation}
+                    profile={this.props.profile}
+                />
                 {
                     diamondLevel === 0 ?
                         <View style={[notificationsStyles.iconContainer, { backgroundColor: '#00803c' }]}>
@@ -57,16 +57,10 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
                 }
 
                 <View style={notificationsStyles.textContainer}>
-                    <TouchableOpacity
-                        style={notificationsStyles.centerTextVertically}
-                        onPress={() => this.props.goToProfile(this.props.profile?.PublicKeyBase58Check, this.props.profile?.Username)}
-                        activeOpacity={1}>
-                        <ProfileInfoUsernameComponent
-                            username={this.props.profile?.Username}
-                            verified={this.props.profile?.IsVerified}
-                        />
-                    </TouchableOpacity>
-
+                    <ProfileInfoUsernameComponent
+                        navigation={this.props.navigation}
+                        profile={this.props.profile}
+                    />
                     {
                         diamondLevel > 0 ?
                             <>
