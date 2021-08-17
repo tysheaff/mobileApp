@@ -177,7 +177,7 @@ export class PostActionsRow extends React.Component<Props, State> {
             };
 
             const headerDescription = options.length > 1 ?
-                'Diamonds are a way to reward great content by sending an amount of your creator coin' :
+                'Diamonds are a way to reward great content by sending an amount of $CLOUT as a tip' :
                 'You have sent the maximum possible amount of diamonds to this post';
             eventManager.dispatchEvent(
                 EventType.ToggleActionSheet,
