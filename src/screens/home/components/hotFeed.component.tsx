@@ -36,6 +36,8 @@ export class HotFeedComponent extends React.Component<Props, State> {
 
     private _page = 0;
 
+    private _postHashHexes: string[] = [];
+
     private _noMoreData = false;
 
     private _isMounted = false;
@@ -86,6 +88,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
 
         this._currentScrollPosition = 0;
         this._page = 0;
+        this._postHashHexes = [];
         this._noMoreData = false;
 
         await loadTickersAndExchangeRate();
@@ -93,7 +96,8 @@ export class HotFeedComponent extends React.Component<Props, State> {
     }
 
     private async loadPosts(p_loadMore: boolean) {
-        if (this.state.isLoadingMore || this._noMoreData) {
+
+        if (this.state.isLoadingMore || (this._noMoreData && this._postHashHexes.length === 0)) {
             return;
         }
 
@@ -102,30 +106,25 @@ export class HotFeedComponent extends React.Component<Props, State> {
         }
 
         try {
-            const filterKey = globals.user.publicKey + constants.localStorage_hotFeedFilter;
-            const filterString = await SecureStore.getItemAsync(filterKey);
-            const filter = filterString ? filterString as HotFeedFilter : HotFeedFilter.Today;
-
-            const response = await searchCloutApi.getTrendingPosts(filter, this._page);
-            const maxPage = response.pages;
-            const postHashHexes = response.posts;
-
-            this._page++;
-            this._noMoreData = this._page >= maxPage;
-
-            let allPosts: Post[] = [];
-            const newPosts = await this.fetchPosts(postHashHexes);
-
-            if (p_loadMore) {
-                allPosts = this.state.posts?.concat(newPosts);
+            if (this._postHashHexes.length > 0) {
+                await this.fetchPosts(p_loadMore);
             } else {
-                allPosts = newPosts;
-            }
+                const filterKey = globals.user.publicKey + constants.localStorage_hotFeedFilter;
+                const filterString = await SecureStore.getItemAsync(filterKey);
+                const filter = filterString ? filterString as HotFeedFilter : HotFeedFilter.Today;
 
-            allPosts = await this.processPosts(allPosts);
+                if (this._isMounted) {
+                    this.setState({ filter });
+                }
 
-            if (this._isMounted) {
-                this.setState({ posts: allPosts });
+                const response = await searchCloutApi.getTrendingPosts(filter, this._page);
+                const maxPage = response.pages;
+                this._postHashHexes = response.posts;
+
+                this._page++;
+                this._noMoreData = this._page >= maxPage;
+
+                await this.fetchPosts(p_loadMore);
             }
 
         } catch (error) {
@@ -137,7 +136,12 @@ export class HotFeedComponent extends React.Component<Props, State> {
         }
     }
 
-    async fetchPosts(postHashHexes: string[]): Promise<Post[]> {
+    async fetchPosts(p_loadMore: boolean): Promise<void> {
+        let allPosts: Post[] = [];
+        const batchSize = 5;
+        const postHashHexes = this._postHashHexes.slice(0, batchSize);
+        this._postHashHexes = this._postHashHexes.slice(batchSize);
+
         const promises: Promise<Post | undefined>[] = [];
 
         for (const postHashHex of postHashHexes) {
@@ -156,7 +160,17 @@ export class HotFeedComponent extends React.Component<Props, State> {
         const posts = await Promise.all(promises);
         const filteredPosts: Post[] = posts.filter(post => post != null) as Post[];
 
-        return filteredPosts;
+        const processedPosts = await this.processPosts(filteredPosts);
+
+        if (p_loadMore) {
+            allPosts = this.state.posts.concat(processedPosts);
+        } else {
+            allPosts = processedPosts;
+        }
+
+        if (this._isMounted) {
+            this.setState({ posts: allPosts });
+        }
     }
 
     private async processPosts(p_posts: Post[]): Promise<Post[]> {
