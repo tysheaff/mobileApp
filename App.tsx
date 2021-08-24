@@ -53,7 +53,7 @@ export default function App(): JSX.Element {
   const messagesInterval = useRef(0);
   const appState = useRef(AppState.currentState);
   const isMounted = useRef<boolean>(true);
-  const intervalTiming = 30000;
+  const intervalTiming = 60000;
 
   function handleAppStateChange(nextAppState: any) {
     if (globals.readonly) {
@@ -118,22 +118,23 @@ export default function App(): JSX.Element {
   );
 
   function notificationListener() {
-    api.getNotifications(globals.user.publicKey, -1, 5).then(
+    api.getNotifications(globals.user.publicKey, -1, 1).then(
       (response: any) => {
-        const newSeenNotificationIndex: number = response.Notifications[0].Index;
-        SecureStore.getItemAsync('lastNotificationIndex').then(
-          (prevStoredIndex: string | null) => {
-            if (newSeenNotificationIndex > parseInt(prevStoredIndex as string)) {
-              eventManager.dispatchEvent(
-                EventType.RefreshNotifications,
-                newSeenNotificationIndex
-              );
-            } else {
-              eventManager.dispatchEvent(EventType.RefreshNotifications, -1);
+        if (response.Notifications?.length > 0) {
+          const newSeenNotificationIndex: number = response.Notifications[0].Index;
+          SecureStore.getItemAsync('lastNotificationIndex').then(
+            (prevStoredIndex: string | null) => {
+              if (newSeenNotificationIndex > parseInt(prevStoredIndex as string)) {
+                eventManager.dispatchEvent(
+                  EventType.RefreshNotifications,
+                  newSeenNotificationIndex
+                );
+              } else {
+                eventManager.dispatchEvent(EventType.RefreshNotifications, -1);
+              }
             }
-          }
-        )
-          .catch(() => undefined);
+          ).catch(() => undefined);
+        }
       }
     ).catch(() => undefined);
   }

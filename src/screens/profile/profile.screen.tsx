@@ -5,7 +5,7 @@ import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.compon
 import { ProfileNotCompletedComponent } from '@components/profileNotCompleted.component';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { globals, navigatorGlobals } from '@globals';
-import { api, calculateBitCloutInUSD, loadTickersAndExchangeRate } from '@services';
+import { api, cache, calculateBitCloutInUSD } from '@services';
 import { CreatorCoinHODLer, DiamondSender, Post, Profile } from '@types';
 import { ProfileStats } from './profileStats.component';
 import { themeStyles } from '@styles/globalColors';
@@ -159,7 +159,7 @@ export function ProfileScreen({ route }: Route): JSX.Element {
 
         Promise.all(
             [
-                loadTickersAndExchangeRate(),
+                cache.exchangeRate.getData(),
                 loadSingleProfile()
             ]
         ).then(

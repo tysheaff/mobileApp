@@ -1,16 +1,5 @@
 import { globals } from '../globals/globals';
-import { api } from './api/api';
 import { formatNumber } from './helpers';
-
-export async function loadTickersAndExchangeRate() {
-    await api.getExchangeRate()
-        .then(
-            p_response => {
-                globals.exchangeRate = p_response;
-            }
-        ).catch(p_error => globals.defaultHandleError(p_error));
-    return true;
-}
 
 export function calculateBitCloutInUSD(p_nanos: number) {
     if (globals.exchangeRate) {

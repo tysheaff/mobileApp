@@ -1,11 +1,11 @@
 import React from 'react';
 import { FlatList, View, RefreshControl, ActivityIndicator } from 'react-native';
 import { PostComponent } from '@components/post/post.component';
-import { Post, User } from '@types';
+import { Post } from '@types';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { themeStyles } from '@styles/globalColors';
 import { globals } from '@globals/globals';
-import { api, cloutFeedApi, loadTickersAndExchangeRate, cache } from '@services';
+import { api, cloutFeedApi, cache } from '@services';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -21,8 +21,8 @@ export enum HomeScreenTab {
 type RouteParams = {
     Home: {
         newPost: Post;
-        deletedPost: Post;
-        blockedUser: User;
+        deletedPost: string;
+        blockedUser: string;
     }
 };
 
@@ -30,7 +30,7 @@ interface Props {
     navigation: StackNavigationProp<ParamListBase>;
     route: RouteProp<RouteParams, 'Home'>;
     selectedTab: HomeScreenTab;
-    api: (publicKey: string, count: number, lastPostHashHex: string) => Promise<any>;
+    api: (publicKey: string, count: number, lastPostHashHex: string | undefined) => Promise<any>;
 }
 
 interface State {
@@ -101,7 +101,7 @@ export class PostListComponent extends React.Component<Props, State> {
 
         if (this.props.route.params?.deletedPost) {
             const posts = this.state.posts?.filter(
-                p_post => p_post.PostHashHex != this.props.route.params.deletedPost
+                p_post => p_post.PostHashHex !== this.props.route.params.deletedPost
             );
             if (this._isMounted && posts) {
                 this.setState({ posts });
@@ -110,7 +110,7 @@ export class PostListComponent extends React.Component<Props, State> {
         }
 
         if (this.props.route.params?.blockedUser) {
-            const posts = this.state.posts?.filter(p_post => p_post.ProfileEntryResponse?.PublicKeyBase58Check != this.props.route.params.blockedUser);
+            const posts = this.state.posts?.filter(p_post => p_post.ProfileEntryResponse?.PublicKeyBase58Check !== this.props.route.params.blockedUser);
             if (this._isMounted && posts) {
                 this.setState({ posts });
             }
@@ -127,7 +127,7 @@ export class PostListComponent extends React.Component<Props, State> {
 
         this._currentScrollPosition = 0;
         this._noMoreData = false;
-        await loadTickersAndExchangeRate();
+        await cache.exchangeRate.getData();
         await this.loadPosts(false);
     }
 

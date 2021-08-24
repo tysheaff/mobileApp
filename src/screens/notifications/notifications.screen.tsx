@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, Text, View, StyleSheet, ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
 import { constants, eventManager, globals } from '@globals';
 import { EventType, Notification, NotificationType, Post, Profile } from '@types';
-import { api, getAnonymousProfile, loadTickersAndExchangeRate } from '@services';
+import { api, cache, getAnonymousProfile } from '@services';
 import { themeStyles } from '@styles';
 import { FollowNotificationComponent } from './components/followNotification.component';
 import { BasicTransferNotificationComponent } from './components/basicTransferNotification.component';
@@ -142,7 +142,7 @@ export class NotificationsScreen extends React.Component<Props, State> {
                             () => eventManager.dispatchEvent(EventType.RefreshNotifications, -1)
                         )
                         .catch(() => undefined);
-                    loadTickersAndExchangeRate().then(
+                    cache.exchangeRate.getData().then(
                         () => {
                             if (this._isMounted) {
                                 this.setState(

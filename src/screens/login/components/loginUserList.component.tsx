@@ -1,8 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View, Text, Dimensions } from 'react-native';
 import { User } from '@types';
-import { api } from '@services';
-import { loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
+import { api, cache } from '@services';
 import { getAnonymousProfile } from '@services/helpers';
 import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -52,7 +51,7 @@ export class LoginUserListComponent extends React.Component<Props, State> {
         }
 
         try {
-            await loadTickersAndExchangeRate();
+            await cache.exchangeRate.getData();
             const response = await api.getProfile(publicKeys);
 
             const users = response.UserList as User[];

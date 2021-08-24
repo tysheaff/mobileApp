@@ -5,7 +5,7 @@ import { Post } from '@types';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { themeStyles } from '@styles/globalColors';
 import { globals } from '@globals/globals';
-import { api, loadTickersAndExchangeRate, cache, searchCloutApi } from '@services';
+import { api, cache, searchCloutApi } from '@services';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { Ionicons } from '@expo/vector-icons';
@@ -91,7 +91,7 @@ export class HotFeedComponent extends React.Component<Props, State> {
         this._postHashHexes = [];
         this._noMoreData = false;
 
-        await loadTickersAndExchangeRate();
+        await cache.exchangeRate.getData();
         await this.loadPosts(false);
     }
 

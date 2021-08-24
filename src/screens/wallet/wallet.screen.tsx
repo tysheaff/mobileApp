@@ -2,14 +2,14 @@ import React from 'react';
 import { View, StyleSheet, RefreshControl, Text, SectionList } from 'react-native';
 import { globals } from '@globals/globals';
 import { themeStyles } from '@styles/globalColors';
-import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD, loadTickersAndExchangeRate } from '@services/bitCloutCalculator';
+import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD } from '@services/bitCloutCalculator';
 import { CoinEntry, CreatorCoinHODLer, User } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.component';
 import { formatNumber } from '@services/helpers';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
-import { api } from '@services';
+import { api, cache } from '@services';
 import { RouteProp } from '@react-navigation/native';
 
 enum WalletTab {
@@ -118,7 +118,7 @@ export class WalletScreen extends React.Component<Props, State> {
             : globals.user.publicKey;
         Promise.all(
             [
-                loadTickersAndExchangeRate(),
+                cache.exchangeRate.getData(),
                 api.getProfile([publicKey])
             ]
         ).then(
