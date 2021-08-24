@@ -393,18 +393,19 @@ export default class ProfileInfoModalComponent extends React.Component<Props, St
                 onBackdropPress={this.close}
                 onBackButtonPress={this.close}
                 isVisible={this.state.isVisible}
-                style={{ margin: 0 }}
+                style={{ marginVertical: 0, marginHorizontal: 15, }}
             >
-                <View style={{ marginHorizontal: 15, }}>
-                    <TouchableOpacity
-                        onPress={this.goToProfile}
-                        activeOpacity={1}>
-                        <ProfileCard
-                            navigation={this.props.navigation}
-                            profile={this.props.profile}
-                            coinPrice={this.props.coinPrice}
-                        />
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={this.goToProfile}
+                    activeOpacity={1}>
+                    <ProfileCard
+                        navigation={this.props.navigation}
+                        profile={this.props.profile}
+                        coinPrice={this.props.coinPrice}
+                    />
+                </TouchableOpacity>
+                {
+                    this.props.profile?.PublicKeyBase58Check !== globals.user.publicKey && !globals.readonly &&
                     <View style={[styles.buttonsContainer, themeStyles.peekOptionsContainer]}>
                         {
                             options.map(
@@ -437,7 +438,7 @@ export default class ProfileInfoModalComponent extends React.Component<Props, St
                             )
                         }
                     </View>
-                </View>
+                }
             </Modal >
         </BlurView>;
     }
@@ -447,9 +448,8 @@ const styles = StyleSheet.create(
     {
         buttonsContainer: {
             marginTop: 20,
-            alignSelf: 'flex-start',
-            width: Dimensions.get('screen').width * 0.65,
             borderRadius: 10,
+            width: Dimensions.get('screen').width * 0.65,
         },
         optionContainer: {
             flexDirection: 'row',
