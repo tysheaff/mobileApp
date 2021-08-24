@@ -18,6 +18,7 @@ import { filterNotifications } from './notificaitonFilterHelper';
 import * as SecureStore from 'expo-secure-store';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { NftNotificationComponent } from './components/nftNotification.component';
 
 interface Props {
     standardPublicKey: string;
@@ -372,6 +373,16 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         goToProfile={this.goToProfile}
                         goToPost={this.goToPost}
                     />;
+                case NotificationType.NftBid: {
+                    const postHashHex = notification.Metadata.NFTBidTxindexMetadata?.NFTPostHashHex as string;
+                    return <NftNotificationComponent
+                        postHashHex={postHashHex}
+                        navigation={this.props.navigation}
+                        notification={notification}
+                        goToPost={this.goToPost}
+                        profile={profile}
+                    />;
+                }
                 case NotificationType.SubmitPost:
                     return this.renderSubmitPostNotification(notification);
                 default:

@@ -75,7 +75,9 @@ export function filterNotifications(p_notificaitons: Notification[], p_filter: N
 
         if (!add && p_filter.purchase) {
             add = notification.Metadata.TxnType === NotificationType.BasicTransfer ||
-                notification.Metadata.TxnType === NotificationType.CreatorCoin;
+                notification.Metadata.TxnType === NotificationType.CreatorCoin ||
+                notification.Metadata.TxnType === NotificationType.NftBid;
+
         }
 
         if (notification.Metadata.TxnType === NotificationType.CreatorCoinTransfer) {

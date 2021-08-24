@@ -80,7 +80,8 @@ export enum NotificationType {
     CreatorCoin = 'CREATOR_COIN',
     Follow = 'FOLLOW',
     Like = 'LIKE',
-    CreatorCoinTransfer = 'CREATOR_COIN_TRANSFER'
+    CreatorCoinTransfer = 'CREATOR_COIN_TRANSFER',
+    NftBid = 'NFT_BID'
 }
 
 export interface NotificationLikeMetaData {
@@ -111,6 +112,12 @@ export interface NotificationCreatorCoinTransferMetaData {
     PostHashHex: string;
 }
 
+export interface NotificationNftBidMetaData {
+    BidAmountNanos: number;
+    NFTPostHashHex: string;
+    SerialNumber: number;
+}
+
 export interface NotificationTransactionOutputResponse {
     AmountNanos: number;
     PublicKeyBase58Check: string;
@@ -124,6 +131,7 @@ export interface NotificationMetaData {
     FollowTxindexMetadata?: NotificationFollowMetaData;
     LikeTxindexMetadata?: NotificationLikeMetaData;
     CreatorCoinTransferTxindexMetadata?: NotificationCreatorCoinTransferMetaData;
+    NFTBidTxindexMetadata?: NotificationNftBidMetaData
 }
 
 export interface Notification {
