@@ -58,15 +58,15 @@ export class NftNotificationComponent extends React.Component<Props> {
                         profile={this.props.profile}
                     />
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> {
-                        isBidCancelled ? ' cancelled their bid on ' : ' bid for '}</Text>
+                        isBidCancelled ? 'cancelled their bid on' : 'bid'}</Text>
                     {
                         !isBidCancelled &&
                         <>
-                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT </Text>
+                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT</Text>
                             <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) </Text>
                         </>
                     }
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>serial number: </Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>for serial number</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {
                         this.props.notification.Metadata.NFTBidTxindexMetadata?.SerialNumber
                     }
