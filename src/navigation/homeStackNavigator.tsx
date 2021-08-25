@@ -28,6 +28,8 @@ import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import { EventType } from '@types';
 import { NotificationsScreen } from '@screens/notifications/notifications.screen';
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
+import BidEditionsScreen from '@screens/nft/bidEditions.screen';
+import NFTTabNavigator from '@screens/nft/nftTabNavigator';
 
 const HomeStack = createStackNavigator();
 export default function HomeStackScreen(): JSX.Element {
@@ -319,6 +321,36 @@ export default function HomeStackScreen(): JSX.Element {
                 }
                 name="Notifications"
                 component={NotificationsScreen}
+            />
+            <HomeStack.Screen
+                options={({ route }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: route.params?.username ? route.params?.username : 'NFT',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="NFTTabNavigator"
+                component={NFTTabNavigator}
+            />
+            <HomeStack.Screen
+                options={({ route }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Bid Editions',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="BidEditions"
+                component={BidEditionsScreen}
             />
         </HomeStack.Navigator>
     );

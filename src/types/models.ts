@@ -72,6 +72,10 @@ export interface Post {
     PosterPublicKeyBase58Check: string;
     StakeMultipleBasisPoints: number;
     QuoteRecloutCount: number;
+    IsNFT: boolean;
+    SerialNumber: number;
+    NumNFTCopies: number;
+    NumNFTCopiesForSale: number;
 }
 
 export enum NotificationType {
@@ -189,4 +193,14 @@ export interface CreatorCoinTransaction {
 export interface CloutTag {
     clouttag: string;
     count: number;
+}
+
+export interface BidEdition {
+    HighestBidAmountNanos: number;
+    IsForSale: boolean;
+    LastAcceptedBidAmountNanos: number;
+    LowestBidAmountNanos: number;
+    MinBidAmountNanos: number;
+    OwnerPublicKeyBase58Check: string;
+    SerialNumber: number;
 }

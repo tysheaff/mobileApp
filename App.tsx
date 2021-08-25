@@ -2,7 +2,7 @@ import { NavigationContainer, NavigationProp, ParamListBase } from '@react-navig
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, ToggleProfileInfoModalEvent, Profile, } from './src/types';
+import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, ToggleBidFormEvent, BidEdition, ToggleProfileInfoModalEvent, Profile, } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
 import { themeStyles, updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';
@@ -31,6 +31,8 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Platform, StatusBar, View } from 'react-native';
 import { AppState } from 'react-native';
 import { messagesService } from './src/services/messagesServices';
+import PlaceBidFormComponent from '@screens/nft/components/placeBidForm.component';
+import { Post } from '@types';
 
 enableScreens();
 
@@ -43,8 +45,11 @@ export default function App(): JSX.Element {
   const [areTermsAccepted, setTermsAccepted] = useState(false);
   const [showProfileManager, setShowProfileManager] = useState(false);
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showBiddingModal, setShowPlaceBiddingModal] = useState(false);
   const [actionSheetConfig, setActionSheetConfig] = useState<ActionSheetConfig>();
   const [navigation, setNavigation] = useState<NavigationProp<ParamListBase>>();
+  const [bidEdition, setBidEdition] = useState<BidEdition>();
+  const [bidPost, setBidPost] = useState<Post | any>();
   const [showProfileInfo, setShowProfileInfo] = useState(false);
   const [profile, setProfile] = useState<Profile>();
   const [coinPrice, setCoinPrice] = useState<number>();
@@ -91,6 +96,16 @@ export default function App(): JSX.Element {
           }
         }
       );
+      const unsubscribeBiddingForm = eventManager.addEventListener(
+        EventType.ToggleBidForm,
+        (event: ToggleBidFormEvent) => {
+          if (isMounted) {
+            setShowPlaceBiddingModal(event.visible);
+            setBidEdition(event.bidEdition);
+            setBidPost(event.post);
+          }
+        }
+      );
       const unsubscribeProfileInfo = eventManager.addEventListener(
         EventType.ToggleProfileInfoModal,
         (event: ToggleProfileInfoModalEvent) => {
@@ -108,6 +123,7 @@ export default function App(): JSX.Element {
       return () => {
         unsubscribeProfileManager();
         unsubscribeActionSheet();
+        unsubscribeBiddingForm();
         unsubscribeProfileInfo();
         window.clearInterval(notificationsInterval.current);
         window.clearInterval(messagesInterval.current);
@@ -373,6 +389,7 @@ export default function App(): JSX.Element {
               coinPrice={coinPrice as number}
             />
           }
+          {showBiddingModal && <PlaceBidFormComponent bidEdition={bidEdition as BidEdition} post={bidPost} />}
         </NavigationContainer>
     }
   </View>;

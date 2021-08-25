@@ -27,6 +27,8 @@ import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
+import NFTTabNavigator from '@screens/nft/nftTabNavigator';
+import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 
 const MessageStack = createStackNavigator();
 
@@ -257,6 +259,36 @@ export default function MessageStackScreen() {
                 )}
                 name="Pending"
                 component={PendingScreen}
+            />
+            <MessageStack.Screen
+                options={({ route }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: route.params?.username ? route.params?.username : 'NFT',
+                        headerBackTitle: ' ',
+                        headerRight: () => < ></>
+                    }
+                )}
+                name="NFTTabNavigator"
+                component={NFTTabNavigator}
+            />
+            <MessageStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Bid Editions',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="BidEditions"
+                component={BidEditionsScreen}
             />
         </MessageStack.Navigator>
     );

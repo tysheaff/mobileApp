@@ -30,6 +30,8 @@ import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
+import BidEditionsScreen from '@screens/nft/bidEditions.screen';
+import NFTTabNavigator from '@screens/nft/nftTabNavigator';
 
 const ProfileStack = createStackNavigator();
 
@@ -305,6 +307,36 @@ export default function ProfileStackScreen() {
             )}
             name="Pending"
             component={PendingScreen}
+        />
+        <ProfileStack.Screen
+            options={({ route }: any) => (
+                {
+                    headerTitleStyle: {
+                        alignSelf: 'center',
+                        color: themeStyles.fontColorMain.color
+                    },
+                    headerTitle: route.params?.username ? route.params?.username : 'NFT',
+                    headerBackTitle: ' ',
+                    headerRight: () => <></>
+                }
+            )}
+            name="NFTTabNavigator"
+            component={NFTTabNavigator}
+        />
+        <ProfileStack.Screen
+            options={({ navigation }: any) => (
+                {
+                    headerTitleStyle: {
+                        alignSelf: 'center',
+                        color: themeStyles.fontColorMain.color
+                    },
+                    headerTitle: 'Bid Editions',
+                    headerBackTitle: ' ',
+                    headerRight: () => <></>
+                }
+            )}
+            name="BidEditions"
+            component={BidEditionsScreen}
         />
     </ProfileStack.Navigator>;
 }

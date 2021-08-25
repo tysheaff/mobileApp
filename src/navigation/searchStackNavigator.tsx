@@ -23,6 +23,8 @@ import { WalletScreen } from '@screens/wallet/wallet.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import SearchTabNavigator from './searchTabNavigator';
 import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
+import NFTTabNavigator from '@screens/nft/nftTabNavigator';
+import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 
 const SearchStack = createStackNavigator();
 
@@ -215,6 +217,36 @@ export default function SearchStackScreen() {
                 )}
                 name="Pending"
                 component={PendingScreen}
+            />
+            <SearchStack.Screen
+                options={({ route }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: route.params?.username ? route.params?.username : 'NFT',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="NFTTabNavigator"
+                component={NFTTabNavigator}
+            />
+            <SearchStack.Screen
+                options={({ route }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Bid Editions',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="BidEditions"
+                component={BidEditionsScreen}
             />
         </SearchStack.Navigator>
     );

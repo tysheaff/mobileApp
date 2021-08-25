@@ -79,6 +79,7 @@ export class PostComponent extends React.Component<Props, State> {
         this.goToStats = this.goToStats.bind(this);
         this.goToPost = this.goToPost.bind(this);
         this.goToRecloutedPost = this.goToRecloutedPost.bind(this);
+        this.goToNFT = this.goToNFT.bind(this);
         this.getEmbeddedVideoLink = this.getEmbeddedVideoLink.bind(this);
         this.toggleHeartIcon = this.toggleHeartIcon.bind(this);
     }
@@ -160,17 +161,30 @@ export class PostComponent extends React.Component<Props, State> {
         );
     }
 
+    private goToNFT() {
+        this.props.navigation.push('NFTTabNavigator',
+            {
+                post: this.props.post,
+                username: this.props.post.ProfileEntryResponse?.Username
+            }
+        );
+    }
+
     render(): JSX.Element {
         const bodyText = this.props.post.Body?.trimEnd();
 
         return (
-            <View style={this.props.isParentPost ? [
-                styles.parentPostContainer,
-                styles.containerVerticalPaddings,
-                themeStyles.containerColorMain,
-                themeStyles.borderColor] : [
-                themeStyles.containerColorMain,
-                themeStyles.borderColor]}>
+            <View style=
+                {
+                    this.props.isParentPost ? [
+                        styles.parentPostContainer,
+                        styles.containerVerticalPaddings,
+                        themeStyles.containerColorMain,
+                        themeStyles.borderColor] : [
+                        themeStyles.containerColorMain,
+                        themeStyles.borderColor
+                    ]
+                }>
                 {
                     this.props.isParentPost &&
                     <View style={styles.parentPostSubContainer}>
@@ -281,6 +295,15 @@ export class PostComponent extends React.Component<Props, State> {
                                     actionsDisabled={this.props.actionsDisabled} />
                                 : undefined
                         }
+                        {
+                            this.props.post?.IsNFT &&
+                            <TouchableOpacity
+                                onPress={this.goToNFT}
+                                activeOpacity={1}
+                                style={[styles.nftButton, themeStyles.verificationBadgeBackgroundColor]}>
+                                <Text style={styles.nftText}>Check NFT</Text>
+                            </TouchableOpacity>
+                        }
                     </View >
                 </View>
 
@@ -386,6 +409,16 @@ const styles = StyleSheet.create(
         },
         pinIcon: {
             marginRight: 6
+        },
+        nftButton: {
+            padding: 10,
+            margin: 15,
+            borderRadius: 4,
+        },
+        nftText: {
+            fontWeight: '600',
+            color: 'white',
+            textAlign: 'center'
         }
     }
 );
