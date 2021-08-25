@@ -16,7 +16,8 @@ export enum EventType {
     ToggleProfileInfoModal = 10,
     RefreshNotifications = 11,
     RefreshMessages = 12,
-    ToggleBidForm = 13,
+    FocusSearchHeader = 13,
+    ToggleBidForm = 14,
 }
 
 export interface ChangeFollowersEvent {
@@ -35,6 +36,10 @@ export interface ToggleProfileManagerEvent {
 
 export interface ToggleCloutCastFeedEvent {
     active: boolean;
+}
+
+export interface FocusSearchHeaderEvent {
+    focused: boolean;
 }
 
 export interface NavigationEvent {

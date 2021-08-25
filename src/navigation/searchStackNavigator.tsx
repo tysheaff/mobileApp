@@ -21,12 +21,25 @@ import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import { WalletScreen } from '@screens/wallet/wallet.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
-import SearchTabNavigator from './searchTabNavigator';
 import { SearchHeaderComponent } from '@screens/search/components/searchHeader';
+import SearchScreen from '@screens/search/search.screen';
+import { DiscoveryTypeCreatorScreen } from '@screens/search/discoverTypeCreatorScreen';
+import { DiscoveryType } from '@types';
 import NFTTabNavigator from '@screens/nft/nftTabNavigator';
 import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 
 const SearchStack = createStackNavigator();
+
+function getDiscoveryTypeCreatorTitle(discoveryType: DiscoveryType) {
+    switch (discoveryType) {
+        case DiscoveryType.CommunityProject:
+            return 'Community Projects';
+        case DiscoveryType.ValueCreator:
+            return 'Value Creators';
+        case DiscoveryType.Goddess:
+            return 'Goddesses';
+    }
+}
 
 export default function SearchStackScreen() {
     return (
@@ -59,9 +72,23 @@ export default function SearchStackScreen() {
                         }
                     )
                 }
-                name="SearchTabNavigator"
-                component={SearchTabNavigator}
+                name="Search"
+                component={SearchScreen}
             />
+
+            <SearchStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: getDiscoveryTypeCreatorTitle((route.params as any)?.discoveryType),
+                            headerBackTitle: ' '
+                        }
+                    )
+                }
+                name="DiscoveryTypeCreator"
+                component={DiscoveryTypeCreatorScreen}
+            />
+
             <SearchStack.Screen
                 options={
                     {

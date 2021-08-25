@@ -1,6 +1,9 @@
+import { CLOUTFEED_API_KEY } from '@env';
+
 const headers = {
     'content-type': 'application/json',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15'
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15',
+    'x-api-key': CLOUTFEED_API_KEY
 };
 
 const host = 'https://cloutfeedapi.azurewebsites.net/';
@@ -151,6 +154,12 @@ const unSubscribeNotifications = (p_publicKey: string, p_jwt: string, p_subscrib
     );
 };
 
+const getDiscoveryType = (discoveryType: string) => {
+    const route = `discovery/${discoveryType}`;
+
+    return get(route);
+};
+
 export const cloutFeedApi = {
     getHistoricalCoinPrice,
     getPinnedPost,
@@ -160,5 +169,6 @@ export const cloutFeedApi = {
     subscribeNotifications,
     unSubscribeNotifications,
     getNotificationsSettings,
-    updateNotificationsSettings
+    updateNotificationsSettings,
+    getDiscoveryType
 };

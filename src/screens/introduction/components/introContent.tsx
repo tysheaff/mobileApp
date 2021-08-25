@@ -46,7 +46,7 @@ export const introduction: IntroductionElement[] = [
     {
         title: 'Let\'s go!',
         imageUri: require('../../../../assets/intro5.png'),
-        description: <Text>What are you waiting for? Start earning BitClouts and socializing with your friends now! Stay updated with the latest news with native notifications.{'\n '} Don't have an account?
+        description: <Text>What are you waiting for? Start earning BitClout and socializing with your friends now! Stay updated with the latest news with native notifications.{'\n '} Don't have an account?
             {' '}<Text
                 onPress={() => Linking.openURL('https://bitclout.com/')}
                 style={[{ fontWeight: '500' }, themeStyles.linkColor]}>

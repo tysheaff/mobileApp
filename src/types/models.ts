@@ -195,6 +195,13 @@ export interface CloutTag {
     count: number;
 }
 
+export enum DiscoveryType {
+    ValueCreator = 'ValueCreator',
+    Goddess = 'Goddess',
+    CommunityProject = 'CommunityProject',
+    FeaturedCreator = 'FeaturedCreator'
+}
+
 export interface BidEdition {
     HighestBidAmountNanos: number;
     IsForSale: boolean;

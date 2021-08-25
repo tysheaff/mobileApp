@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { eventManager, globals, hapticsManager, navigatorGlobals, settingsGlobals } from '@globals';
 import { themeStyles } from '@styles';
 import { cache } from '@services/dataCaching';
-import { EventType } from '@types';
+import { EventType, FocusSearchHeaderEvent } from '@types';
 import HomeStackScreen from './homeStackNavigator';
 import ProfileStackScreen from './profileStackNavigator';
 import WalletStackScreen from './walletStackNavigator';
@@ -23,7 +23,7 @@ const firstScreen: any = {
     ProfileStack: 'Profile',
     WalletStack: 'Wallet',
     CreatePostStack: 'CreatePost',
-    SearchStack: 'SearchTabNavigator'
+    SearchStack: 'Search'
 };
 
 const TabElement = ({ tab, onPress, selectedTab }: any) => {
@@ -133,8 +133,20 @@ const TabBar = ({ state }: any) => {
                 navigatorGlobals.refreshWallet();
             } else if (p_screenName === 'ProfileStack' && (focusedRouteName === 'Profile' || focusedRouteName === undefined)) {
                 navigatorGlobals.refreshProfile();
+            } else if (p_screenName === 'SearchStack' && (focusedRouteName === 'Search' || focusedRouteName === undefined)) {
+                const event: FocusSearchHeaderEvent = {
+                    focused: false
+                };
+                eventManager.dispatchEvent(EventType.FocusSearchHeader, event);
+            } else {
+                navigation.navigate(selectedTab, { screen: firstScreen[selectedTab] });
+                if (p_screenName === 'SearchStack') {
+                    const event: FocusSearchHeaderEvent = {
+                        focused: false
+                    };
+                    eventManager.dispatchEvent(EventType.FocusSearchHeader, event);
+                }
             }
-            navigation.navigate(selectedTab, { screen: firstScreen[selectedTab] });
         } else {
             navigation.navigate(p_screenName);
         }

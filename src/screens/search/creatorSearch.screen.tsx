@@ -108,7 +108,7 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
         try {
             const response = await Promise.all(
                 [
-                    api.getLeaderBoard(globals.user.publicKey),
+                    api.getLeaderBoard(globals.user.publicKey, 20),
                     cache.user.getData()
                 ]
             );
