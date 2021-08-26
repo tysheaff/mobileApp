@@ -345,7 +345,9 @@ export class NotificationsScreen extends React.Component<Props, State> {
                         navigation={this.props.navigation}
                         notification={notification}
                         goToProfile={this.goToProfile}
+                        goToPost={this.goToPost}
                         profile={profile}
+                        post={this.state.posts[notification.Metadata.BasicTransferTxindexMetadata?.PostHashHex as string]}
                     />;
                 case NotificationType.Like: {
                     const postHashHex = notification.Metadata.LikeTxindexMetadata?.PostHashHex as string;

@@ -2,7 +2,7 @@ import { themeStyles } from '@styles/globalColors';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Profile, Notification } from '@types';
+import { Profile, Notification, Post } from '@types';
 import { globalStyles } from '@styles/globalStyles';
 import { calculateAndFormatBitCloutInUsd } from '@services/bitCloutCalculator';
 import { globals } from '@globals/globals';
@@ -15,8 +15,10 @@ import { ParamListBase } from '@react-navigation/native';
 interface Props {
     profile: Profile;
     goToProfile: (p_userKey: string, p_username: string) => void;
+    goToPost: (postHashCode: string) => void;
     notification: Notification;
     navigation: StackNavigationProp<ParamListBase>;
+    post: Post;
 }
 
 export class BasicTransferNotificationComponent extends React.Component<Props> {
@@ -29,6 +31,41 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
     }
 
     render() {
+        const diamondLevel = this.props.notification.Metadata.BasicTransferTxindexMetadata?.DiamondLevel as number;
+
+        if (diamondLevel > 0) {
+            const postHashHex = this.props.notification.Metadata.BasicTransferTxindexMetadata?.PostHashHex as string;
+
+            return <TouchableOpacity
+                style={[notificationsStyles.notificationContainer, notificationsStyles.centerTextVertically, themeStyles.containerColorMain, themeStyles.borderColor]}
+                onPress={() => this.props.goToPost(postHashHex)}
+                activeOpacity={1}>
+                <ProfileInfoImageComponent
+                    navigation={this.props.navigation}
+                    profile={this.props.profile}
+                />
+
+                <View style={[notificationsStyles.iconContainer, { backgroundColor: '#00803c' }]}>
+                    <FontAwesome style={{ marginLeft: 1, marginTop: 1 }} name="diamond" size={12} color="white" />
+                </View>
+
+                <View style={notificationsStyles.textContainer}>
+                    <ProfileInfoUsernameComponent
+                        navigation={this.props.navigation}
+                        profile={this.props.profile}
+                    />
+
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> gave your post </Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>
+                        {diamondLevel} {diamondLevel === 1 ? 'diamond' : 'diamonds'}{this.props.post?.Body && ': '}</Text>
+                    {
+                        !!this.props.post?.Body &&
+                        <Text style={[notificationsStyles.postText, themeStyles.fontColorSub]} numberOfLines={1}>{this.props.post?.Body}</Text>
+                    }
+                </View>
+            </TouchableOpacity>;
+        }
+
         const output = this.props.notification.TxnOutputResponses?.find(
             p_output => p_output.PublicKeyBase58Check === globals.user.publicKey
         );

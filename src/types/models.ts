@@ -116,6 +116,11 @@ export interface NotificationCreatorCoinTransferMetaData {
     PostHashHex: string;
 }
 
+export interface NotificationBasicTransferMetaData {
+    DiamondLevel: number;
+    PostHashHex: string;
+}
+
 export interface NotificationNftBidMetaData {
     BidAmountNanos: number;
     NFTPostHashHex: string;
@@ -135,7 +140,8 @@ export interface NotificationMetaData {
     FollowTxindexMetadata?: NotificationFollowMetaData;
     LikeTxindexMetadata?: NotificationLikeMetaData;
     CreatorCoinTransferTxindexMetadata?: NotificationCreatorCoinTransferMetaData;
-    NFTBidTxindexMetadata?: NotificationNftBidMetaData
+    NFTBidTxindexMetadata?: NotificationNftBidMetaData;
+    BasicTransferTxindexMetadata?: NotificationBasicTransferMetaData;
 }
 
 export interface Notification {

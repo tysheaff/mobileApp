@@ -50,13 +50,23 @@ function checkCreatorCoinTransfer(p_notification: Notification, p_diamond: boole
     return diamondLevel === 0;
 }
 
+function checkBasicTransfer(p_notification: Notification, p_diamond: boolean): boolean {
+    const diamondLevel = p_notification.Metadata.BasicTransferTxindexMetadata?.DiamondLevel as number;
+    if (p_diamond) {
+        return diamondLevel >= 1;
+    }
+    return diamondLevel === 0;
+}
+
 export function filterNotifications(p_notificaitons: Notification[], p_filter: NotificationsFilter, p_posts: any) {
     const filteredNotifications: Notification[] = [];
     for (const notification of p_notificaitons) {
         let add = false;
+
         if (p_filter.follow) {
             add = notification.Metadata.TxnType === NotificationType.Follow;
         }
+
         if (!add && p_filter.like) {
             add = notification.Metadata.TxnType === NotificationType.Like;
         }
@@ -74,14 +84,18 @@ export function filterNotifications(p_notificaitons: Notification[], p_filter: N
         }
 
         if (!add && p_filter.purchase) {
-            add = notification.Metadata.TxnType === NotificationType.BasicTransfer ||
+            add = checkBasicTransfer(notification, false) ||
                 notification.Metadata.TxnType === NotificationType.CreatorCoin ||
                 notification.Metadata.TxnType === NotificationType.NftBid;
 
         }
 
-        if (notification.Metadata.TxnType === NotificationType.CreatorCoinTransfer) {
-            if (!add && p_filter.creatorCoinTransfer) {
+        if (!add && p_filter.diamond) {
+            add = checkCreatorCoinTransfer(notification, true) || checkBasicTransfer(notification, true);
+        }
+
+        if (!add && notification.Metadata.TxnType === NotificationType.CreatorCoinTransfer) {
+            if (p_filter.creatorCoinTransfer) {
                 add = checkCreatorCoinTransfer(notification, false);
             }
             if (!add && p_filter.diamond) {
