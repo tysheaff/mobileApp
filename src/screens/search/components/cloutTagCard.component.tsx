@@ -11,7 +11,7 @@ interface Props {
     navigation: StackNavigationProp<ParamListBase>;
 }
 
-export default class CloutListCardComponent extends React.Component<Props> {
+export default class CloutTagListCardComponent extends React.Component<Props> {
 
     constructor(props: Props) {
         super(props);

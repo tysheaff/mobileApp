@@ -4,10 +4,12 @@ import { StyleSheet, View, Text, RefreshControl, TouchableOpacity } from 'react-
 import { FontAwesome, SimpleLineIcons, Octicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { api, cache, cloutFeedApi, getAnonymousProfile } from '@services';
-import { DiscoveryType, Profile } from '@types';
+import { CloutTag, DiscoveryType, Profile } from '@types';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ProfileListCardComponent } from '@components/profileListCard.component';
+import { cloutApi } from '@services/api/cloutApi';
+import CloutTagListCardComponent from './cloutTagCard.component';
 
 interface Props {
     navigation: StackNavigationProp<any>;
@@ -18,6 +20,7 @@ interface State {
     isLoading: boolean;
     refreshing: boolean;
     featuredProfiles: Profile[];
+    trendingCloutTags: CloutTag[];
 }
 
 export default class DiscoveryListComponent extends React.Component<Props, State> {
@@ -32,7 +35,8 @@ export default class DiscoveryListComponent extends React.Component<Props, State
         this.state = {
             isLoading: true,
             refreshing: false,
-            featuredProfiles: []
+            featuredProfiles: [],
+            trendingCloutTags: []
         };
 
         this.init();
@@ -62,7 +66,8 @@ export default class DiscoveryListComponent extends React.Component<Props, State
             await Promise.all(
                 [
                     this.fetchFeaturedCreators(),
-                    this.setFollowedByUserMap()
+                    this.setFollowedByUserMap(),
+                    this.fetchTrendingTags()
                 ]
             );
         } catch (e) {
@@ -101,6 +106,13 @@ export default class DiscoveryListComponent extends React.Component<Props, State
         }
 
         this._followedByUserMap = followedByUserMap;
+    }
+
+    private async fetchTrendingTags() {
+        const trendingCloutTags = await cloutApi.getTrendingClouts(3);
+        if (this._isMounted) {
+            this.setState({ trendingCloutTags });
+        }
     }
 
     private renderListItem(icon: any, text: string, discoveryType: DiscoveryType) {
@@ -145,6 +157,19 @@ export default class DiscoveryListComponent extends React.Component<Props, State
                     />
                 )
             }
+
+            <Text style={[styles.featuredCreatorsText, themeStyles.fontColorSub]}>Trending CloutTags</Text>
+
+            {
+                this.state.trendingCloutTags.map(
+                    cloutTag => <CloutTagListCardComponent
+                        key={cloutTag.clouttag}
+                        cloutTag={cloutTag}
+                        navigation={this.props.navigation}
+                    />
+                )
+            }
+
         </ScrollView>;
     }
 }
@@ -169,7 +194,7 @@ const styles = StyleSheet.create(
             fontSize: 15
         },
         featuredCreatorsText: {
-            marginTop: 16,
+            marginTop: 12,
             paddingHorizontal: 10,
         }
     }

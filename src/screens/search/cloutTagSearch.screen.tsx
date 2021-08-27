@@ -7,7 +7,7 @@ import { themeStyles } from '@styles/globalColors';
 import { isNumber } from '@services/helpers';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import { globals } from '@globals/globals';
-import CloutListCardComponent from './components/cloutTagCard.component';
+import CloutTagListCardComponent from './components/cloutTagCard.component';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -106,7 +106,7 @@ export default class CloutTagSearchScreen extends React.Component<Props, State> 
 
     render() {
         const renderItem = (item: CloutTag) =>
-            <CloutListCardComponent
+            <CloutTagListCardComponent
                 navigation={this.props.navigation}
                 cloutTag={item} />;
         const keyExtractor = (item: CloutTag, index: number) => `${item.clouttag}_${index}`;
