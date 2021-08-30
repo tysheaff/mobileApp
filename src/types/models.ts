@@ -205,7 +205,8 @@ export enum DiscoveryType {
     ValueCreator = 'ValueCreator',
     Goddess = 'Goddess',
     CommunityProject = 'CommunityProject',
-    FeaturedCreator = 'FeaturedCreator'
+    FeaturedCreator = 'FeaturedCreator',
+    Developer = 'Developer'
 }
 
 export interface BidEdition {

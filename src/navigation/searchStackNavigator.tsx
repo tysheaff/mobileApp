@@ -38,6 +38,8 @@ function getDiscoveryTypeCreatorTitle(discoveryType: DiscoveryType) {
             return 'Value Creators';
         case DiscoveryType.Goddess:
             return 'Goddesses';
+        case DiscoveryType.Developer:
+            return 'Developers';
     }
 }
 
