@@ -237,6 +237,7 @@ export function CreatePostScreen({ navigation, route }: any) {
                             recloutedPost={recloutedPostEntry}
                             videoLink={editedPost?.PostExtraData.EmbedVideoURL}
                             setVideoLink={setVideoLink}
+                            newPost={newPost}
                         ></CreatePostComponent> :
                         <View style={[
                             globalStyles.profileNotCompletedContainer,

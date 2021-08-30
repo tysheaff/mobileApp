@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, InputAccessoryView, Platform, Dimensions, KeyboardAvoidingView, Alert } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import * as Clipboard from 'expo-clipboard';
@@ -28,14 +28,15 @@ interface Props {
     postText: string,
     setPostText: (postText: string) => void,
     editedPostImageUrls: string[],
-    setImagesBase64: (prevState: (imageUri: string[]) => void) => void,
+    setImagesBase64: Dispatch<SetStateAction<string[]>>,
     recloutedPost?: Post,
     videoLink: string,
-    setVideoLink: (link: string) => void
+    setVideoLink: (link: string) => void;
+    newPost: boolean;
 }
 
 export function CreatePostComponent(
-    { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink }: Props) {
+    { profile, postText, setPostText, editedPostImageUrls, setImagesBase64, recloutedPost, videoLink, setVideoLink, newPost }: Props) {
     const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
     const route = useRoute();
 
@@ -71,6 +72,7 @@ export function CreatePostComponent(
     const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
     const [insertVideo, setInsertVideo] = useState<boolean>(!!videoLink);
     const [internalVideoLink, setInternalVideoLink] = useState<string>(videoLink);
+    const [textSelection, setTextSelection] = useState<any>(newPost ? { start: 0, end: 0 } : undefined);
 
     const scrollViewRef = useRef<ScrollView>(null);
     let inputRef: any;
@@ -79,6 +81,10 @@ export function CreatePostComponent(
 
     useEffect(
         () => {
+
+            if (newPost) {
+                onMentionChange('\n\nPosted by @[cloutfeed](undefined)');
+            }
             return () => {
                 isMounted.current = false;
             };
@@ -226,6 +232,10 @@ export function CreatePostComponent(
             inputAccessoryViewID={inputAccessoryViewId}
             onChange={(value) => onMentionChange(value)}
             keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
+            selection={textSelection}
+            onSelectionChange={() => {
+                setTextSelection(undefined);
+            }}
             partTypes={mentionPartTypes}
         />
         {
@@ -316,7 +326,7 @@ export function CreatePostComponent(
                     </View>
                 </KeyboardAvoidingView>
         }
-
+        {newPost && <Text style={[styles.hintText, themeStyles.fontColorSub]}>Include @CloutFeed signature and receive 1-4 Diamonds on every new post. (Max. 5 posts daily)</Text>}
         <View style={styles.emptyView} />
     </ScrollView>;
 }
@@ -399,6 +409,11 @@ const styles = StyleSheet.create(
         },
         emptyView: {
             height: 500
+        },
+        hintText: {
+            marginHorizontal: 10,
+            marginTop: 5,
+            fontSize: 10
         }
     }
 );
