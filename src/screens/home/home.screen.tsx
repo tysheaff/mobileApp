@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { api, notificationsService } from '@services';
 import { themeStyles } from '@styles';
 import { constants, eventManager, globals } from '@globals';
@@ -11,6 +11,7 @@ import * as SecureStore from 'expo-secure-store';
 import { CloutCastFeedComponent } from './components/cloutCastFeed.component';
 import { HotFeedComponent } from './components/hotFeed.component';
 import { StackNavigationProp } from '@react-navigation/stack';
+import * as Linking from 'expo-linking';
 
 type RouteParams = {
     Home: {
@@ -39,9 +40,13 @@ export class HomeScreen extends React.Component<Props, State> {
 
     private _hotFeedComponent = React.createRef<HotFeedComponent>();
 
+    private _lastLinkingListenerData: Date | undefined;
+
     private _unsubscribeNavigationEvent: () => void = () => undefined;
 
     private _unsubscribeCloutCastEvent: () => void = () => undefined;
+
+    private _unsubscribeLinkingListener: (event: any) => void = () => undefined;
 
     constructor(props: Props) {
 
@@ -58,12 +63,22 @@ export class HomeScreen extends React.Component<Props, State> {
         this.subscribeToggleCloutCastEvent();
 
         this.onTabClick = this.onTabClick.bind(this);
+
+        if (Platform.OS === 'android') {
+            this._unsubscribeLinkingListener = this.onLinkingUrl.bind(this);
+            Linking.addEventListener('url', this._unsubscribeLinkingListener);
+            this.checkInitialRoute();
+        }
     }
 
     componentWillUnmount(): void {
         notificationsService.unregisterNotificationHandler();
         this._unsubscribeNavigationEvent();
         this._unsubscribeCloutCastEvent();
+
+        if (Platform.OS === 'android') {
+            Linking.removeEventListener('url', this._unsubscribeLinkingListener);
+        }
     }
 
     private async init(): Promise<void> {
@@ -73,6 +88,63 @@ export class HomeScreen extends React.Component<Props, State> {
         const selectedTab = defaultFeed ? defaultFeed as HomeScreenTab : HomeScreenTab.Global;
         this.setState({ selectedTab });
         this.configureTabs();
+    }
+
+    private async checkInitialRoute() {
+        if (globals.checkedInitialRoute) {
+            return;
+        }
+
+        globals.checkedInitialRoute = true;
+        try {
+            const initialRoute = await Linking.getInitialURL();
+
+            if (initialRoute) {
+                this.handleDeepLink(initialRoute);
+            }
+        } catch {
+        }
+    }
+
+    private onLinkingUrl(event: any) {
+        if (!this._lastLinkingListenerData || new Date().getTime() - this._lastLinkingListenerData.getTime() > 1000) {
+            this._lastLinkingListenerData = new Date();
+
+            try {
+                const data = Linking.parse(event.url);
+
+                if (data.path) {
+                    this.handleDeepLink(data.path);
+                }
+            } catch {
+            }
+        }
+    }
+
+    private handleDeepLink(url: string) {
+        let params;
+        let key;
+        let screenName = '';
+        const targetQuery = url.split('/');
+        const lastSegment = targetQuery[targetQuery.length - 1].split('?')[0];
+
+        if (url.includes('posts/') || url.includes('nft/')) {
+            screenName = 'Post';
+            params = { postHashHex: lastSegment };
+            key = 'Post_' + lastSegment;
+        } else if (url.includes('u/')) {
+            screenName = 'UserProfile';
+            params = { username: lastSegment };
+            key = 'Profile_' + lastSegment;
+        }
+
+        if (params && key) {
+            this.props.navigation.navigate('HomeStack', { screen: 'Home' });
+            this.props.navigation.push(
+                screenName,
+                params
+            );
+        }
     }
 
     private async configureTabs(): Promise<void> {

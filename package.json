@@ -67,7 +67,8 @@
     "react-native-wheel-color-picker": "^1.1.0",
     "sha256": "^0.2.0",
     "victory-native": "^35.3.3",
-    "expo-blur": "~9.0.3"
+    "expo-blur": "~9.0.3",
+    "expo-linking": "~2.3.1"
   },
   "devDependencies": {
     "@babel/core": "~7.14.6",

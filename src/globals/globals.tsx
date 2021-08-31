@@ -31,4 +31,5 @@ export const globals = {
         }
     },
     dispatchRefreshMessagesEvent: () => { 0; },
+    checkedInitialRoute: false
 };
