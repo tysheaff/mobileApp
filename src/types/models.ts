@@ -85,7 +85,8 @@ export enum NotificationType {
     Follow = 'FOLLOW',
     Like = 'LIKE',
     CreatorCoinTransfer = 'CREATOR_COIN_TRANSFER',
-    NftBid = 'NFT_BID'
+    NftBid = 'NFT_BID',
+    AcceptNftBid = 'ACCEPT_NFT_BID'
 }
 
 export interface NotificationLikeMetaData {
@@ -141,6 +142,7 @@ export interface NotificationMetaData {
     LikeTxindexMetadata?: NotificationLikeMetaData;
     CreatorCoinTransferTxindexMetadata?: NotificationCreatorCoinTransferMetaData;
     NFTBidTxindexMetadata?: NotificationNftBidMetaData;
+    AcceptNFTBidTxindexMetadata?: NotificationNftBidMetaData;
     BasicTransferTxindexMetadata?: NotificationBasicTransferMetaData;
 }
 

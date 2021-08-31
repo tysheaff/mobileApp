@@ -19,7 +19,7 @@ interface Props {
     postHashHex: string;
 }
 
-export class NftNotificationComponent extends React.Component<Props> {
+export class AcceptNftBidNotificationComponent extends React.Component<Props> {
     constructor(props: Props) {
         super(props);
     }
@@ -29,8 +29,8 @@ export class NftNotificationComponent extends React.Component<Props> {
     }
 
     render() {
-        const output = this.props.notification.Metadata.NFTBidTxindexMetadata?.BidAmountNanos;
-        const isBidCancelled = this.props.notification.Metadata.NFTBidTxindexMetadata?.BidAmountNanos === 0;
+        const output = this.props.notification.Metadata.AcceptNFTBidTxindexMetadata?.BidAmountNanos;
+        const serialNumber = this.props.notification.Metadata.AcceptNFTBidTxindexMetadata?.SerialNumber;
         let bitCloutAmount = '';
         let usdAmount = '';
 
@@ -48,7 +48,7 @@ export class NftNotificationComponent extends React.Component<Props> {
                     navigation={this.props.navigation}
                     profile={this.props.profile}
                 />
-                <View style={[notificationsStyles.iconContainer, { backgroundColor: isBidCancelled ? '#FE3537' : '#00803c' }]}>
+                <View style={[notificationsStyles.iconContainer, { backgroundColor: '#00803c' }]}>
                     <FontAwesome style={[{ marginLeft: 1 }]} name="dollar" size={14} color="white" />
                 </View>
 
@@ -57,23 +57,16 @@ export class NftNotificationComponent extends React.Component<Props> {
                         navigation={this.props.navigation}
                         profile={this.props.profile}
                     />
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> {
-                        isBidCancelled ? 'cancelled their bid on' : 'bid'}</Text>
-                    {
-                        !isBidCancelled &&
-                        <>
-                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT</Text>
-                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) </Text>
-                        </>
-                    }
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>for serial number</Text>
-                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {
-                        this.props.notification.Metadata.NFTBidTxindexMetadata?.SerialNumber
-                    }
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> accepted your bid of</Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT</Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) </Text>
+
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>for serial number </Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}>
+                        {serialNumber}
                     </Text>
                 </View>
             </TouchableOpacity>
         );
     }
-
 }
