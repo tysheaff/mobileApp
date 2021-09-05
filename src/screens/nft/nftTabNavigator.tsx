@@ -284,7 +284,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             if (this.state.selectedNftsForSale.length !== 0 && this.state.selectModeOn) {
                 if (this.props.route.params.post.NumNFTCopies <= 1 && this.state.hasUnlockableContent) {
                     return this.toggleSendUnlockableText(true);
-                } else if (!this.state.hasUnlockableContent && this.props.route.params.post.NumNFTCopies <= 1) {
+                } else if (this.props.route.params.post.NumNFTCopies <= 1 && !this.state.hasUnlockableContent) {
                     return this.handleSellNftBidAlert();
                 }
                 this.goToSellNft();
@@ -478,7 +478,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                                         this.state.isUserOwner ?
                                             <>
                                                 <CloutFeedButton
-                                                    backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                                                    backgroundColor={this.state.selectModeOn ? themeStyles.likeHeartBackgroundColor.backgroundColor : themeStyles.verificationBadgeBackgroundColor.backgroundColor}
                                                     styles={[styles.nftButtonContainer, { width: 110 }]}
                                                     title={editAuctionsTitle}
                                                     onPress={this.goToAuctionStatus}
@@ -516,7 +516,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                                             isLoading={this.state.isButtonLoading}
                                             backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
                                             styles={styles.nftButtonContainer}
-                                            title={'Put On Sale'}
+                                            title={'Put on Sale'}
                                             onPress={this.handleSingleAuctionAlert}
                                         />
                                 )

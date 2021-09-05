@@ -266,7 +266,7 @@ export default function SearchStackScreen() {
                 component={NFTTabNavigator}
             />
             <SearchStack.Screen
-                options={({ route }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -276,12 +276,12 @@ export default function SearchStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="BidEditions"
                 component={BidEditionsScreen}
             />
             <SearchStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -291,12 +291,12 @@ export default function SearchStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="AuctionTabNavigator"
                 component={AuctionsTabNavigator}
             />
             <SearchStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -306,12 +306,12 @@ export default function SearchStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="MintPost"
                 component={MintPostScreen}
             />
             <SearchStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -321,7 +321,7 @@ export default function SearchStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="SellNft"
                 component={SellNftScreen}
             />

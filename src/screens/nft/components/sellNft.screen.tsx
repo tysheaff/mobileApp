@@ -29,10 +29,10 @@ interface Props {
 interface State {
     isLoading: boolean;
     selectedNftsForSale: Post[];
-    totalEarningsUsd: number;
-    totalEarningsClout: number;
-    creatorRoyalty: number;
-    coinHolderRoyalty: number;
+    sellingPriceCloutNanos: number;
+    earningsCloutNanos: number;
+    creatorRoyaltyCloutNanos: number;
+    coinHolderRoyaltyCloutNanos: number;
     unlockableText: string;
     isSellButtonLoading: boolean;
 }
@@ -47,10 +47,10 @@ export default class SellNftScreen extends React.Component<Props, State> {
         this.state = {
             isLoading: true,
             selectedNftsForSale: this.props.route.params.selectedNftsForSale,
-            totalEarningsUsd: 0,
-            totalEarningsClout: 0,
-            creatorRoyalty: 0,
-            coinHolderRoyalty: 0,
+            sellingPriceCloutNanos: 0,
+            earningsCloutNanos: 0,
+            creatorRoyaltyCloutNanos: 0,
+            coinHolderRoyaltyCloutNanos: 0,
             unlockableText: '',
             isSellButtonLoading: false
         };
@@ -74,29 +74,38 @@ export default class SellNftScreen extends React.Component<Props, State> {
     }
 
     private init(): void {
-        let totalEarningsSum = 0;
-        for (const nft of this.state.selectedNftsForSale) {
-            totalEarningsSum += nft.BidAmountNanos;
-        }
-        const creatorRoyaltyPercentage = (this.props.route.params.post as any).NFTRoyaltyToCoinBasisPoints / 100;
-        const coinHolderRoyaltyPercentage = (this.props.route.params.post as any).NFTRoyaltyToCreatorBasisPoints / 100;
 
-        const creatorRoyalty = creatorRoyaltyPercentage * totalEarningsSum;
-        const coinHolderRoyalty = coinHolderRoyaltyPercentage * totalEarningsSum;
-        const totalEarningsClout = totalEarningsSum;
-        const totalEarningsUsd = totalEarningsSum;
+        const sellingStats = this.calculateSellingStats(this.state.selectedNftsForSale);
 
         if (this._isMounted) {
             this.setState(
                 {
-                    totalEarningsUsd,
-                    totalEarningsClout,
-                    creatorRoyalty,
-                    coinHolderRoyalty,
+                    ...sellingStats,
                     isLoading: false
                 }
             );
         }
+    }
+
+    private calculateSellingStats(p_nftBids: Post[]) {
+        let sellingPriceCloutNanos = 0;
+        for (const nft of p_nftBids) {
+            sellingPriceCloutNanos += nft.BidAmountNanos;
+        }
+
+        const creatorRoyaltyPercentage = this.props.route.params.post.NFTRoyaltyToCreatorBasisPoints / 10000;
+        const coinHolderRoyaltyPercentage = this.props.route.params.post.NFTRoyaltyToCoinBasisPoints / 10000;
+
+        const creatorRoyaltyCloutNanos = creatorRoyaltyPercentage * sellingPriceCloutNanos;
+        const coinHolderRoyaltyCloutNanos = coinHolderRoyaltyPercentage * sellingPriceCloutNanos;
+        const earningsCloutNanos = sellingPriceCloutNanos - creatorRoyaltyCloutNanos - coinHolderRoyaltyCloutNanos;
+
+        return {
+            sellingPriceCloutNanos,
+            creatorRoyaltyCloutNanos,
+            coinHolderRoyaltyCloutNanos,
+            earningsCloutNanos
+        };
     }
 
     private calculateBidderBalance(bidderBalanceNanos: number): string {
@@ -107,8 +116,15 @@ export default class SellNftScreen extends React.Component<Props, State> {
 
     private filterNfts(serialNumber: number): void {
         const filteredNfts = this.state.selectedNftsForSale.filter((item: Post) => item.SerialNumber !== serialNumber);
-        if (this._isMounted) {
-            this.setState({ selectedNftsForSale: filteredNfts });
+
+        if (filteredNfts.length > 0) {
+            const sellingStats = this.calculateSellingStats(filteredNfts);
+
+            if (this._isMounted) {
+                this.setState({ ...sellingStats, selectedNftsForSale: filteredNfts });
+            }
+        } else {
+            this.props.navigation.goBack();
         }
     }
 
@@ -220,29 +236,29 @@ export default class SellNftScreen extends React.Component<Props, State> {
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Selling Price</Text>
                     <Text style={themeStyles.fontColorSub}>
-                        {this.calculateBidderBalance(this.state.totalEarningsClout)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.totalEarningsUsd)})
+                        {this.calculateBidderBalance(this.state.sellingPriceCloutNanos)}
+                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.sellingPriceCloutNanos)})
                     </Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Earnings</Text>
                     <Text style={themeStyles.fontColorSub}>
-                        {this.calculateBidderBalance(this.state.totalEarningsClout)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.totalEarningsUsd)})
+                        {this.calculateBidderBalance(this.state.earningsCloutNanos)}
+                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.earningsCloutNanos)})
                     </Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Creator royalty</Text>
                     <Text style={themeStyles.fontColorSub}>
-                        {this.calculateBidderBalance(this.state.creatorRoyalty)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.creatorRoyalty)})
+                        {this.calculateBidderBalance(this.state.creatorRoyaltyCloutNanos)}
+                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.creatorRoyaltyCloutNanos)})
                     </Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Coin-holder royalty</Text>
                     <Text style={themeStyles.fontColorSub}>
-                        {this.calculateBidderBalance(this.state.coinHolderRoyalty)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.coinHolderRoyalty)})
+                        {this.calculateBidderBalance(this.state.coinHolderRoyaltyCloutNanos)}
+                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.coinHolderRoyaltyCloutNanos)})
                     </Text>
                 </View>
             </View>
@@ -284,22 +300,14 @@ export default class SellNftScreen extends React.Component<Props, State> {
             style={[styles.container, themeStyles.containerColorMain]}
             behavior={behavior}
         >
-            <View>
-                {
-                    this.state.selectedNftsForSale.length === 0 ?
-                        <Text style={[styles.emptyNfts, themeStyles.fontColorSub]}>You must select at least one bid in order to sell this NFT.</Text> :
-                        <>
-                            <FlatList
-                                ListHeaderComponent={renderHeader}
-                                ListFooterComponent={renderFooter}
-                                contentContainerStyle={styles.flatListStyle}
-                                keyExtractor={keyExtractor}
-                                renderItem={({ item }) => renderItem(item)}
-                                data={this.state.selectedNftsForSale}
-                            />
-                        </>
-                }
-            </View>
+            <FlatList
+                ListHeaderComponent={renderHeader}
+                ListFooterComponent={renderFooter}
+                contentContainerStyle={styles.flatListStyle}
+                keyExtractor={keyExtractor}
+                renderItem={({ item }) => renderItem(item)}
+                data={this.state.selectedNftsForSale}
+            />
         </KeyboardAvoidingView>;
     }
 }
@@ -317,11 +325,12 @@ const styles = StyleSheet.create(
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingVertical: 10,
-            borderWidth: 1,
+            borderBottomWidth: 1,
         },
         row: {
             flexDirection: 'row',
             alignItems: 'center',
+            paddingHorizontal: 10
         },
         deleteIconContainer: {
             marginRight: 10
@@ -367,11 +376,6 @@ const styles = StyleSheet.create(
             borderRadius: 4,
             marginVertical: 20,
             alignSelf: 'center'
-        },
-        emptyNfts: {
-            fontSize: 16,
-            textAlign: 'center',
-            margin: 20
         },
         inputContainer: {
             padding: 10

@@ -13,7 +13,7 @@ import { signing } from '@services/authorization/signing';
 import { settingsGlobals } from '@globals/settingsGlobals';
 
 interface Props {
-    post: Post | undefined;
+    post: Post;
     bidEdition: BidEdition;
 }
 
@@ -114,7 +114,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
                 this.setState(
                     (prevState) => (
                         {
-                            usd: String(parsedUsd + 1),
+                            usd: (parsedUsd + 1).toFixed(2),
                             clout: (Number(prevState.clout.split(',').join('.')) + (100 / globals.exchangeRate.USDCentsPerBitCloutExchangeRate)).toFixed(4)
                         }
                     )
@@ -123,7 +123,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
                 this.setState(
                     (prevState) => (
                         {
-                            usd: String(parsedUsd - 1),
+                            usd: (parsedUsd - 1).toFixed(2),
                             clout: (Number(prevState.clout.split(',').join('.')) - (100 / globals.exchangeRate.USDCentsPerBitCloutExchangeRate)).toFixed(4)
                         }
                     )
@@ -165,7 +165,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
     private isBidFormValid(bidAmountNanos: number): boolean {
 
         const minBidAmountInUsd = formatNumber(calculateBitCloutInUSD(this.props.bidEdition.MinBidAmountNanos), true);
-        const minBidAmountInClout = formatNumber(this.props.bidEdition.MinBidAmountNanos / 1000000000, true);
+        const minBidAmountInClout = formatNumber(this.props.bidEdition.MinBidAmountNanos / 1000000000, true, 4);
 
         if (this.state.clout.length === 0 || this.state.usd.length === 0) {
             Alert.alert('Error', 'Bid amount is empty');
@@ -198,7 +198,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
         }
         Keyboard.dismiss();
 
-        const postHashHex: string = (this.props.post as any)?.PostEntryResponse.PostHashHex;
+        const postHashHex: string = this.props.post.PostHashHex;
         try {
             const transactionResponse = await nftApi.placeNftBid(bidAmountNanos, postHashHex, this.props.bidEdition.SerialNumber, globals.user.publicKey);
             const transactionHex: string = transactionResponse.TransactionHex;
@@ -281,7 +281,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
                                 </TouchableOpacity>
                             </View>
                             <Text style={[themeStyles.fontColorSub, styles.subtitle]}>You are about to place a bid for an NFT auctioned by
-                                <Text style={styles.username}> @{(this.props.post as any).PostEntryResponse.ProfileEntryResponse.Username}</Text>
+                                <Text style={styles.username}> @{this.props.post.ProfileEntryResponse.Username}</Text>
                             </Text>
                             <View style={styles.serialNumberRow}>
                                 <Text style={[styles.serialNumber, themeStyles.fontColorMain]}>Serial Number #{this.props.bidEdition.SerialNumber}</Text>
@@ -318,14 +318,14 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
                                 <Text style={[themeStyles.fontColorMain, styles.rowTitle]}>Creator Royalty bid </Text>
                                 <View style={[styles.box, themeStyles.currencyButtonBackgroundColor]}>
                                     <Text style={[themeStyles.fontColorSub, styles.rowCoinValue]}>
-                                        {(this.props.post as any).PostEntryResponse?.NFTRoyaltyToCreatorBasisPoints / 100}%
+                                        {this.props.post.NFTRoyaltyToCreatorBasisPoints / 100}%
                                     </Text>
                                 </View>
                             </View>
                             <View style={styles.priceRow}>
                                 <Text style={[themeStyles.fontColorMain, styles.rowTitle]}>Coin-holder Royalty</Text>
                                 <View style={[styles.box, themeStyles.currencyButtonBackgroundColor]}>
-                                    <Text style={[themeStyles.fontColorSub, styles.rowCoinValue]}>{(this.props.post as any).PostEntryResponse?.NFTRoyaltyToCoinBasisPoints / 100}%</Text>
+                                    <Text style={[themeStyles.fontColorSub, styles.rowCoinValue]}>{this.props.post.NFTRoyaltyToCoinBasisPoints / 100}%</Text>
                                 </View>
                             </View>
 

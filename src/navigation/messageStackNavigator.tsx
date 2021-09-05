@@ -279,7 +279,7 @@ export default function MessageStackScreen() {
                 component={NFTTabNavigator}
             />
             <MessageStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -289,12 +289,12 @@ export default function MessageStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="BidEditions"
                 component={BidEditionsScreen}
             />
             <MessageStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -304,12 +304,12 @@ export default function MessageStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="AuctionTabNavigator"
                 component={AuctionsTabNavigator}
             />
             <MessageStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -319,12 +319,12 @@ export default function MessageStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="MintPost"
                 component={MintPostScreen}
             />
             <MessageStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -334,7 +334,7 @@ export default function MessageStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="SellNft"
                 component={SellNftScreen}
             />

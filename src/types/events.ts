@@ -74,6 +74,5 @@ export interface ToggleProfileInfoModalEvent {
 }
 
 export interface ToggleSellNftModalEvent {
-    visible: boolean;
     selectedNftsForSale: Post[]
 }

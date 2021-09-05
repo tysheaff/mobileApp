@@ -216,7 +216,7 @@ export default function WalletStackScreen() {
                 component={PendingScreen}
             />
             <WalletStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -226,12 +226,12 @@ export default function WalletStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="AuctionTabNavigator"
                 component={AuctionsTabNavigator}
             />
             <WalletStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -241,12 +241,12 @@ export default function WalletStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="MintPost"
                 component={MintPostScreen}
             />
             <WalletStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -256,7 +256,7 @@ export default function WalletStackScreen() {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="SellNft"
                 component={SellNftScreen}
             />

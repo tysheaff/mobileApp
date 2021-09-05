@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, Dimensions, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
-import { EventType, Post } from '@types';
+import { EventType, Post, ToggleSellNftModalEvent } from '@types';
 import { themeStyles } from '@styles/globalColors';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ParamListBase } from '@react-navigation/native';
@@ -30,8 +30,6 @@ interface State {
     isRefreshing: boolean;
     bids: Post[];
     isTransactionLoading: boolean;
-    selectedPublicKeysForNft: string[];
-    selectedNftsForSale: Post[];
     isSellButtonLoading: boolean;
     isUnlockableTextModalVisible: boolean;
     unlockableText: string;
@@ -42,10 +40,6 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
 
-    private _currentSelectedPublicKeysForNfts: string[] = [];
-
-    private _currentSelectedNfts: Post[] = [];
-
     constructor(props: Props) {
         super(props);
 
@@ -54,9 +48,7 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
             isRefreshing: false,
             bids: [],
             isTransactionLoading: false,
-            selectedPublicKeysForNft: [],
             isSellButtonLoading: false,
-            selectedNftsForSale: [],
             isUnlockableTextModalVisible: false,
             unlockableText: '',
             selectedNftObj: {}
@@ -187,67 +179,23 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
         );
     }
 
-    private handleSelectNFTsActions(): void {
-        if (this._currentSelectedNfts.length === 0) {
-            eventManager.dispatchEvent(EventType.ToggleSetSelectedNfts, { visible: false, selectedNftsForSale: [] });
-        } else {
-            eventManager.dispatchEvent(EventType.ToggleSetSelectedNfts,
-                {
-                    visible: true,
-                    selectedNftsForSale: this._currentSelectedNfts
-                }
-            );
-        }
-    }
-
     private markNftForSale(bid: Post): void {
-        const publicKey = bid.ProfileEntryResponse?.PublicKeyBase58Check;
-
-        if (this.props.numNFTCopies === 1) {
-            if (!this._currentSelectedPublicKeysForNfts.includes(publicKey)) {
-                this._currentSelectedPublicKeysForNfts = [publicKey];
-                this._currentSelectedNfts = [bid];
-            } else {
-                this._currentSelectedPublicKeysForNfts = [];
-                this._currentSelectedNfts = [];
-                if (this._isMounted) {
-                    this.setState(
-                        {
-                            selectedPublicKeysForNft: [],
-                            selectedNftsForSale: []
-                        }
-                    );
-                }
-            }
-            if (this._isMounted) {
-                this.setState(
-                    {
-                        selectedPublicKeysForNft: this._currentSelectedPublicKeysForNfts,
-                        selectedNftsForSale: this._currentSelectedNfts
-                    }
-                );
-            }
-            this.handleSelectNFTsActions();
-            return;
-        }
-
         const selectedObj = this.state.selectedNftObj;
         selectedObj[bid.SerialNumber] = selectedObj[bid.SerialNumber] === bid.ProfileEntryResponse?.PublicKeyBase58Check ?
             false :
             bid.ProfileEntryResponse?.PublicKeyBase58Check;
 
+        const bids = this.state.bids;
+
         if (this._isMounted) {
             this.setState({ selectedNftObj: { ...selectedObj } });
         }
 
-        const bids = this.state.bids;
-        this._currentSelectedNfts = bids.filter((item: Post) => !!selectedObj[item.SerialNumber] && selectedObj[item.SerialNumber] == item.ProfileEntryResponse?.PublicKeyBase58Check);
-
-        if (this._isMounted) {
-            this.setState({ selectedNftsForSale: this._currentSelectedNfts });
-        }
-
-        this.handleSelectNFTsActions();
+        const selectedNftsForSale = bids.filter((item: Post) => !!selectedObj[item.SerialNumber] && selectedObj[item.SerialNumber] == item.ProfileEntryResponse?.PublicKeyBase58Check);
+        const event: ToggleSellNftModalEvent = {
+            selectedNftsForSale
+        };
+        eventManager.dispatchEvent(EventType.ToggleSetSelectedNfts, event);
     }
 
     render(): JSX.Element {
@@ -293,81 +241,84 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
         const keyExtractor = (item: Post, index: number): string => `${item.ProfileEntryResponse?.PublicKeyBase58Check}_${index.toString()}`;
 
         const renderItem = (item: Post): JSX.Element =>
-            <Swipeable
-                rightThreshold={40}
-                renderRightActions=
+            <TouchableOpacity
+                activeOpacity={0.85}
+                onPress=
                 {
-                    (_progress: any, dragX: any) => item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey ?
-                        renderRightCancelSwipe(dragX, item) :
-                        undefined
+                    this.props.selectModeOn ?
+                        () => this.markNftForSale(item) :
+                        () => this.goToProfile(item.ProfileEntryResponse)
+                }
+                style=
+                {
+                    [
+                        this.props.selectModeOn &&
+                            this.state.selectedNftObj[item.SerialNumber] &&
+                            this.state.selectedNftObj[item.ProfileEntryResponse?.PublicKeyBase58Check] ?
+                            themeStyles.modalBackgroundColor :
+                            themeStyles.containerColorMain,
+                        themeStyles.borderColor,
+                        styles.ownerCard
+                    ]
                 }
             >
-                <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress=
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {
-                        this.props.selectModeOn ?
-                            () => this.markNftForSale(item) :
-                            () => this.goToProfile(item.ProfileEntryResponse)
+                        this.props.selectModeOn && (
+                            this.state.selectedNftObj[item.SerialNumber] &&
+                                this.state.selectedNftObj[item.SerialNumber] === item.ProfileEntryResponse?.PublicKeyBase58Check ?
+                                <MaterialCommunityIcons
+                                    style={styles.checkBoxIcon}
+                                    name="checkbox-marked"
+                                    size={18}
+                                    color={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                                /> :
+                                <MaterialCommunityIcons
+                                    name="checkbox-blank-outline"
+                                    size={18}
+                                    style={styles.checkBoxIcon}
+                                    color={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                                />
+                        )
                     }
-                    style=
-                    {
-                        [
-                            this.props.selectModeOn &&
-                                this.state.selectedNftObj[item.SerialNumber] &&
-                                this.state.selectedNftObj[item.ProfileEntryResponse?.PublicKeyBase58Check] ?
-                                themeStyles.modalBackgroundColor :
-                                themeStyles.containerColorMain,
-                            themeStyles.borderColor,
-                            styles.ownerCard
-                        ]
-                    }
-                >
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <ProfileInfoCardComponent
+                        profile={item.ProfileEntryResponse}
+                        navigation={this.props.navigation}
+                    />
+                </View>
+                <View style={styles.rightContainer}>
+                    <View style=
                         {
-                            this.props.selectModeOn && (
-                                this.state.selectedNftObj[item.SerialNumber] &&
-                                    this.state.selectedNftObj[item.SerialNumber] === item.ProfileEntryResponse?.PublicKeyBase58Check ?
-                                    <MaterialCommunityIcons
-                                        style={styles.checkBoxIcon}
-                                        name="checkbox-marked"
-                                        size={18}
-                                        color={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                    /> :
-                                    <MaterialCommunityIcons
-                                        name="checkbox-blank-outline"
-                                        size={18}
-                                        style={styles.checkBoxIcon}
-                                        color={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                    />
-                            )
+                            [
+                                styles.serialNumberBox,
+                                themeStyles.borderColor,
+                                themeStyles.modalBackgroundColor
+                            ]
                         }
-                        <ProfileInfoCardComponent
-                            profile={item.ProfileEntryResponse}
-                            navigation={this.props.navigation}
-                        />
+                    >
+                        <Text style={[themeStyles.fontColorSub, styles.serialNumber]}>#{item.SerialNumber}</Text>
                     </View>
-                    <View style={styles.rightContainer}>
-                        <View style=
-                            {
-                                [
-                                    styles.serialNumberBox,
-                                    themeStyles.borderColor,
-                                    themeStyles.modalBackgroundColor
-                                ]
-                            }
-                        >
-                            <Text style={[themeStyles.fontColorSub, styles.serialNumber]}>#{item.SerialNumber}</Text>
-                        </View>
-                        <Text style={[styles.balance, themeStyles.fontColorMain]}>
-                            {this.calculateBidderBalance(item.BidAmountNanos)}
-                        </Text>
-                        <Text style={[styles.coinPrice, themeStyles.fontColorMain]}>
-                            ~${calculateAndFormatBitCloutInUsd(item.BidAmountNanos)}
-                        </Text>
-                    </View>
-                </TouchableOpacity>
-            </Swipeable>;
+                    <Text style={[styles.balance, themeStyles.fontColorMain]}>
+                        {this.calculateBidderBalance(item.BidAmountNanos)}
+                    </Text>
+                    <Text style={[styles.coinPrice, themeStyles.fontColorMain]}>
+                        ~${calculateAndFormatBitCloutInUsd(item.BidAmountNanos)}
+                    </Text>
+                </View>
+            </TouchableOpacity>;
+
+        const renderSwipableItem = (item: Post): JSX.Element => <Swipeable
+            rightThreshold={40}
+            renderRightActions=
+            {
+                (_progress: any, dragX: any) => renderRightCancelSwipe(dragX, item)
+            }
+        >
+            {renderItem(item)}
+        </Swipeable >;
+
+        const renderListItem = ({ item }: { item: Post }): JSX.Element => item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey ?
+            renderSwipableItem(item) : renderItem(item);
 
         const renderRefresh: JSX.Element = <RefreshControl
             tintColor={themeStyles.fontColorMain.color}
@@ -395,12 +346,11 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
                         <FlatList
                             data={this.state.bids}
                             keyExtractor={keyExtractor}
-                            renderItem={({ item }) => renderItem(item)}
+                            renderItem={renderListItem}
                             refreshControl={renderRefresh}
                         />
                     </>
             }
-
         </View>;
     }
 }

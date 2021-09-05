@@ -83,6 +83,8 @@ export interface Post {
     MinBidAmountNanos: number;
     OwnerPublicKeyBase58Check: string;
     BidAmountNanos: number;
+    NFTRoyaltyToCoinBasisPoints: number;
+    NFTRoyaltyToCreatorBasisPoints: number;
 }
 
 export enum NotificationType {

@@ -327,7 +327,7 @@ export default function ProfileStackScreen() {
             component={NFTTabNavigator}
         />
         <ProfileStack.Screen
-            options={({ navigation }: any) => (
+            options={
                 {
                     headerTitleStyle: {
                         alignSelf: 'center',
@@ -337,12 +337,12 @@ export default function ProfileStackScreen() {
                     headerBackTitle: ' ',
                     headerRight: () => <></>
                 }
-            )}
+            }
             name="BidEditions"
             component={BidEditionsScreen}
         />
         <ProfileStack.Screen
-            options={({ navigation }: any) => (
+            options={
                 {
                     headerTitleStyle: {
                         alignSelf: 'center',
@@ -352,12 +352,12 @@ export default function ProfileStackScreen() {
                     headerBackTitle: ' ',
                     headerRight: () => <></>
                 }
-            )}
+            }
             name="AuctionTabNavigator"
             component={AuctionsTabNavigator}
         />
         <ProfileStack.Screen
-            options={({ navigation }: any) => (
+            options={
                 {
                     headerTitleStyle: {
                         alignSelf: 'center',
@@ -367,12 +367,12 @@ export default function ProfileStackScreen() {
                     headerBackTitle: ' ',
                     headerRight: () => <></>
                 }
-            )}
+            }
             name="MintPost"
             component={MintPostScreen}
         />
         <ProfileStack.Screen
-            options={({ navigation }: any) => (
+            options={
                 {
                     headerTitleStyle: {
                         alignSelf: 'center',
@@ -382,7 +382,7 @@ export default function ProfileStackScreen() {
                     headerBackTitle: ' ',
                     headerRight: () => <></>
                 }
-            )}
+            }
             name="SellNft"
             component={SellNftScreen}
         />

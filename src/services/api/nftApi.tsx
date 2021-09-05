@@ -82,8 +82,8 @@ const mintPost = (
     forSale: boolean,
     minBidAmountNanos: number,
     postHashHex: string,
-    royalityToCoinBasisPoints: number,
-    royalityToCreatorBasisPoints: number,
+    royaltyToCoinBasisPoints: number,
+    royaltyToCreatorBasisPoints: number,
     numCopies: number,
     publicKey: string
 ) => {
@@ -96,8 +96,8 @@ const mintPost = (
             MinBidAmountNanos: minBidAmountNanos,
             MinFeeRateNanosPerKB: 1000,
             NFTPostHashHex: postHashHex,
-            NFTRoyaltyToCoinBasisPoints: royalityToCoinBasisPoints,
-            NFTRoyaltyToCreatorBasisPoints: royalityToCreatorBasisPoints,
+            NFTRoyaltyToCoinBasisPoints: royaltyToCoinBasisPoints,
+            NFTRoyaltyToCreatorBasisPoints: royaltyToCreatorBasisPoints,
             NumCopies: numCopies,
             UpdaterPublicKeyBase58Check: publicKey
         }

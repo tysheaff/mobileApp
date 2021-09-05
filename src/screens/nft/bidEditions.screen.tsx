@@ -74,7 +74,7 @@ export default class BidEditionsScreen extends React.Component<Props, State> {
                 this.setState(
                     {
                         bidEditions,
-                        bidPost: responses[1].NFTCollectionResponse,
+                        bidPost: responses[1].NFTCollectionResponse.PostEntryResponse,
                     }
                 );
             }
