@@ -193,8 +193,8 @@ export default class MintPostScreen extends React.Component<Props, State> {
                 this.state.isForSale,
                 bidAmountNanos,
                 this.props.route.params.postHashHex,
-                Number(this.state.coinHolderRoyaltyPercentage) * 100,
-                Number(this.state.creatorRoyaltyPercentage) * 100,
+                Number(this.state.coinHolderRoyaltyPercentage.split(',').join('.')) * 100,
+                Number(this.state.creatorRoyaltyPercentage.split(',').join('.')) * 100,
                 Number(this.state.nftCopiesCount),
                 globals.user.publicKey
             );
@@ -427,7 +427,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
                     {
                         this.state.isMintButtonEnabled ?
                             <ActivityIndicator color='white' /> :
-                            <Text style={styles.mintPost}>Mint Post</Text>
+                            <Text style={styles.mintPost}>Mint NFT</Text>
                     }
                 </TouchableOpacity>
             </View>

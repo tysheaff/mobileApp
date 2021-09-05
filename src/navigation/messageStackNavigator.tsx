@@ -316,7 +316,7 @@ export default function MessageStackScreen() {
                             alignSelf: 'center',
                             color: themeStyles.fontColorMain.color
                         },
-                        headerTitle: 'Mint Post',
+                        headerTitle: 'Mint NFT',
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }

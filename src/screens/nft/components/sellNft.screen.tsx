@@ -281,6 +281,7 @@ export default class SellNftScreen extends React.Component<Props, State> {
                             [
                                 styles.input,
                                 themeStyles.borderColor,
+                                themeStyles.fontColorMain,
                                 Platform.OS === 'ios' && { paddingBottom: 40 }
                             ]
                         }

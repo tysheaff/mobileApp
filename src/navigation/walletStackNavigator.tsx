@@ -237,7 +237,7 @@ export default function WalletStackScreen() {
                             alignSelf: 'center',
                             color: themeStyles.fontColorMain.color
                         },
-                        headerTitle: 'Mint Post',
+                        headerTitle: 'Mint NFT',
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }

@@ -104,7 +104,7 @@ export default class NftOwnersScreen extends Component<Props, State> {
 
         const keyExtractor = (item: Post, index: number): string => `${item.ProfileEntryResponse?.PublicKeyBase58Check}_${index.toString()}`;
 
-        const renderItem = (item: Post): JSX.Element =>
+        const renderItem = ({ item }: { item: Post }): JSX.Element =>
             <TouchableOpacity
                 activeOpacity={1}
                 onPress={() => this.goToProfile(item.ProfileEntryResponse)}
@@ -132,10 +132,10 @@ export default class NftOwnersScreen extends Component<Props, State> {
                         <Text style={[themeStyles.fontColorSub, styles.serialNumber]}>#{item.SerialNumber}</Text>
                     </View>
                     <Text style={[styles.balance, themeStyles.fontColorMain]}>
-                        {this.calculateBidderBalance((item as any).MinBidAmountNanos)}
+                        {this.calculateBidderBalance(item.LastAcceptedBidAmountNanos)}
                     </Text>
                     <Text style={[styles.coinPrice, themeStyles.fontColorMain]}>~$
-                        {calculateAndFormatBitCloutInUsd((item as any).MinBidAmountNanos)}
+                        {calculateAndFormatBitCloutInUsd(item.LastAcceptedBidAmountNanos)}
                     </Text>
                 </View>
             </TouchableOpacity>;
@@ -157,7 +157,7 @@ export default class NftOwnersScreen extends Component<Props, State> {
                         <FlatList
                             data={this.state.owners}
                             keyExtractor={keyExtractor}
-                            renderItem={({ item }) => renderItem(item)}
+                            renderItem={renderItem}
                             refreshControl={renderRefresh}
                         />
                     </>

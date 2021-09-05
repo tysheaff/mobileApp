@@ -341,7 +341,7 @@ export default function HomeStackScreen(): JSX.Element {
                 component={NFTTabNavigator}
             />
             <HomeStack.Screen
-                options={({ route }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -351,12 +351,12 @@ export default function HomeStackScreen(): JSX.Element {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="BidEditions"
                 component={BidEditionsScreen}
             />
             <HomeStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -366,27 +366,27 @@ export default function HomeStackScreen(): JSX.Element {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="AuctionTabNavigator"
                 component={AuctionsTabNavigator}
             />
             <HomeStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
                             color: themeStyles.fontColorMain.color
                         },
-                        headerTitle: 'Mint Post',
+                        headerTitle: 'Mint NFT',
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="MintPost"
                 component={MintPostScreen}
             />
             <HomeStack.Screen
-                options={({ navigation }: any) => (
+                options={
                     {
                         headerTitleStyle: {
                             alignSelf: 'center',
@@ -396,7 +396,7 @@ export default function HomeStackScreen(): JSX.Element {
                         headerBackTitle: ' ',
                         headerRight: () => <></>
                     }
-                )}
+                }
                 name="SellNft"
                 component={SellNftScreen}
             />

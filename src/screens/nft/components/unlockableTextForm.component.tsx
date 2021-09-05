@@ -61,7 +61,7 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
         if (this._isMounted) {
             this.setState({ isVisible: false });
         }
-        setTimeout(() => this.props.toggleModal(false), 500);
+        setTimeout(() => this.props.toggleModal(false), 1000);
     }
 
     private async handleSellSingleNftBid(): Promise<void> {

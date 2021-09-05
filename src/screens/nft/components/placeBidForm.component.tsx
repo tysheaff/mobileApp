@@ -98,6 +98,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
 
     private setUsdAmount(usd: string): void {
         const parsedUsd = Number(usd.split(',').join('.'));
+
         const clout = ((parsedUsd * 100) / globals.exchangeRate.USDCentsPerBitCloutExchangeRate).toFixed(4);
         if (this._isMounted && !isNaN(parsedUsd)) {
             this.setState({ usd, clout: clout });
@@ -188,7 +189,8 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
     }
 
     private async placeBid(): Promise<void> {
-        const bidAmountNanos = Number(this.state.clout.split(',').join('.')) * 1000000000;
+        const bidAmountNanos = parseInt((Number(this.state.clout.split(',').join('.')) * 1000000000).toFixed(0));
+
         if (!this.isBidFormValid(bidAmountNanos)) {
             return;
         }
