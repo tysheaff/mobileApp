@@ -118,7 +118,7 @@ export class WalletScreen extends React.Component<Props, State> {
             : globals.user.publicKey;
         Promise.all(
             [
-                cache.exchangeRate.getData(),
+                cache.exchangeRate.getData(true),
                 api.getProfile([publicKey])
             ]
         ).then(

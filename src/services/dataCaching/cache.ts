@@ -55,7 +55,7 @@ const exchangeRate = new CacheableObject<{ SatoshisPerBitCloutExchangeRate: numb
         globals.exchangeRate = p_response;
         return p_response;
     },
-    120
+    300
 );
 
 interface Cache {
