@@ -2,7 +2,7 @@ import { NavigationContainer, NavigationProp, ParamListBase } from '@react-navig
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, ToggleBidFormEvent, BidEdition, ToggleProfileInfoModalEvent, Profile, } from './src/types';
+import { EventType, ToggleProfileManagerEvent, User, ToggleActionSheetEvent, ToggleBidFormEvent, BidEdition, ToggleProfileInfoModalEvent, Profile } from './src/types';
 import { settingsGlobals } from './src/globals/settingsGlobals';
 import { themeStyles, updateThemeStyles } from './styles/globalColors';
 import { globals } from './src/globals/globals';

@@ -65,13 +65,15 @@ export default class BidEditionsScreen extends React.Component<Props, State> {
             const responses = await Promise.all(
                 [
                     cache.exchangeRate.getData(),
-                    nftApi.getNftBidEditions(this.props.route.params.publicKey, this.props.route.params.postHashHex)
+                    nftApi.getNftBidEditions(globals.user.publicKey, this.props.route.params.postHashHex),
                 ]
             );
+            const bidEditions = Object.values(responses[1].SerialNumberToNFTEntryResponse).filter((item: any) => item.OwnerPublicKeyBase58Check !== globals.user.publicKey) as BidEdition[];
+
             if (this._isMounted) {
                 this.setState(
                     {
-                        bidEditions: Object.values(responses[1].SerialNumberToNFTEntryResponse),
+                        bidEditions,
                         bidPost: responses[1].NFTCollectionResponse,
                     }
                 );

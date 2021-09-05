@@ -22,6 +22,9 @@ import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
 import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
 import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
+import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
+import MintPostScreen from '@screens/nft/mintPost.screen';
+import SellNftScreen from '@screens/nft/components/sellNft.screen';
 
 const WalletStack = createStackNavigator();
 
@@ -211,6 +214,51 @@ export default function WalletStackScreen() {
                 )}
                 name="Pending"
                 component={PendingScreen}
+            />
+            <WalletStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Edit Auctions',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="AuctionTabNavigator"
+                component={AuctionsTabNavigator}
+            />
+            <WalletStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Mint Post',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="MintPost"
+                component={MintPostScreen}
+            />
+            <WalletStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Sell NFT',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="SellNft"
+                component={SellNftScreen}
             />
         </WalletStack.Navigator>
     );

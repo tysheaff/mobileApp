@@ -76,6 +76,13 @@ export interface Post {
     SerialNumber: number;
     NumNFTCopies: number;
     NumNFTCopiesForSale: number;
+    IsForSale?: boolean;
+    HighestBidAmountNanos: number;
+    LastAcceptedBidAmountNanos: number;
+    LowestBidAmountNanos: number;
+    MinBidAmountNanos: number;
+    OwnerPublicKeyBase58Check: string;
+    BidAmountNanos: number;
 }
 
 export enum NotificationType {

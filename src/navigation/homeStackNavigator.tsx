@@ -30,6 +30,9 @@ import { NotificationsScreen } from '@screens/notifications/notifications.screen
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
 import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 import NFTTabNavigator from '@screens/nft/nftTabNavigator';
+import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
+import MintPostScreen from '@screens/nft/mintPost.screen';
+import SellNftScreen from '@screens/nft/components/sellNft.screen';
 
 const HomeStack = createStackNavigator();
 export default function HomeStackScreen(): JSX.Element {
@@ -351,6 +354,51 @@ export default function HomeStackScreen(): JSX.Element {
                 )}
                 name="BidEditions"
                 component={BidEditionsScreen}
+            />
+            <HomeStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Edit Auctions',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="AuctionTabNavigator"
+                component={AuctionsTabNavigator}
+            />
+            <HomeStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Mint Post',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="MintPost"
+                component={MintPostScreen}
+            />
+            <HomeStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Sell NFT',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="SellNft"
+                component={SellNftScreen}
             />
         </HomeStack.Navigator>
     );

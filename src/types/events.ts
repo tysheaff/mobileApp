@@ -18,6 +18,7 @@ export enum EventType {
     RefreshMessages = 12,
     FocusSearchHeader = 13,
     ToggleBidForm = 14,
+    ToggleSetSelectedNfts = 15
 }
 
 export interface ChangeFollowersEvent {
@@ -70,4 +71,9 @@ export interface ToggleProfileInfoModalEvent {
     profile: Profile;
     coinPrice: number;
     navigation: NavigationProp<any>;
+}
+
+export interface ToggleSellNftModalEvent {
+    visible: boolean;
+    selectedNftsForSale: Post[]
 }

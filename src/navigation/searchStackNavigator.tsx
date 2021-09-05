@@ -27,6 +27,9 @@ import { DiscoveryTypeCreatorScreen } from '@screens/search/discoverTypeCreatorS
 import { DiscoveryType } from '@types';
 import NFTTabNavigator from '@screens/nft/nftTabNavigator';
 import BidEditionsScreen from '@screens/nft/bidEditions.screen';
+import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
+import MintPostScreen from '@screens/nft/mintPost.screen';
+import SellNftScreen from '@screens/nft/components/sellNft.screen';
 
 const SearchStack = createStackNavigator();
 
@@ -276,6 +279,51 @@ export default function SearchStackScreen() {
                 )}
                 name="BidEditions"
                 component={BidEditionsScreen}
+            />
+            <SearchStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Edit Auctions',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="AuctionTabNavigator"
+                component={AuctionsTabNavigator}
+            />
+            <SearchStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Mint Post',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="MintPost"
+                component={MintPostScreen}
+            />
+            <SearchStack.Screen
+                options={({ navigation }: any) => (
+                    {
+                        headerTitleStyle: {
+                            alignSelf: 'center',
+                            color: themeStyles.fontColorMain.color
+                        },
+                        headerTitle: 'Sell NFT',
+                        headerBackTitle: ' ',
+                        headerRight: () => <></>
+                    }
+                )}
+                name="SellNft"
+                component={SellNftScreen}
             />
         </SearchStack.Navigator>
     );

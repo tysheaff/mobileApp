@@ -8,11 +8,12 @@ import { api, cache } from '@services';
 import { eventManager } from '@globals/injector';
 import * as Clipboard from 'expo-clipboard';
 import { snackbar } from '@services/snackbar';
-import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native';
+import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { cloutApi } from '@services/api/cloutApi';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
-    navigation: NavigationProp<ParamListBase>;
+    navigation: StackNavigationProp<ParamListBase>;
     route: RouteProp<ParamListBase, string>;
     post: Post;
 }
@@ -104,81 +105,123 @@ export class PostOptionsComponent extends React.Component<Props> {
         const pinnedPost = await cache.pinnedPost.getData();
         const isPostPinned = pinnedPost?.postHashHex === this.props.post.PostHashHex;
         const pinPostText = isPostPinned ? 'Unpin from Profile' : 'Pin to Profile';
-        const options = [pinPostText, savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
+        const isNft = this.props.post.IsNFT;
+        const options = isNft ?
+            [pinPostText, savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Cancel'] :
+            ['Mint NFT', pinPostText, savePostText, 'Open in Browser', 'Copy Link', 'Copy Text', 'Edit', 'Delete Post', 'Cancel'];
 
-        const callback = async (p_optionIndex: number) => {
-            switch (p_optionIndex) {
-                case 0:
-                    if (isPostPinned) {
-                        this.unpinPost();
-                    } else {
-                        this.pinPost();
-                    }
-                    break;
-                case 1:
-                    if (isPostSaved) {
-                        await this.unsavePost();
-                    } else {
-                        await this.savePost();
-                    }
-                    break;
-                case 2:
-                    Linking.openURL(`https://bitclout.com/posts/${this.props.post.PostHashHex}`);
-                    break;
-                case 3:
-                    return this.copyToClipBoard(true);
-                case 4:
-                    return this.copyToClipBoard(false);
-                case 5:
-                    if (this.props.post.Body || this.props.post.ImageURLs?.length > 0) {
-                        this.props.navigation.navigate(
-                            'CreatePost',
+        const callback = isNft ?
+            async (p_optionIndex: number) => {
+                switch (p_optionIndex) {
+                    case 0:
+                        if (isPostPinned) {
+                            this.unpinPost();
+                        } else {
+                            this.pinPost();
+                        }
+                        break;
+                    case 1:
+                        if (isPostSaved) {
+                            await this.unsavePost();
+                        } else {
+                            await this.savePost();
+                        }
+                        break;
+                    case 2:
+                        Linking.openURL(`https://bitclout.com/posts/${this.props.post.PostHashHex}`);
+                        break;
+                    case 3:
+                        return this.copyToClipBoard(true);
+                    case 4:
+                        return this.copyToClipBoard(false);
+                }
+            } :
+            async (p_optionIndex: number) => {
+                switch (p_optionIndex) {
+                    case 0:
+                        this.props.navigation.push(
+                            'MintPost',
                             {
-                                editPost: true,
-                                editedPost: this.props.post
+                                postHashHex: this.props.post.PostHashHex,
                             }
                         );
-                    } else {
-                        Alert.alert('Sorry!', 'You cannot edit a reclout, if it does not include a quote.');
-                    }
-                    break;
-                case 6:
-                    api.hidePost(
-                        globals.user.publicKey,
-                        this.props.post.PostHashHex,
-                        this.props.post.Body,
-                        this.props.post.ImageURLs,
-                        this.props.post.RecloutedPostEntryResponse?.PostHashHex
-                    ).then(
-                        async p_response => {
-                            const transactionHex = p_response.TransactionHex;
-
-                            const signedTransactionHex = await signing.signTransaction(transactionHex);
-                            await api.submitTransaction(signedTransactionHex);
-
-                            if (this.props.route.name === 'Home' || this.props.route.name === 'Profile') {
-                                Alert.alert('Success', 'Your post was deleted successfully.');
-                                this.props.navigation.navigate(
-                                    this.props.route.name,
-                                    {
-                                        deletedPost: this.props.post.PostHashHex
-                                    }
-                                );
-
-                            } else {
-                                Alert.alert('Success', 'Your post was deleted successfully. Please reload the screen to see this change.');
-                            }
+                        break;
+                    case 1:
+                        if (isPostPinned) {
+                            this.unpinPost();
+                        } else {
+                            this.pinPost();
                         }
-                    ).catch(p_error => globals.defaultHandleError(p_error));
-                    break;
-            }
-        };
+                        break;
+                    case 2:
+                        if (isPostSaved) {
+                            await this.unsavePost();
+                        } else {
+                            await this.savePost();
+                        }
+                        break;
+                    case 3:
+                        Linking.openURL(`https://bitclout.com/posts/${this.props.post.PostHashHex}`);
+                        break;
+                    case 4:
+                        return this.copyToClipBoard(true);
+                    case 5:
+                        return this.copyToClipBoard(false);
+                    case 6:
+                        if (this.props.post.Body || this.props.post.ImageURLs?.length > 0) {
+                            this.props.navigation.navigate(
+                                'CreatePost',
+                                {
+                                    editPost: true,
+                                    editedPost: this.props.post
+                                }
+                            );
+                        } else {
+                            Alert.alert('Sorry!', 'You cannot edit a reclout, if it does not include a quote.');
+                        }
+                        break;
+                    case 7:
+                        api.hidePost(
+                            globals.user.publicKey,
+                            this.props.post.PostHashHex,
+                            this.props.post.Body,
+                            this.props.post.ImageURLs,
+                            this.props.post.RecloutedPostEntryResponse?.PostHashHex
+                        ).then(
+                            async p_response => {
+                                const transactionHex = p_response.TransactionHex;
+
+                                const signedTransactionHex = await signing.signTransaction(transactionHex);
+                                await api.submitTransaction(signedTransactionHex);
+
+                                if (this.props.route.name === 'Home' || this.props.route.name === 'Profile') {
+                                    Alert.alert('Success', 'Your post was deleted successfully.');
+                                    this.props.navigation.navigate(
+                                        this.props.route.name,
+                                        {
+                                            deletedPost: this.props.post.PostHashHex
+                                        }
+                                    );
+
+                                } else {
+                                    Alert.alert('Success', 'Your post was deleted successfully. Please reload the screen to see this change.');
+                                }
+                            }
+                        ).catch(p_error => globals.defaultHandleError(p_error));
+                        break;
+                }
+            };
 
         eventManager.dispatchEvent(
             EventType.ToggleActionSheet,
             {
                 visible: true,
-                config: { options, callback, destructiveButtonIndex: [6] }
+                config: {
+                    options,
+                    callback,
+                    destructiveButtonIndex: isNft ? [] : [7],
+                    mintingButton: isNft ? undefined : 0
+                }
             }
         );
     }

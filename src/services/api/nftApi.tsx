@@ -62,12 +62,12 @@ const placeNftBid = (bidAmount: number, nftPostHashHex: string, serialNumber: nu
     );
 };
 
-const updateNftBid = (minBidAmountNanos: number, postHashHex: string, serialNumber: number, publicKey: string) => {
+const updateNftBid = (forSale: boolean, minBidAmountNanos: number | null, postHashHex: string, serialNumber: number, publicKey: string) => {
     const route = 'update-nft';
     return post(
         route,
         {
-            IsForSale: false,
+            IsForSale: forSale,
             MinBidAmountNanos: minBidAmountNanos,
             MinFeeRateNanosPerKB: 1000,
             NFTPostHashHex: postHashHex,
@@ -77,9 +77,54 @@ const updateNftBid = (minBidAmountNanos: number, postHashHex: string, serialNumb
     );
 };
 
+const mintPost = (
+    hasUnlockable: boolean,
+    forSale: boolean,
+    minBidAmountNanos: number,
+    postHashHex: string,
+    royalityToCoinBasisPoints: number,
+    royalityToCreatorBasisPoints: number,
+    numCopies: number,
+    publicKey: string
+) => {
+    const route = 'create-nft';
+    return post(
+        route,
+        {
+            HasUnlockable: hasUnlockable,
+            IsForSale: forSale,
+            MinBidAmountNanos: minBidAmountNanos,
+            MinFeeRateNanosPerKB: 1000,
+            NFTPostHashHex: postHashHex,
+            NFTRoyaltyToCoinBasisPoints: royalityToCoinBasisPoints,
+            NFTRoyaltyToCreatorBasisPoints: royalityToCreatorBasisPoints,
+            NumCopies: numCopies,
+            UpdaterPublicKeyBase58Check: publicKey
+        }
+    );
+};
+
+const sellNft = (bidAmountNanos: number, bidderPublicKey: string, encryptedUnlockableText: string, postHashHex: string, serialNumber: number, updaterPublicKey: string) => {
+    const route = 'accept-nft-bid';
+    return post(
+        route,
+        {
+            BidAmountNanos: bidAmountNanos,
+            BidderPublicKeyBase58Check: bidderPublicKey,
+            EncryptedUnlockableText: encryptedUnlockableText,
+            MinFeeRateNanosPerKB: 1000,
+            NFTPostHashHex: postHashHex,
+            SerialNumber: serialNumber,
+            UpdaterPublicKeyBase58Check: updaterPublicKey
+        }
+    );
+};
+
 export const nftApi = {
     getNftBids,
     getNftBidEditions,
     placeNftBid,
-    updateNftBid
+    updateNftBid,
+    mintPost,
+    sellNft
 };

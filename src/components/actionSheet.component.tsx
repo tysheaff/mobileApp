@@ -62,7 +62,9 @@ export function ActionSheet(props: { config: ActionSheetConfig }): JSX.Element {
                         >
                             <Text style={[
                                 styles.optionText,
-                                themeStyles.fontColorMain, props.config.destructiveButtonIndex?.includes(p_index) && { color: '#f53636' }
+                                themeStyles.fontColorMain,
+                                props.config.destructiveButtonIndex?.includes(p_index) && { color: '#f53636' },
+                                props.config.mintingButton === p_index && { color: '#00803c' }
                             ]}>{p_option}</Text>
                         </TouchableOpacity>
                 )

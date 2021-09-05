@@ -32,6 +32,9 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 import NFTTabNavigator from '@screens/nft/nftTabNavigator';
+import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
+import MintPostScreen from '@screens/nft/mintPost.screen';
+import SellNftScreen from '@screens/nft/components/sellNft.screen';
 
 const ProfileStack = createStackNavigator();
 
@@ -337,6 +340,51 @@ export default function ProfileStackScreen() {
             )}
             name="BidEditions"
             component={BidEditionsScreen}
+        />
+        <ProfileStack.Screen
+            options={({ navigation }: any) => (
+                {
+                    headerTitleStyle: {
+                        alignSelf: 'center',
+                        color: themeStyles.fontColorMain.color
+                    },
+                    headerTitle: 'Edit Auctions',
+                    headerBackTitle: ' ',
+                    headerRight: () => <></>
+                }
+            )}
+            name="AuctionTabNavigator"
+            component={AuctionsTabNavigator}
+        />
+        <ProfileStack.Screen
+            options={({ navigation }: any) => (
+                {
+                    headerTitleStyle: {
+                        alignSelf: 'center',
+                        color: themeStyles.fontColorMain.color
+                    },
+                    headerTitle: 'Mint Post',
+                    headerBackTitle: ' ',
+                    headerRight: () => <></>
+                }
+            )}
+            name="MintPost"
+            component={MintPostScreen}
+        />
+        <ProfileStack.Screen
+            options={({ navigation }: any) => (
+                {
+                    headerTitleStyle: {
+                        alignSelf: 'center',
+                        color: themeStyles.fontColorMain.color
+                    },
+                    headerTitle: 'Sell NFT',
+                    headerBackTitle: ' ',
+                    headerRight: () => <></>
+                }
+            )}
+            name="SellNft"
+            component={SellNftScreen}
         />
     </ProfileStack.Navigator>;
 }

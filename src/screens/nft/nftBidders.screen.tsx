@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, Dimensions, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
-import { Post } from '@types';
+import { EventType, Post } from '@types';
 import { themeStyles } from '@styles/globalColors';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ParamListBase } from '@react-navigation/native';
@@ -9,16 +9,20 @@ import { nftApi, calculateAndFormatBitCloutInUsd, api, snackbar } from '@service
 import { globals } from '@globals/globals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import ProfileInfoCardComponent from '@components/profileInfo/profileInfoCard.component';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { signing } from '@services/authorization/signing';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { eventManager } from '@globals/injector';
 
 interface Props {
     navigation: StackNavigationProp<ParamListBase>;
     post: Post;
     selectedTab: string;
     isNftForSale?: boolean;
-    handleOwnBidInfo: (minBid: number, serialNumber: number) => void;
+    numNFTCopies?: number;
+    hasUnlockableContent?: boolean;
+    selectModeOn?: boolean;
+    refresh: any;
 }
 
 interface State {
@@ -26,11 +30,21 @@ interface State {
     isRefreshing: boolean;
     bids: Post[];
     isTransactionLoading: boolean;
+    selectedPublicKeysForNft: string[];
+    selectedNftsForSale: Post[];
+    isSellButtonLoading: boolean;
+    isUnlockableTextModalVisible: boolean;
+    unlockableText: string;
+    selectedNftObj: any
 }
 
 export default class NFTBiddersScreen extends React.Component<Props, State> {
 
     private _isMounted = false;
+
+    private _currentSelectedPublicKeysForNfts: string[] = [];
+
+    private _currentSelectedNfts: Post[] = [];
 
     constructor(props: Props) {
         super(props);
@@ -39,13 +53,22 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
             isLoading: true,
             isRefreshing: false,
             bids: [],
-            isTransactionLoading: false
+            isTransactionLoading: false,
+            selectedPublicKeysForNft: [],
+            isSellButtonLoading: false,
+            selectedNftsForSale: [],
+            isUnlockableTextModalVisible: false,
+            unlockableText: '',
+            selectedNftObj: {}
         };
 
         this.init = this.init.bind(this);
-        this.cancelBid = this.cancelBid.bind(this);
+        this.handleCancelBidAlert = this.handleCancelBidAlert.bind(this);
         this.handleCancelBid = this.handleCancelBid.bind(this);
+        this.markNftForSale = this.markNftForSale.bind(this);
+
         this.init();
+
     }
 
     componentDidMount(): void {
@@ -60,39 +83,22 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
         if (this._isMounted) {
             this.setState({ isLoading: true });
         }
-        let targetResponse = [];
+
+        let bids = [];
+
         try {
             const response = await nftApi.getNftBids(this.props.post.ProfileEntryResponse?.PublicKeyBase58Check, this.props.post.PostHashHex);
-            targetResponse =
-                this.props.selectedTab === 'bidders' ||
-                    this.props.selectedTab === 'myBids' ?
-                    response.BidEntryResponses :
-                    this.props.selectedTab === 'owners' &&
-                    response.NFTEntryResponses;
+            bids = response.BidEntryResponses;
 
-            if (targetResponse) {
-                if (this.props.selectedTab === 'myBids' || this.props.selectedTab === 'bidders') {
-                    targetResponse.sort((a: any, b: any) => b.BidAmountNanos - a.BidAmountNanos);
-                } else if (this.props.selectedTab === 'owners') {
-                    const minBidsArray: number[] = [];
-                    let serialNumber;
-                    for (const response of targetResponse) {
-                        minBidsArray.push(response.MinBidAmountNanos);
-                        if (response.OwnerPublicKeyBase58Check === globals.user.publicKey) {
-                            serialNumber = response.SerialNumber;
-                        }
-                    }
-                    const minBidAmount = Math.min(...minBidsArray);
-                    this.props.handleOwnBidInfo(minBidAmount, serialNumber);
-                }
-
+            if (bids) {
+                bids.sort((a: any, b: any) => b.BidAmountNanos - a.BidAmountNanos);
                 if (this.props.selectedTab === 'myBids') {
-                    targetResponse = targetResponse.filter((item: any) => item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey);
+                    bids = bids.filter((item: any) => item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey);
                 }
             }
 
             if (this._isMounted) {
-                this.setState({ bids: targetResponse });
+                this.setState({ bids });
             }
 
         } catch (error) {
@@ -111,7 +117,6 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
     }
 
     private goToProfile(profile: Profile): void {
-
         if (profile && profile?.Username !== 'anonymous') {
             this.props.navigation.push(
                 'UserProfile',
@@ -124,22 +129,23 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
         }
     }
 
-    private async cancelBid(): Promise<void> {
-
+    private async handleCancelBid(bid: Post): Promise<void> {
         if (this._isMounted) {
             this.setState({ isTransactionLoading: true });
         }
 
         let targetBid: any;
+
         const filteredBids = this.state.bids.filter(
-            (item: any) => {
-                if (item.ProfileEntryResponse?.PublicKeyBase58Check !== globals.user.publicKey) {
-                    return true;
+            (item: Post) => {
+                if (item.SerialNumber === bid.SerialNumber && item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey) {
+                    targetBid = item;
+                    return false;
                 }
-                targetBid = item;
-                return false;
+                return true;
             }
         );
+
         try {
             const transactionResponse = await nftApi.placeNftBid(0, this.props.post.PostHashHex, targetBid.SerialNumber, targetBid.ProfileEntryResponse?.PublicKeyBase58Check);
             const transactionHex: string = transactionResponse.TransactionHex;
@@ -157,21 +163,20 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
         } catch (error) {
             globals.defaultHandleError(error);
         } finally {
-
             if (this._isMounted) {
                 this.setState({ isTransactionLoading: false, });
             }
         }
     }
 
-    private handleCancelBid(): void {
+    private handleCancelBidAlert(bid: Post): void {
         Alert.alert(
             'Cancel Bid',
             'Are you sure you want to cancel this bid?',
             [
                 {
                     text: 'Yes',
-                    onPress: this.cancelBid
+                    onPress: () => this.handleCancelBid(bid)
                 },
                 {
                     text: 'No',
@@ -182,13 +187,76 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
         );
     }
 
+    private handleSelectNFTsActions(): void {
+        if (this._currentSelectedNfts.length === 0) {
+            eventManager.dispatchEvent(EventType.ToggleSetSelectedNfts, { visible: false, selectedNftsForSale: [] });
+        } else {
+            eventManager.dispatchEvent(EventType.ToggleSetSelectedNfts,
+                {
+                    visible: true,
+                    selectedNftsForSale: this._currentSelectedNfts
+                }
+            );
+        }
+    }
+
+    private markNftForSale(bid: Post): void {
+        const publicKey = bid.ProfileEntryResponse?.PublicKeyBase58Check;
+
+        if (this.props.numNFTCopies === 1) {
+            if (!this._currentSelectedPublicKeysForNfts.includes(publicKey)) {
+                this._currentSelectedPublicKeysForNfts = [publicKey];
+                this._currentSelectedNfts = [bid];
+            } else {
+                this._currentSelectedPublicKeysForNfts = [];
+                this._currentSelectedNfts = [];
+                if (this._isMounted) {
+                    this.setState(
+                        {
+                            selectedPublicKeysForNft: [],
+                            selectedNftsForSale: []
+                        }
+                    );
+                }
+            }
+            if (this._isMounted) {
+                this.setState(
+                    {
+                        selectedPublicKeysForNft: this._currentSelectedPublicKeysForNfts,
+                        selectedNftsForSale: this._currentSelectedNfts
+                    }
+                );
+            }
+            this.handleSelectNFTsActions();
+            return;
+        }
+
+        const selectedObj = this.state.selectedNftObj;
+        selectedObj[bid.SerialNumber] = selectedObj[bid.SerialNumber] === bid.ProfileEntryResponse?.PublicKeyBase58Check ?
+            false :
+            bid.ProfileEntryResponse?.PublicKeyBase58Check;
+
+        if (this._isMounted) {
+            this.setState({ selectedNftObj: { ...selectedObj } });
+        }
+
+        const bids = this.state.bids;
+        this._currentSelectedNfts = bids.filter((item: Post) => !!selectedObj[item.SerialNumber] && selectedObj[item.SerialNumber] == item.ProfileEntryResponse?.PublicKeyBase58Check);
+
+        if (this._isMounted) {
+            this.setState({ selectedNftsForSale: this._currentSelectedNfts });
+        }
+
+        this.handleSelectNFTsActions();
+    }
+
     render(): JSX.Element {
 
         if (this.state.isLoading) {
             return <CloutFeedLoader />;
         }
 
-        const renderRightSwipe = (_progress: any, dragX: any): JSX.Element => {
+        const renderRightCancelSwipe = (dragX: any, bid: Post): JSX.Element => {
             const scale = dragX.interpolate({
                 inputRange: [-100, 0],
                 outputRange: [1, 0.3],
@@ -197,8 +265,8 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
 
             return <TouchableOpacity
                 style={{ backgroundColor: '#fc6360' }}
-                activeOpacity={0.6}
-                onPress={this.handleCancelBid}
+                activeOpacity={0.7}
+                onPress={() => this.handleCancelBidAlert(bid)}
             >
                 <View style={[styles.deleteBox, themeStyles.borderColor]}>
                     {
@@ -206,9 +274,16 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
                             <ActivityIndicator color='white' /> :
                             <>
                                 <AntDesign name="delete" size={20} color="white" />
-                                <Animated.Text style={[
-                                    { transform: [{ scale: scale }] },
-                                    styles.deleteBoxText]} >Cancel Bid</Animated.Text>
+                                <Animated.Text style=
+                                    {
+                                        [
+                                            { transform: [{ scale: scale }] },
+                                            styles.deleteBoxText
+                                        ]
+                                    }
+                                >
+                                    Cancel Bid
+                                </Animated.Text>
                             </>
                     }
                 </View>
@@ -219,56 +294,76 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
 
         const renderItem = (item: Post): JSX.Element =>
             <Swipeable
-                enabled={
-                    (this.props.selectedTab === 'bidders' ||
-                        this.props.selectedTab === 'myBids') &&
-                    item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey
+                rightThreshold={40}
+                renderRightActions=
+                {
+                    (_progress: any, dragX: any) => item.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey ?
+                        renderRightCancelSwipe(dragX, item) :
+                        undefined
                 }
-                renderRightActions={renderRightSwipe}
             >
                 <TouchableOpacity
-                    activeOpacity={1}
-                    onPress={() => this.goToProfile(item.ProfileEntryResponse)}
+                    activeOpacity={0.85}
+                    onPress=
+                    {
+                        this.props.selectModeOn ?
+                            () => this.markNftForSale(item) :
+                            () => this.goToProfile(item.ProfileEntryResponse)
+                    }
                     style=
                     {
                         [
-                            styles.ownerCard,
-                            themeStyles.containerColorMain,
-                            themeStyles.borderColor
+                            this.props.selectModeOn &&
+                                this.state.selectedNftObj[item.SerialNumber] &&
+                                this.state.selectedNftObj[item.ProfileEntryResponse?.PublicKeyBase58Check] ?
+                                themeStyles.modalBackgroundColor :
+                                themeStyles.containerColorMain,
+                            themeStyles.borderColor,
+                            styles.ownerCard
                         ]
                     }
                 >
-                    <View style={styles.profileRow}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {
+                            this.props.selectModeOn && (
+                                this.state.selectedNftObj[item.SerialNumber] &&
+                                    this.state.selectedNftObj[item.SerialNumber] === item.ProfileEntryResponse?.PublicKeyBase58Check ?
+                                    <MaterialCommunityIcons
+                                        style={styles.checkBoxIcon}
+                                        name="checkbox-marked"
+                                        size={18}
+                                        color={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                                    /> :
+                                    <MaterialCommunityIcons
+                                        name="checkbox-blank-outline"
+                                        size={18}
+                                        style={styles.checkBoxIcon}
+                                        color={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                                    />
+                            )
+                        }
                         <ProfileInfoCardComponent
                             profile={item.ProfileEntryResponse}
                             navigation={this.props.navigation}
                         />
                     </View>
                     <View style={styles.rightContainer}>
-                        <View style={
-                            [
-                                styles.serialNumberBox,
-                                themeStyles.borderColor,
-                                themeStyles.modalBackgroundColor
-                            ]
-                        }>
+                        <View style=
+                            {
+                                [
+                                    styles.serialNumberBox,
+                                    themeStyles.borderColor,
+                                    themeStyles.modalBackgroundColor
+                                ]
+                            }
+                        >
                             <Text style={[themeStyles.fontColorSub, styles.serialNumber]}>#{item.SerialNumber}</Text>
                         </View>
                         <Text style={[styles.balance, themeStyles.fontColorMain]}>
-                            {
-                                this.props.selectedTab === 'bidders' ||
-                                    this.props.selectedTab === 'myBids' ?
-                                    this.calculateBidderBalance((item as any).BidAmountNanos)
-                                    : this.calculateBidderBalance((item as any).LastAcceptedBidAmountNanos)
-                            }
+                            {this.calculateBidderBalance(item.BidAmountNanos)}
                         </Text>
-                        <Text style={[styles.coinPrice, themeStyles.fontColorMain]}>~$
-                            {
-                                this.props.selectedTab === 'bidders' ||
-                                    this.props.selectedTab === 'myBids' ?
-                                    calculateAndFormatBitCloutInUsd((item as any).BidAmountNanos) :
-                                    calculateAndFormatBitCloutInUsd((item as any).LastAcceptedBidAmountNanos)
-                            }
+                        <Text style={[styles.coinPrice, themeStyles.fontColorMain]}>
+                            ~${calculateAndFormatBitCloutInUsd(item.BidAmountNanos)}
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -278,7 +373,7 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
             tintColor={themeStyles.fontColorMain.color}
             titleColor={themeStyles.fontColorMain.color}
             refreshing={this.state.isRefreshing}
-            onRefresh={this.init}
+            onRefresh={() => this.props.refresh(true)}
         />;
 
         return <View style={styles.container}>
@@ -288,13 +383,11 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
                     <ScrollView refreshControl={renderRefresh} >
                         <Text style={[styles.emptyBidders, themeStyles.fontColorSub]}>
                             {
-                                this.props.selectedTab === 'bidders' ?
-                                    'No bidders for this post yet' :
-                                    this.props.selectedTab === 'owners' ?
-                                        'No owners for this post yet' :
-                                        this.props.isNftForSale ?
-                                            'Placing a bid for this post is not available at the moment' :
-                                            'You have no bids yet, press on the Place a bid button to start!'
+                                this.props.selectedTab === 'bidders' && (
+                                    this.props.isNftForSale ?
+                                        'There are no bids yet' :
+                                        'This NFT is not on sale'
+                                )
                             }
                         </Text>
                     </ScrollView> :
@@ -307,6 +400,7 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
                         />
                     </>
             }
+
         </View>;
     }
 }
@@ -318,16 +412,13 @@ const styles = StyleSheet.create(
         },
         ownerCard: {
             flexDirection: 'row',
+            zIndex: 10,
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingVertical: 10,
             paddingHorizontal: 10,
             borderBottomWidth: 1,
             width: Dimensions.get('screen').width
-        },
-        profileRow: {
-            flexDirection: 'row',
-            alignItems: 'center'
         },
         balance: {
             fontSize: 15,
@@ -368,7 +459,10 @@ const styles = StyleSheet.create(
         deleteBoxText: {
             color: 'white',
             paddingTop: 5,
-            fontSize: 12
+            fontSize: 13
+        },
+        checkBoxIcon: {
+            marginRight: 8
         }
     }
 );
