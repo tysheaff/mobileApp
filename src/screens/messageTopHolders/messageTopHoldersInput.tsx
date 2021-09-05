@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native';
 import { ScrollView, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { CreatorCoinHODLer, Profile } from '@types';
-import { globals, navigatorGlobals, settingsGlobals } from '@globals';
+import { CreatorCoinHODLer, EventType, Profile } from '@types';
+import { eventManager, globals, settingsGlobals } from '@globals';
 import { api, cache, promiseHelper } from '@services';
 import { themeStyles } from '@styles';
 import { signing } from '@services/authorization/signing';
@@ -25,14 +25,12 @@ export function MessageTopHoldersInputScreen({ route }: Route) {
     const [isLoading, setLoading] = useState(true);
     const [isSending, setSending] = useState(false);
     const [profile, setProfile] = useState({} as Profile);
-    const [messageText, setMessageText] = useState('');
-    const [relevantHolders, setRelevantHolders] = useState<string[]>([]);
     const [receiversCount, setReceiversCount] = useState(0);
     const [alreadyReceivedCount, setAlreadyReceivedCount] = useState(0);
 
+    const relevantHolders = useRef<string[]>([]);
+    const messageText = useRef<string>('');
     const isMounted = useRef<boolean>(true);
-
-    navigatorGlobals.broadcastMessage = broadcastMessages;
 
     useEffect(
         () => {
@@ -60,7 +58,7 @@ export function MessageTopHoldersInputScreen({ route }: Route) {
                         if (isMounted) {
                             setProfile(profile);
                             setLoading(false);
-                            setRelevantHolders(usersWhoHODLYou.map(user => user.HODLerPublicKeyBase58Check));
+                            relevantHolders.current = usersWhoHODLYou.map(user => user.HODLerPublicKeyBase58Check);
                         }
                     } else {
                         alert('You do not have any coin holders!');
@@ -69,8 +67,11 @@ export function MessageTopHoldersInputScreen({ route }: Route) {
                 }
             ).catch(error => globals.defaultHandleError(error));
 
+            const unsubscribeEvent = eventManager.addEventListener(EventType.BroadcastMessage, broadcastMessages);
+
             return () => {
                 isMounted.current = false;
+                unsubscribeEvent();
             };
         },
         []
@@ -81,22 +82,21 @@ export function MessageTopHoldersInputScreen({ route }: Route) {
             return;
         }
 
-        broadcastMessagesInBatches(relevantHolders);
+        broadcastMessagesInBatches();
     }
 
-    async function broadcastMessagesInBatches(holders: string[]): Promise<void> {
+    async function broadcastMessagesInBatches(): Promise<void> {
         setSending(true);
-        setReceiversCount(holders.length);
+        setReceiversCount(relevantHolders.current.length);
 
         if (isMounted) {
             setLoading(true);
         }
 
         try {
-            for (const holder of holders) {
+            for (const holder of relevantHolders.current) {
                 try {
-                    const encryptedMessage = await signing.encryptShared(holder, messageText);
-
+                    const encryptedMessage = await signing.encryptShared(holder, messageText.current);
                     await promiseHelper.retryOperation(
                         () => {
                             return new Promise<void>(
@@ -169,9 +169,8 @@ export function MessageTopHoldersInputScreen({ route }: Route) {
                             placeholderTextColor={themeStyles.fontColorSub.color}
                             multiline
                             maxLength={2048}
-                            value={messageText}
                             autoFocus
-                            onChangeText={setMessageText}
+                            onChangeText={(text) => { messageText.current = text; }}
                             keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
                         />
 

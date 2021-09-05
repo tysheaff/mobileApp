@@ -3,5 +3,4 @@ export const navigatorGlobals = {
     refreshProfile: () => { },
     refreshWallet: () => { },
     searchResults: (p_query: string) => { },
-    broadcastMessage: () => { }
 };

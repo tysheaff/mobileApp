@@ -18,7 +18,8 @@ export enum EventType {
     RefreshMessages = 12,
     FocusSearchHeader = 13,
     ToggleBidForm = 14,
-    ToggleSetSelectedNfts = 15
+    ToggleSetSelectedNfts = 15,
+    BroadcastMessage = 16
 }
 
 export interface ChangeFollowersEvent {

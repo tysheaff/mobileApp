@@ -9,7 +9,7 @@ import { MessageTopHoldersOptionsScreen } from '@screens/messageTopHolders/messa
 import { MessageTopHoldersInputScreen } from '@screens/messageTopHolders/messageTopHoldersInput';
 import { ChatHeaderComponent } from '@components/chatHeader.component';
 import { MessagesHeaderComponent } from '@screens/messages/components/messagesHeader';
-import { navigatorGlobals, globals } from '@globals';
+import { globals, eventManager } from '@globals';
 import { themeStyles } from '@styles';
 import { MessagesScreen } from '@screens/messages/messages.screen';
 import { IdentityScreen } from '@screens/login/identity.screen';
@@ -32,6 +32,7 @@ import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
 import MintPostScreen from '@screens/nft/mintPost.screen';
 import SellNftScreen from '@screens/nft/components/sellNft.screen';
+import { EventType } from '@types';
 
 const MessageStack = createStackNavigator();
 
@@ -78,7 +79,7 @@ export default function MessageStackScreen() {
                     headerBackTitle: ' ',
                     headerRight: () => <CloutFeedButton
                         title={'Send'}
-                        onPress={navigatorGlobals.broadcastMessage}
+                        onPress={() => eventManager.dispatchEvent(EventType.BroadcastMessage)}
                         styles={styles.postButton}
                     />
                 }}
