@@ -42,6 +42,7 @@ export class CreatorsSearchScreen extends React.Component<Props, State> {
 
         this.init();
 
+        this.setSearchMethod();
         this._focusSubscription = this.props.navigation.addListener(
             'focus',
             () => {
