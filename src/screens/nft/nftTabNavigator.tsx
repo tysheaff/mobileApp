@@ -50,6 +50,7 @@ interface State {
     selectModeOn: boolean;
     sendUnlockableTextFormVisible: boolean;
     isSellButtonLoading: boolean;
+    ownUserBidders: Post[];
 }
 
 const NFTTab = createMaterialTopTabNavigator();
@@ -60,7 +61,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
 
     private _unsubscribes: (() => void) = () => { };
 
-    private _unsubscribeTest: (() => void) = () => { };
+    private _unsubscribeRefreshOnFocus: (() => void) = () => { };
 
     private _noBids = false;
 
@@ -82,7 +83,8 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             isUserOwner: false,
             selectModeOn: false,
             sendUnlockableTextFormVisible: false,
-            isSellButtonLoading: false
+            isSellButtonLoading: false,
+            ownUserBidders: []
         };
 
         this.init = this.init.bind(this);
@@ -100,7 +102,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         this.refresh = this.refresh.bind(this);
         this.init(false);
 
-        this._unsubscribeTest = this.props.navigation.addListener('focus',
+        this._unsubscribeRefreshOnFocus = this.props.navigation.addListener('focus',
             () => {
                 this.init(true);
                 this.refresh();
@@ -131,7 +133,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         this._isMounted = false;
         this._unsubscribes();
 
-        this._unsubscribeTest();
+        this._unsubscribeRefreshOnFocus();
     }
 
     private refresh(): void {
@@ -147,6 +149,8 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             }
             let isUserBidder = false;
             let isUserOwner = false;
+            const ownUserBidders: Post[] = [];
+            const availableSerialNumbers: number[] = [];
             const encryptedUnlockableTexts: UnlockableText[] = [];
 
             const response = await nftApi.getNftBids(globals.user.publicKey, this.props.route.params.post.PostHashHex);
@@ -155,10 +159,19 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             const hasUnlockableContent = response.PostEntryResponse?.HasUnlockable === true;
             this._noBids = bidResponses === null;
 
+            for (const nft of nftResponses) {
+                if (nft.OwnerPublicKeyBase58Check === globals.user.publicKey) {
+                    availableSerialNumbers.push(nft.SerialNumber);
+                }
+            }
+
             if (bidResponses) {
                 for (const bidEntry of bidResponses) {
                     if (bidEntry?.PublicKeyBase58Check === globals.user.publicKey) {
                         isUserBidder = true;
+                    }
+                    if (availableSerialNumbers.includes(bidEntry.SerialNumber)) {
+                        ownUserBidders.push(bidEntry);
                     }
                 }
             }
@@ -188,6 +201,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                     isUserOwner,
                     availableBids: response.PostEntryResponse.NumNFTCopiesForSale,
                     isNftForSale: response.PostEntryResponse.NumNFTCopiesForSale !== 0,
+                    ownUserBidders
                 }
             );
         } catch (error) {
@@ -533,7 +547,11 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                         )
                     }
                     {
-                        !globals.readonly && this.state.isUserOwner && this.state.isNftForSale && !this._noBids &&
+                        !globals.readonly &&
+                        this.state.isUserOwner &&
+                        this.state.isNftForSale &&
+                        !this._noBids &&
+                        this.state.ownUserBidders.length !== 0 &&
                         <CloutFeedButton
                             isLoading={this.state.isSellButtonLoading}
                             backgroundColor={sellButtonBackgroundColor}
@@ -562,6 +580,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                     {
                         props => <NFTBiddersScreen
                             {...props}
+                            ownUserBidders={this.state.ownUserBidders}
                             refresh={(isLoading: boolean) => this.init(isLoading)}
                             selectModeOn={this.state.selectModeOn}
                             numNFTCopies={this.props.route.params.post.NumNFTCopies}

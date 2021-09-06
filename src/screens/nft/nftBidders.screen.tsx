@@ -23,6 +23,7 @@ interface Props {
     hasUnlockableContent?: boolean;
     selectModeOn?: boolean;
     refresh: any;
+    ownUserBidders?: Post[];
 }
 
 interface State {
@@ -342,14 +343,12 @@ export default class NFTBiddersScreen extends React.Component<Props, State> {
                             }
                         </Text>
                     </ScrollView> :
-                    <>
-                        <FlatList
-                            data={this.state.bids}
-                            keyExtractor={keyExtractor}
-                            renderItem={renderListItem}
-                            refreshControl={renderRefresh}
-                        />
-                    </>
+                    <FlatList
+                        data={this.props.selectModeOn ? this.props.ownUserBidders : this.state.bids}
+                        keyExtractor={keyExtractor}
+                        renderItem={renderListItem}
+                        refreshControl={renderRefresh}
+                    />
             }
         </View>;
     }
