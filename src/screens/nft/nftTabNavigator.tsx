@@ -567,7 +567,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 sceneContainerStyle={themeStyles.containerColorMain}
                 tabBarOptions={
                     {
-                        style: themeStyles.containerColorMain,
+                        style: [themeStyles.containerColorMain, styles.tabBarStyle],
                         indicatorStyle: { backgroundColor: themeStyles.fontColorMain.color },
                         tabStyle: { marginTop: 0 },
                         activeTintColor: themeStyles.fontColorMain.color,
@@ -642,6 +642,13 @@ const styles = StyleSheet.create(
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center'
+        },
+        tabBarStyle: {
+            elevation: 0,
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0,
+            shadowRadius: 0
         },
         nftButtonContainer: {
             width: 100,
