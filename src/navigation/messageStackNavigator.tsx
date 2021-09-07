@@ -31,7 +31,7 @@ import NFTTabNavigator from '@screens/nft/nftTabNavigator';
 import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
 import MintPostScreen from '@screens/nft/mintPost.screen';
-import SellNftScreen from '@screens/nft/components/sellNft.screen';
+import SellNftScreen from '@screens/nft/sellNft.screen';
 import { EventType } from '@types';
 
 const MessageStack = createStackNavigator();

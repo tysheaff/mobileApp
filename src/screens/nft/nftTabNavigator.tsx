@@ -5,7 +5,7 @@ import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { themeStyles } from '@styles/globalColors';
 import { StackNavigationProp } from '@react-navigation/stack';
 import NFTBiddersScreen from './nftBidders.screen';
-import { EventType, Post, ToggleSellNftModalEvent as ToggleSellNftModalEvent } from '@types';
+import { BidEdition, EventType, Post, ToggleSellNftModalEvent as ToggleSellNftModalEvent } from '@types';
 import { globals } from '@globals/globals';
 import { api, nftApi } from '@services';
 import { signing } from '@services/authorization/signing';
@@ -14,7 +14,7 @@ import { eventManager } from '@globals/injector';
 import { FontAwesome } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import { TextWithLinks } from '@components/textWithLinks.component';
-import NftOwnersScreen from './components/nftOwners.screen';
+import NftOwnersScreen from './nftOwners.screen';
 import UnlockableTextFormComponent from './components/unlockableTextForm.component';
 import CloutFeedButton from '@components/cloutfeedButton.component';
 
@@ -63,7 +63,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
 
     private _unsubscribeRefreshOnFocus: (() => void) = () => { };
 
-    private _noBids = false;
+    private _userCanBid = true;
 
     constructor(props: Props) {
         super(props);
@@ -100,6 +100,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         this.handleSellNftBidAlert = this.handleSellNftBidAlert.bind(this);
         this.handleSellSingleNftBid = this.handleSellSingleNftBid.bind(this);
         this.refresh = this.refresh.bind(this);
+        this.toggleMultipleNFTOptions = this.toggleMultipleNFTOptions.bind(this);
         this.init(false);
 
         this._unsubscribeRefreshOnFocus = this.props.navigation.addListener('focus',
@@ -153,11 +154,20 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             const availableSerialNumbers: number[] = [];
             const encryptedUnlockableTexts: UnlockableText[] = [];
 
-            const response = await nftApi.getNftBids(globals.user.publicKey, this.props.route.params.post.PostHashHex);
-            const bidResponses = response.BidEntryResponses;
-            const nftResponses = response.NFTEntryResponses;
-            const hasUnlockableContent = response.PostEntryResponse?.HasUnlockable === true;
-            this._noBids = bidResponses === null;
+            const responses = await Promise.all(
+                [
+                    nftApi.getNftBids(globals.user.publicKey, this.props.route.params.post.PostHashHex),
+                    nftApi.getNftBidEditions(globals.user.publicKey, this.props.route.params.post.PostHashHex),
+                ]
+            );
+            const bidEditions = Object.values(responses[1].SerialNumberToNFTEntryResponse).filter((item: any) => item.OwnerPublicKeyBase58Check !== globals.user.publicKey) as BidEdition[];
+
+            if (bidEditions.length === 0) {
+                this._userCanBid = false;
+            }
+            const bidResponses = responses[0].BidEntryResponses;
+            const nftResponses = responses[0].NFTEntryResponses;
+            const hasUnlockableContent = responses[0].PostEntryResponse?.HasUnlockable === true;
 
             for (const nft of nftResponses) {
                 if (nft.OwnerPublicKeyBase58Check === globals.user.publicKey) {
@@ -176,9 +186,10 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 }
             }
 
+            ownUserBidders.sort((a: any, b: any) => b.BidAmountNanos - a.BidAmountNanos);
             if (nftResponses) {
                 for (const nftEntry of nftResponses) {
-                    if (nftEntry.ProfileEntryResponse?.PublicKeyBase58Check === globals.user.publicKey) {
+                    if (nftEntry.OwnerPublicKeyBase58Check === globals.user.publicKey) {
                         isUserOwner = true;
                     }
                     if (nftEntry.EncryptedUnlockableText && hasUnlockableContent) {
@@ -199,8 +210,8 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                     hasUnlockableContent,
                     encryptedUnlockableTexts,
                     isUserOwner,
-                    availableBids: response.PostEntryResponse.NumNFTCopiesForSale,
-                    isNftForSale: response.PostEntryResponse.NumNFTCopiesForSale !== 0,
+                    availableBids: responses[0].PostEntryResponse.NumNFTCopiesForSale,
+                    isNftForSale: responses[0].PostEntryResponse.NumNFTCopiesForSale !== 0,
                     ownUserBidders
                 }
             );
@@ -252,7 +263,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
     }
 
     private handleSingleAuctionAlert(): void {
-        if (this.state.selectModeOn) {
+        if (this.state.selectModeOn && this._isMounted) {
             return this.setState({ selectModeOn: false });
         }
         const title = this.state.isNftForSale ? 'Close Auction' : 'Open Auction';
@@ -389,25 +400,162 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         }
     }
 
+    private toggleMultipleNFTOptions(): void {
+        if (this.state.selectModeOn) {
+            return this.setState({ selectModeOn: false });
+        }
+        const options = ['Place a bid', 'Sell NFT', 'Edit NFT', 'Cancel'];
+        const callback = (optionIndex: number) => {
+            switch (optionIndex) {
+                case 0:
+                    this.goToBidEditions();
+                    break;
+                case 1:
+                    this.setSelectModeOn();
+                    break;
+                case 2:
+                    this.goToAuctionStatus();
+                    break;
+            }
+        };
+
+        eventManager.dispatchEvent(
+            EventType.ToggleActionSheet,
+            {
+                visible: true,
+                config: { options, callback, destructiveButtonIndex: [] }
+            }
+        );
+    }
+
+    private renderPlaceBidButton(): JSX.Element | undefined {
+        if (
+            (!this.state.isUserOwner && this.state.isNftForSale) ||
+            (this.state.isUserOwner && this.state.isNftForSale && !this.state.selectModeOn && this._userCanBid)
+        ) {
+            return <CloutFeedButton
+                backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                styles={styles.sellNftButtonContainer}
+                title={'Place a bid'}
+                onPress={this.goToBidEditions}
+            />;
+        }
+    }
+
+    private renderCloseAuctionButton(): JSX.Element | undefined {
+        if (
+            this.state.isUserOwner &&
+            this.state.isNftForSale &&
+            !this.state.selectModeOn &&
+            this.props.route.params.post.NumNFTCopies === 1
+        ) {
+            return <CloutFeedButton
+                isLoading={this.state.isButtonLoading}
+                backgroundColor={themeStyles.likeHeartBackgroundColor.backgroundColor}
+                styles={styles.editAuctionsButtonContainer}
+                title={'Close Auction'}
+                onPress={this.handleSingleAuctionAlert}
+            />;
+        }
+    }
+
+    private renderPutOnSaleButton(): JSX.Element | undefined {
+        if (this.state.isUserOwner && !this.state.isNftForSale && this.props.route.params.post.NumNFTCopies === 1) {
+            return <CloutFeedButton
+                isLoading={this.state.isButtonLoading}
+                backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                styles={styles.editAuctionsButtonContainer}
+                title={'Put on sale'}
+                onPress={this.handleSingleAuctionAlert}
+            />;
+        }
+    }
+
+    private renderSellNFTButton(): JSX.Element | undefined {
+        if (!this.state.selectModeOn && this.state.isUserOwner && this.state.isNftForSale && this.state.ownUserBidders.length !== 0) {
+            return <CloutFeedButton
+                backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                styles={styles.sellNftButtonContainer}
+                title={'Sell NFT'}
+                onPress={this.setSelectModeOn}
+            />;
+        }
+    }
+
+    private renderConfirmButton(): JSX.Element | undefined {
+        if (this.state.isUserOwner && this.state.selectModeOn) {
+            const disabled = this.state.selectedNftsForSale.length === 0;
+            return <CloutFeedButton
+                disabled={disabled}
+                isLoading={this.state.isSellButtonLoading}
+                backgroundColor={disabled ? 'rgba(0, 126, 245, 0.6)' : themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                styles={styles.sellNftButtonContainer}
+                title={'Confirm'}
+                onPress={this.setSelectModeOn}
+            />;
+        }
+    }
+
+    private renderCancelButton(): JSX.Element | undefined {
+        if (this.state.isUserOwner && this.state.selectModeOn) {
+            return <CloutFeedButton
+                backgroundColor={themeStyles.likeHeartBackgroundColor.backgroundColor}
+                styles={styles.nftButtonContainer}
+                title={'Cancel'}
+                onPress={this.handleSingleAuctionAlert}
+            />;
+        }
+    }
+
+    private renderEditAuctionButton(): JSX.Element | undefined {
+        if (this.state.isUserOwner && !this.state.selectModeOn && this.props.route.params.post.NumNFTCopies > 1) {
+            return <CloutFeedButton
+                backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                styles={styles.editAuctionsButtonContainer}
+                title={'Edit Auctions'}
+                onPress={this.goToAuctionStatus}
+            />;
+        }
+    }
+
+    private renderNFTOptionsButton(): JSX.Element | undefined {
+        return <>
+            {this.renderCancelButton()}
+            {this.renderConfirmButton()}
+            <CloutFeedButton
+                isLoading={this.state.isSellButtonLoading}
+                backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
+                styles={styles.editAuctionsButtonContainer}
+                title={'NFT Options'}
+                onPress={this.toggleMultipleNFTOptions}
+            />
+        </>;
+    }
+
+    private renderNFTButtons(): JSX.Element | undefined {
+        if (globals.readonly) {
+            return undefined;
+        }
+        if (this.state.isUserOwner && this._userCanBid && this.state.ownUserBidders.length !== 0 && !this.state.selectModeOn) {
+            return this.renderNFTOptionsButton();
+        }
+        return <>
+            {this.renderCloseAuctionButton()}
+            {this.renderPutOnSaleButton()}
+            {this.renderEditAuctionButton()}
+            {this.renderPlaceBidButton()}
+            {this.renderSellNFTButton()}
+            {this.renderCancelButton()}
+            {this.renderConfirmButton()}
+        </>;
+    }
+
     render(): JSX.Element {
 
         if (this.state.isLoading) {
             return <CloutFeedLoader />;
         }
-
-        const closeAuctionButtonTitle = this.state.selectModeOn ? 'Cancel' : 'Close auction';
-        const sellButtonTitle = this.state.selectModeOn ?
-            'Confirm' :
-            this.props.route.params.post.NumNFTCopies === 1 ?
-                'Sell NFT' :
-                'Sell NFTs';
-
-        const editAuctionsTitle = this.state.selectModeOn ? 'Cancel' : 'Edit Auctions';
-        const isSellButtonDisabled = this.state.selectedNftsForSale.length === 0 && this.state.selectModeOn;
-        const sellButtonBackgroundColor = isSellButtonDisabled ? 'rgba(0, 126, 245, 0.6)' : themeStyles.verificationBadgeBackgroundColor.backgroundColor;
-
         const keyExtractor = (item: UnlockableText, index: number): string => `${item.EncryptedText}_${index.toString()}`;
-
         const renderHeader = <>
             <Text style={[themeStyles.fontColorMain, styles.unlockableTitle]}>Unlockable Content</Text>
             <View style={[styles.titleBorder, themeStyles.borderColor]} />
@@ -427,9 +575,9 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             <View style={styles.headerContainer}>
                 <View>
                     <Text style={[styles.availableNfts, themeStyles.fontColorMain]}>
-                        <Text style={{ fontWeight: 'bold' }}>{this.state.availableBids} </Text>
+                        <Text style={styles.auctionCount}>{this.state.availableBids} </Text>
                         of
-                        <Text style={{ fontWeight: 'bold' }}> {this.props.route.params.post.NumNFTCopies} </Text>
+                        <Text style={styles.auctionCount}> {this.props.route.params.post.NumNFTCopies} </Text>
                         availabe
                     </Text>
                     {
@@ -483,84 +631,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                     }
                 </View>
                 <View style={{ flexDirection: 'row' }}>
-                    {
-                        !globals.readonly && (
-                            this.props.route.params.post.NumNFTCopies > 1 &&
-                            (
-                                <>
-                                    {
-                                        this.state.isUserOwner ?
-                                            <>
-                                                <CloutFeedButton
-                                                    backgroundColor={this.state.selectModeOn ? themeStyles.likeHeartBackgroundColor.backgroundColor : themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                                    styles={[styles.nftButtonContainer, { width: 110 }]}
-                                                    title={editAuctionsTitle}
-                                                    onPress={this.goToAuctionStatus}
-                                                />
-                                            </>
-                                            : this.state.isNftForSale &&
-                                            <CloutFeedButton
-                                                backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                                styles={styles.nftButtonContainer}
-                                                title={'Place a bid'}
-                                                onPress={this.goToBidEditions}
-                                            />
-                                    }
-                                </>
-                            )
-
-                        )
-                    }
-
-                    {
-                        !globals.readonly && this.props.route.params.post.NumNFTCopies === 1 && (
-                            this.state.isUserOwner ? (
-                                (
-                                    this.state.isNftForSale ?
-                                        <CloutFeedButton
-                                            isLoading={this.state.isButtonLoading}
-                                            backgroundColor={themeStyles.likeHeartBackgroundColor.backgroundColor}
-                                            styles={[styles.nftButtonContainer, { width: 115 }]}
-                                            title={closeAuctionButtonTitle}
-                                            onPress={this.handleSingleAuctionAlert}
-                                        />
-                                        :
-                                        this.state.isUserOwner &&
-                                        <CloutFeedButton
-                                            isLoading={this.state.isButtonLoading}
-                                            backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                            styles={styles.nftButtonContainer}
-                                            title={'Put on Sale'}
-                                            onPress={this.handleSingleAuctionAlert}
-                                        />
-                                )
-                            ) :
-                                (
-                                    this.state.isNftForSale &&
-                                    <CloutFeedButton
-                                        backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                        styles={styles.nftButtonContainer}
-                                        title={'Place a bid'}
-                                        onPress={this.goToBidEditions}
-                                    />
-                                )
-                        )
-                    }
-                    {
-                        !globals.readonly &&
-                        this.state.isUserOwner &&
-                        this.state.isNftForSale &&
-                        !this._noBids &&
-                        this.state.ownUserBidders.length !== 0 &&
-                        <CloutFeedButton
-                            isLoading={this.state.isSellButtonLoading}
-                            backgroundColor={sellButtonBackgroundColor}
-                            styles={[styles.nftButtonContainer, { marginLeft: 10 }]}
-                            disabled={isSellButtonDisabled}
-                            title={sellButtonTitle}
-                            onPress={this.setSelectModeOn}
-                        />
-                    }
+                    {this.renderNFTButtons()}
                 </View>
             </View>
             <NFTTab.Navigator
@@ -642,6 +713,24 @@ const styles = StyleSheet.create(
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center'
+        },
+        sellNftButtonContainer: {
+            width: 100,
+            height: 30,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 4,
+            marginLeft: 10
+        },
+        auctionCount: {
+            fontWeight: 'bold'
+        },
+        editAuctionsButtonContainer: {
+            width: 115,
+            height: 30,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 4
         },
         tabBarStyle: {
             elevation: 0,

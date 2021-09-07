@@ -34,7 +34,7 @@ import BidEditionsScreen from '@screens/nft/bidEditions.screen';
 import NFTTabNavigator from '@screens/nft/nftTabNavigator';
 import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
 import MintPostScreen from '@screens/nft/mintPost.screen';
-import SellNftScreen from '@screens/nft/components/sellNft.screen';
+import SellNftScreen from '@screens/nft/sellNft.screen';
 
 const ProfileStack = createStackNavigator();
 

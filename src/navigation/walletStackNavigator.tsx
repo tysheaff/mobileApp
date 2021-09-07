@@ -24,7 +24,7 @@ import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
 import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
 import MintPostScreen from '@screens/nft/mintPost.screen';
-import SellNftScreen from '@screens/nft/components/sellNft.screen';
+import SellNftScreen from '@screens/nft/sellNft.screen';
 
 const WalletStack = createStackNavigator();
 
