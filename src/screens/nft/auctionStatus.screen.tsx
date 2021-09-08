@@ -2,14 +2,12 @@ import { globals } from '@globals/globals';
 import { api, cache, calculateBitCloutInUSD, formatNumber, nftApi, snackbar } from '@services';
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
-import { ActivityIndicator, Alert, FlatList, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Keyboard, Platform } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Post } from '@types';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
-import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { signing } from '@services/authorization/signing';
-import Modal from 'react-native-modal';
-import { settingsGlobals } from '@globals/settingsGlobals';
-import CloutFeedButton from '@components/cloutfeedButton.component';
+import MinBidAmountFormComponent from './components/minBidAmountForm.component';
 
 interface Props {
     selectedTab: string;
@@ -25,7 +23,7 @@ interface State {
     selectedAuctions: Post[];
     selectedSerialNumbers: number[];
     areAllAuctionsSelected: boolean;
-    isAuctionPriceModalVisible: boolean;
+    newMinBidAmountFormVisible: boolean;
     usd: string;
     clout: string;
     isUsd: boolean;
@@ -51,12 +49,12 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
             selectedSerialNumbers: [],
             areAllAuctionsSelected: false,
             isButtonLoading: false,
-            isAuctionPriceModalVisible: false,
+            newMinBidAmountFormVisible: false,
             usd: '0',
             clout: '0',
             isUsd: false,
             ownUserBalance: 0,
-            isModalButtonLoading: false
+            isModalButtonLoading: false,
         };
 
         this.init = this.init.bind(this);
@@ -66,6 +64,8 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
         this.setCloutAmount = this.setCloutAmount.bind(this);
         this.setUsdAmount = this.setUsdAmount.bind(this);
         this.toggleCurrencyTransfer = this.toggleCurrencyTransfer.bind(this);
+        this.toggleNewMinBidAmount = this.toggleNewMinBidAmount.bind(this);
+        this.refreshBids = this.refreshBids.bind(this);
 
         this.init(false);
     }
@@ -82,6 +82,7 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
         if (isRefreshing && this._isMounted) {
             this.setState({ isRefreshing: true });
         }
+
         try {
             const auctionsOnSale = [];
             const closedAuctions = [];
@@ -219,7 +220,7 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
             globals.defaultHandleError(error);
         } finally {
             if (this.props.selectedTab === 'closed' && this._isMounted) {
-                this.setState({ isAuctionPriceModalVisible: false });
+                this.setState({ newMinBidAmountFormVisible: false });
             }
             if (this._isMounted) {
                 this.setState({ isButtonLoading: false, isModalButtonLoading: false });
@@ -254,12 +255,6 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
         );
     }
 
-    private toggleAuctionPriceModal(isAuctionPriceModalVisible: boolean): void {
-        if (this._isMounted) {
-            this.setState({ isAuctionPriceModalVisible });
-        }
-    }
-
     private isBidFormValid() {
 
         if (this.state.clout.length === 0 || this.state.usd.length === 0) {
@@ -292,11 +287,30 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
         }
     }
 
-    render(): JSX.Element {
+    private toggleNewMinBidAmount(newMinBidAmountFormVisible: boolean): void {
+        if (this._isMounted) {
+            this.setState({ newMinBidAmountFormVisible });
+        }
+    }
 
-        const currencyLabel = this.state.isUsd ? 'USD' : 'CLOUT';
-        const keyboardVerticalOffset = Platform.OS === 'ios' ? 10 : 0;
-        const behavior = Platform.OS === 'ios' ? 'padding' : undefined;
+    private refreshBids(): void {
+
+        const filteredAuctions = this.state.auctions.filter((auction: Post) => !this.state.selectedSerialNumbers.includes(auction.SerialNumber));
+        if (this._isMounted) {
+            this.setState(
+                {
+                    auctions: filteredAuctions,
+                    areAllAuctionsSelected: false,
+                    selectedSerialNumbers: [],
+                    selectedAuctions: [],
+                }
+            );
+            this._currentSelectedEditions = [];
+            this._currentSelectedSerialNumbers = [];
+        }
+    }
+
+    render(): JSX.Element {
 
         const buttonTitle = this.props.selectedTab === 'onSale' ? 'Close auctions' : 'Put on Sale';
         const isButtonDisabled = this.state.selectedAuctions.length === 0;
@@ -352,7 +366,7 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
         const renderFooter = <TouchableOpacity
             activeOpacity={0.8}
             disabled={isButtonDisabled}
-            onPress={this.props.selectedTab === 'onSale' ? this.handleOwnAuctionAlert : () => this.toggleAuctionPriceModal(true)}
+            onPress={this.props.selectedTab === 'onSale' ? this.handleOwnAuctionAlert : () => this.toggleNewMinBidAmount(true)}
             style={[styles.closeBidButton, buttonBackgroundColor]
             }
         >
@@ -396,79 +410,16 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
                             data={this.state.auctions}
                             ListFooterComponent={renderFooter}
                         />
-                        <Modal
-                            animationIn={'slideInUp'}
-                            animationOut={'slideOutDown'}
-                            swipeDirection='down'
-                            animationInTiming={400}
-                            animationOutTiming={400}
-                            onSwipeComplete={() => this.toggleAuctionPriceModal(false)}
-                            onBackdropPress={() => this.toggleAuctionPriceModal(false)}
-                            onBackButtonPress={() => this.toggleAuctionPriceModal(false)}
-                            isVisible={this.state.isAuctionPriceModalVisible}
-                            style={styles.modal}>
-                            <KeyboardAvoidingView
-                                behavior={behavior}
-                                keyboardVerticalOffset={keyboardVerticalOffset}
-                                style={[styles.subContainer, themeStyles.modalBackgroundColor]}
-                            >
-                                <TouchableOpacity
-                                    activeOpacity={1}
-                                    onPress={() => Keyboard.dismiss()}
-                                >
-                                    <View style={styles.modalHeaderRow}>
-                                        <View style={styles.midTitleContainer}>
-                                            <Text style={[styles.headerTitle, themeStyles.fontColorMain]}>Create an Auction</Text>
-                                            <View style={[styles.titleBorder, themeStyles.borderColor]} />
-                                        </View>
-                                        <TouchableOpacity onPress={() => this.toggleAuctionPriceModal(false)}>
-                                            <AntDesign name="close" size={21} color={themeStyles.fontColorMain.color} />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View >
-                                        <Text style={[styles.label, themeStyles.fontColorSub]}>Minimum price (Optional)</Text>
-                                        <View style={styles.currencyRow}>
-                                            <Text style={[{ paddingRight: 4 }, themeStyles.fontColorMain]}>Currency: </Text>
-                                            <View style={{ flexDirection: 'row' }}>
-                                                <TouchableOpacity
-                                                    activeOpacity={0.7}
-                                                    onPress={this.toggleCurrencyTransfer}
-                                                    style={
-                                                        [
-                                                            styles.currencyButton,
-                                                            themeStyles.verificationBadgeBackgroundColor,
-                                                            themeStyles.lightBorderColor
-                                                        ]
-                                                    }>
-                                                    <Text style={styles.currency}>{currencyLabel}</Text>
-                                                </TouchableOpacity>
-                                                <TextInput
-                                                    maxLength={8}
-                                                    keyboardType='numeric'
-                                                    style={
-                                                        [
-                                                            styles.input,
-                                                            { borderColor: themeStyles.currencyButtonBackgroundColor.backgroundColor },
-                                                            themeStyles.fontColorSub
-                                                        ]
-                                                    }
-                                                    value={this.state.isUsd ? this.state.usd : this.state.clout}
-                                                    onChangeText={(input) => this.state.isUsd ? this.setUsdAmount(input) : this.setCloutAmount(input)}
-                                                    keyboardAppearance={settingsGlobals.darkMode ? 'dark' : 'light'}
-                                                />
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <CloutFeedButton
-                                        backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
-                                        isLoading={this.state.isModalButtonLoading}
-                                        styles={styles.putOnSaleButtonContainer}
-                                        title={'Put on sale'}
-                                        onPress={this.handleOwnAuctionAlert}
-                                    />
-                                </TouchableOpacity>
-                            </KeyboardAvoidingView>
-                        </Modal>
+                        {
+                            this.state.newMinBidAmountFormVisible &&
+                            <MinBidAmountFormComponent
+                                refresh={this.refreshBids}
+                                auctions={this.state.selectedAuctions}
+                                toggleModal={this.toggleNewMinBidAmount}
+                                isVisible={this.state.newMinBidAmountFormVisible}
+                                postHashHex={this.props.post.PostHashHex}
+                            />
+                        }
                     </>
             }
         </View>;
@@ -480,26 +431,11 @@ const styles = StyleSheet.create(
         container: {
             flex: 1,
         },
-        modal: {
-            margin: 0,
-            justifyContent: 'flex-end'
-        },
-        subContainer: {
-            borderTopStartRadius: 10,
-            borderTopEndRadius: 10,
-            paddingVertical: 15,
-            paddingHorizontal: 10
-        },
         headerRow: {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: 10,
-        },
-        modalHeaderRow: {
-            flexDirection: 'row-reverse',
-            justifyContent: 'space-between',
-            alignItems: 'center',
         },
         rowContainer: {
             flexDirection: 'row',
@@ -508,35 +444,6 @@ const styles = StyleSheet.create(
             borderBottomWidth: 1,
             paddingVertical: 25,
             paddingHorizontal: 10,
-        },
-        midTitleContainer: {
-            position: 'absolute',
-            right: 0,
-            left: 0,
-            top: -3,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderColor: 'red',
-        },
-        headerTitle: {
-            fontSize: 20,
-        },
-        titleBorder: {
-            width: '100%',
-            borderWidth: 1,
-            borderRadius: 2,
-            marginBottom: 15,
-            marginTop: 4,
-            alignSelf: 'center'
-        },
-        input: {
-            borderWidth: 1,
-            height: 30,
-            width: 55,
-            fontSize: 12,
-            textAlign: 'center',
-            marginHorizontal: 4,
-            borderRadius: 3
         },
         serialNumber: {
             marginLeft: 4
@@ -563,39 +470,6 @@ const styles = StyleSheet.create(
             fontSize: 16,
             textAlign: 'center',
             margin: 20
-        },
-        label: {
-            fontSize: 16,
-            textAlign: 'center',
-            marginTop: 15
-        },
-        currencyRow: {
-            marginVertical: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-        },
-        currencyButton: {
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 70,
-            height: 28,
-            borderWidth: 1,
-            borderRadius: 4,
-        },
-        currency: {
-            fontSize: 12,
-            color: 'white'
-        },
-        putOnSaleButtonContainer: {
-            width: 120,
-            height: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 4,
-            marginTop: 10,
-            marginBottom: 30,
-            alignSelf: 'center'
         },
     }
 );

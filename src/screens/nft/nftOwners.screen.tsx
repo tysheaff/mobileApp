@@ -12,7 +12,7 @@ import { ParamListBase } from '@react-navigation/native';
 interface Props {
     post: Post;
     navigation: StackNavigationProp<ParamListBase>;
-    handleOwnBidInfo: (minBid: number, serialNumber: number) => void;
+    handleOwnBidInfo: (bid: Post) => void;
 }
 
 interface State {
@@ -55,16 +55,20 @@ export default class NftOwnersScreen extends Component<Props, State> {
             const response = await nftApi.getNftBids(this.props.post.ProfileEntryResponse?.PublicKeyBase58Check, this.props.post.PostHashHex);
             const owners = response.NFTEntryResponses;
             response.NFTEntryResponses.sort((a: Post, b: Post) => a.SerialNumber - b.SerialNumber);
+            let ownerBid;
             const minBidsArray: number[] = [];
-            let serialNumber;
             for (const owner of owners) {
                 minBidsArray.push(owner.MinBidAmountNanos);
                 if (owner.OwnerPublicKeyBase58Check === globals.user.publicKey) {
-                    serialNumber = owner.SerialNumber;
+                    ownerBid = owner;
                 }
             }
-            const minBidAmount = Math.min(...minBidsArray);
-            this.props.handleOwnBidInfo(minBidAmount, serialNumber);
+            if (ownerBid) {
+                const minBidAmount = Math.min(...minBidsArray);
+                ownerBid.MinBidAmountNanos = minBidAmount;
+                this.props.handleOwnBidInfo(ownerBid);
+            }
+
             if (this._isMounted) {
                 this.setState({ owners });
             }

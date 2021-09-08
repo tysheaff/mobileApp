@@ -17,6 +17,7 @@ import { TextWithLinks } from '@components/textWithLinks.component';
 import NftOwnersScreen from './nftOwners.screen';
 import UnlockableTextFormComponent from './components/unlockableTextForm.component';
 import CloutFeedButton from '@components/cloutfeedButton.component';
+import MinBidAmountFormComponent from './components/minBidAmountForm.component';
 
 type UnlockableText = {
     SerialNumber: number;
@@ -36,8 +37,6 @@ interface Props {
 
 interface State {
     isLoading: boolean,
-    minBidAmountNanos: number;
-    serialNumber: number;
     isNftForSale: boolean;
     isButtonLoading: boolean;
     availableBids: number;
@@ -51,6 +50,7 @@ interface State {
     sendUnlockableTextFormVisible: boolean;
     isSellButtonLoading: boolean;
     ownUserBidders: Post[];
+    newMinBidAmountFormVisible: boolean;
 }
 
 const NFTTab = createMaterialTopTabNavigator();
@@ -70,8 +70,6 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
 
         this.state = {
             isLoading: true,
-            minBidAmountNanos: 0,
-            serialNumber: 0,
             isNftForSale: this.props.route.params.post.NumNFTCopiesForSale !== 0,
             isButtonLoading: true,
             availableBids: this.props.route.params.post.NumNFTCopiesForSale,
@@ -84,13 +82,14 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             selectModeOn: false,
             sendUnlockableTextFormVisible: false,
             isSellButtonLoading: false,
-            ownUserBidders: []
+            ownUserBidders: [],
+            newMinBidAmountFormVisible: false
         };
 
         this.init = this.init.bind(this);
         this.goToBidEditions = this.goToBidEditions.bind(this);
-        this.handleSingleAuctionAlert = this.handleSingleAuctionAlert.bind(this);
-        this.handleSingleAuction = this.handleSingleAuction.bind(this);
+        this.closeSingleAuctionAlert = this.closeSingleAuctionAlert.bind(this);
+        this.closeSingleAuction = this.closeSingleAuction.bind(this);
         this.handleOwnBidInfo = this.handleOwnBidInfo.bind(this);
         this.goToAuctionStatus = this.goToAuctionStatus.bind(this);
         this.goToSellNft = this.goToSellNft.bind(this);
@@ -101,6 +100,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         this.handleSellSingleNftBid = this.handleSellSingleNftBid.bind(this);
         this.refresh = this.refresh.bind(this);
         this.toggleMultipleNFTOptions = this.toggleMultipleNFTOptions.bind(this);
+        this.toggleNewMinBidAmount = this.toggleNewMinBidAmount.bind(this);
         this.init(false);
 
         this._unsubscribeRefreshOnFocus = this.props.navigation.addListener('focus',
@@ -239,43 +239,42 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         );
     }
 
-    private async handleSingleAuction(): Promise<void> {
+    private async closeSingleAuction(): Promise<void> {
         try {
             if (this._isMounted) {
                 this.setState({ isButtonLoading: true });
             }
 
             const transactionResponse = await nftApi.updateNftBid(
-                !this.state.isNftForSale,
-                this.state.minBidAmountNanos,
+                false,
+                this.state.selectedNftsForSale[0].MinBidAmountNanos,
                 this.props.route.params.post?.PostHashHex,
-                this.state.serialNumber,
+                this.state.selectedNftsForSale[0].SerialNumber,
                 globals.user.publicKey
             );
             const transactionHex: string = transactionResponse.TransactionHex;
 
             const signedTransactionHex = await signing.signTransaction(transactionHex);
             await api.submitTransaction(signedTransactionHex);
-            setTimeout(() => { this.init(true); }, 700);
+            setTimeout(() => { this.init(true); }, 750);
         } catch (error) {
             globals.defaultHandleError(error);
         }
     }
 
-    private handleSingleAuctionAlert(): void {
+    private closeSingleAuctionAlert(): void {
         if (this.state.selectModeOn && this._isMounted) {
             return this.setState({ selectModeOn: false });
         }
-        const title = this.state.isNftForSale ? 'Close Auction' : 'Open Auction';
-        const body = this.state.isNftForSale ? 'You are about to close the auction. This will cancel all bids on your NFT and prevent new bids from being submitted.' :
-            'Are you sure you want to put the auction on sale again?';
+        const title = 'Close Auction';
+        const body = 'You are about to close the auction. This will cancel all bids on your NFT and prevent new bids from being submitted.';
         Alert.alert(
             title,
             body,
             [
                 {
                     text: 'Yes',
-                    onPress: this.handleSingleAuction
+                    onPress: this.closeSingleAuction
                 },
                 {
                     text: 'Cancel',
@@ -286,9 +285,9 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         );
     }
 
-    private handleOwnBidInfo(minBidAmountNanos: number, serialNumber: number): void {
+    private handleOwnBidInfo(selectedNftsForSale: Post): void {
         if (this._isMounted) {
-            this.setState({ minBidAmountNanos, serialNumber, isButtonLoading: false });
+            this.setState({ selectedNftsForSale: [selectedNftsForSale] });
         }
     }
 
@@ -400,6 +399,12 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         }
     }
 
+    private toggleNewMinBidAmount(newMinBidAmountFormVisible: boolean): void {
+        if (this._isMounted) {
+            this.setState({ newMinBidAmountFormVisible });
+        }
+    }
+
     private toggleMultipleNFTOptions(): void {
         if (this.state.selectModeOn) {
             return this.setState({ selectModeOn: false });
@@ -454,7 +459,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 backgroundColor={themeStyles.likeHeartBackgroundColor.backgroundColor}
                 styles={styles.editAuctionsButtonContainer}
                 title={'Close Auction'}
-                onPress={this.handleSingleAuctionAlert}
+                onPress={this.closeSingleAuctionAlert}
             />;
         }
     }
@@ -466,7 +471,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
                 styles={styles.editAuctionsButtonContainer}
                 title={'Put on sale'}
-                onPress={this.handleSingleAuctionAlert}
+                onPress={() => this.toggleNewMinBidAmount(true)}
             />;
         }
     }
@@ -502,7 +507,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 backgroundColor={themeStyles.likeHeartBackgroundColor.backgroundColor}
                 styles={styles.nftButtonContainer}
                 title={'Cancel'}
-                onPress={this.handleSingleAuctionAlert}
+                onPress={this.closeSingleAuctionAlert}
             />;
         }
     }
@@ -698,7 +703,17 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                     selectedNftForSale={this.state.selectedNftsForSale[0]}
                     toggleModal={this.toggleSendUnlockableText}
                     isVisible={this.state.sendUnlockableTextFormVisible}
-                    post={this.state.selectedNftsForSale[0]}
+                    postHashHex={this.props.route.params.post.PostHashHex}
+                />
+            }
+            {
+                this.state.newMinBidAmountFormVisible &&
+                <MinBidAmountFormComponent
+                    refresh={this.init as any}
+                    isSingleNFT={true}
+                    auctions={this.state.selectedNftsForSale}
+                    toggleModal={this.toggleNewMinBidAmount}
+                    isVisible={this.state.newMinBidAmountFormVisible}
                     postHashHex={this.props.route.params.post.PostHashHex}
                 />
             }

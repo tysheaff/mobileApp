@@ -10,7 +10,6 @@ import { signing } from '@services/authorization/signing';
 import { nftApi } from '@services';
 
 interface Props {
-    post: Post;
     isVisible: boolean;
     toggleModal: (isVisible: boolean) => void;
     selectedNftForSale: Post;
