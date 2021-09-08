@@ -4,37 +4,18 @@ import { View, StyleSheet, Platform, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { PostScreen } from '@screens/post.screen';
-import { eventManager, globals } from '@globals';
+import { eventManager } from '@globals';
 import { themeStyles } from '@styles';
-import { IdentityScreen } from '@screens/login/identity.screen';
 import { HomeScreen } from '@screens/home/home.screen';
-import { ProfileScreen } from '@screens/profile/profile.screen';
-import EditProfileScreen from '@screens/profile/editProfile.screen';
-import { CreatorCoinScreen } from '@screens/creatorCoin/creatorCoin.screen';
-import { CreatePostScreen } from '@screens/createPost.screen';
 import { LogoHeaderComponent } from '@components/logoHeader.component';
-import CloutTagPostsScreen from '@screens/cloutTagPosts/cloutTagPosts.screen';
-import postStatsTabNavigator from '@screens/postStats/postStatsTabNavigator';
 import { stackConfig } from './stackNavigationConfig';
-import CloutFeedButton from '@components/cloutfeedButton.component';
-import { PendingScreen } from '@screens/bitBadges/screens/pendingBadges.screen';
-import { BadgeScreen } from '@screens/bitBadges/screens/badge.screen';
-import IssueBadgeScreen from '@screens/bitBadges/screens/issueBadge.screen';
-import { BadgesScreen } from '@screens/bitBadges/screens/bitBadges.screen';
-import { WalletScreen } from '@screens/wallet/wallet.screen';
-import { ChatScreen } from '@screens/chatScreen';
-import ProfileFollowersTab from '@screens/profile/profileFollowersTabNavigator';
 import { EventType } from '@types';
-import { NotificationsScreen } from '@screens/notifications/notifications.screen';
+import { SharedStackScreens } from './sharedStackScreens';
 import { NotificationsHeaderComponent } from '@screens/notifications/components/notificationsHeader.component';
-import BidEditionsScreen from '@screens/nft/bidEditions.screen';
-import NFTTabNavigator from '@screens/nft/nftTabNavigator';
-import AuctionsTabNavigator from '@screens/nft/auctionsTabNavigator';
-import MintPostScreen from '@screens/nft/mintPost.screen';
-import SellNftScreen from '@screens/nft/sellNft.screen';
+import { NotificationsScreen } from '@screens/notifications/notifications.screen';
 
 const HomeStack = createStackNavigator();
+
 export default function HomeStackScreen(): JSX.Element {
 
     const [messagesCount, setMessagesCount] = useState<number>(0);
@@ -92,7 +73,6 @@ export default function HomeStackScreen(): JSX.Element {
                     <Ionicons name="chevron-back" size={32} color="#007ef5" />
                 </TouchableOpacity>
             })}>
-
             <HomeStack.Screen
                 options={
                     ({ navigation }) => ({
@@ -139,179 +119,6 @@ export default function HomeStackScreen(): JSX.Element {
             />
 
             <HomeStack.Screen
-                options={({ route }) => (
-                    {
-                        title: ' ',
-                        headerBackTitle: ' ',
-                        headerLeft: () => (
-                            route.params &&
-                            <ChatHeaderComponent contactWithMessages={(route.params as any).contactWithMessages} />
-                        )
-                    }
-                )}
-                name="Chat"
-                component={ChatScreen}
-            />
-            <HomeStack.Screen
-                options={{
-                    headerTitle: 'CloutFeed',
-                    headerBackTitle: ' '
-                }}
-                name="UserProfile"
-                component={ProfileScreen}
-            />
-
-            <HomeStack.Screen
-                options={{
-                    headerTitle: 'Edit Profile',
-                    headerBackTitle: ' '
-                }}
-                name="EditProfile"
-                component={EditProfileScreen}
-            />
-
-            <HomeStack.Screen
-                options={
-                    ({ route }) => (
-                        {
-                            title: route.params ? (route.params as any).username : 'Wallet',
-                            headerBackTitle: ' '
-                        }
-                    )
-                }
-                name="UserWallet"
-                component={WalletScreen}
-            />
-
-            <HomeStack.Screen
-                options={
-                    ({ route }) => (
-                        {
-                            title: route.params ? (route.params as any).username : 'Profile',
-                            headerBackTitle: ' '
-                        }
-                    )
-                }
-                name="ProfileFollowersTab"
-                component={ProfileFollowersTab}
-            />
-
-            <HomeStack.Screen
-                options={
-                    ({ route }) => (
-                        {
-                            title: route.params ? '$' + (route.params as any).username : 'Creator Coin',
-                            headerTitleStyle: { fontSize: 20, alignSelf: 'center', color: themeStyles.fontColorMain.color, marginRight: Platform.OS === 'ios' ? 0 : 50 },
-                            headerBackTitle: ' '
-                        }
-                    )
-                }
-                name="CreatorCoin"
-                component={CreatorCoinScreen}
-            />
-
-            <HomeStack.Screen
-                options={
-                    ({ route }) => (
-                        {
-                            headerTitleStyle: {
-                                alignSelf: 'center',
-                                color: themeStyles.fontColorMain.color
-                            },
-                            headerTitle: (route.params as any).newPost ? 'New Post' : (route.params as any).comment ? 'New Comment' :
-                                (route.params as any).editPost ? 'Edit Post' : 'Reclout Post',
-                            headerBackTitle: 'Cancel',
-                            headerRight: () => <CloutFeedButton
-                                title={'Post'}
-                                onPress={() => globals.createPost()}
-                                styles={styles.postButton}
-                            />
-                        }
-                    )}
-                name="CreatePost"
-                component={CreatePostScreen}
-            />
-
-            <HomeStack.Screen
-                options={{
-                    headerTitle: 'CloutFeed',
-                    headerBackTitle: ' '
-                }}
-                name="Post"
-                component={PostScreen}
-            />
-
-            <HomeStack.Screen
-                options={{
-                    headerTitle: 'CloutFeed',
-                    headerBackTitle: ' '
-                }}
-                name="PostStatsTabNavigator"
-                component={postStatsTabNavigator}
-            />
-
-            <HomeStack.Screen
-                options={
-                    ({ route }) => (
-                        {
-                            headerTitle: `#${(route.params as any).cloutTag}`,
-                            headerBackTitle: ' ',
-                        }
-                    )}
-                name="CloutTagPosts"
-                component={CloutTagPostsScreen}
-            />
-
-            <HomeStack.Screen
-                options={
-                    {
-                        headerStyle: styles.identityHeader,
-                        headerTitleStyle: { color: 'white', fontSize: 20 }
-                    }
-                }
-                name="Identity" component={IdentityScreen}
-            />
-            <HomeStack.Screen
-                options={({ route }) => (
-                    {
-                        title: route.params ? (route.params as any).username : 'BitBadges',
-                        headerBackTitle: ' ',
-                    }
-                )}
-                name="BitBadges"
-                component={BadgesScreen}
-            />
-            <HomeStack.Screen
-                options={
-                    {
-                        headerTitle: 'Issue Badge',
-                        headerBackTitle: ' ',
-                    }
-                }
-                name="Issue"
-                component={IssueBadgeScreen}
-            />
-            <HomeStack.Screen
-                options={({ route }) => (
-                    {
-                        title: route.params ? (route.params as any).username : 'Badge',
-                        headerBackTitle: ' ',
-                    })
-                }
-                name="Badge"
-                component={BadgeScreen}
-            />
-            <HomeStack.Screen
-                options={({ route }) => (
-                    {
-                        title: route.params ? (route.params as any).username : 'Pending',
-                        headerBackTitle: ' ',
-                    }
-                )}
-                name="Pending"
-                component={PendingScreen}
-            />
-            <HomeStack.Screen
                 options={
                     {
                         headerTitleStyle: {
@@ -325,95 +132,23 @@ export default function HomeStackScreen(): JSX.Element {
                 name="Notifications"
                 component={NotificationsScreen}
             />
-            <HomeStack.Screen
-                options={({ route }: any) => (
-                    {
-                        headerTitleStyle: {
-                            alignSelf: 'center',
-                            color: themeStyles.fontColorMain.color
-                        },
-                        headerTitle: route.params?.username ? route.params?.username : 'NFT',
-                        headerBackTitle: ' ',
-                        headerRight: () => <></>
-                    }
-                )}
-                name="NFTTabNavigator"
-                component={NFTTabNavigator}
-            />
-            <HomeStack.Screen
-                options={
-                    {
-                        headerTitleStyle: {
-                            alignSelf: 'center',
-                            color: themeStyles.fontColorMain.color
-                        },
-                        headerTitle: 'Bid Editions',
-                        headerBackTitle: ' ',
-                        headerRight: () => <></>
-                    }
-                }
-                name="BidEditions"
-                component={BidEditionsScreen}
-            />
-            <HomeStack.Screen
-                options={
-                    {
-                        headerTitleStyle: {
-                            alignSelf: 'center',
-                            color: themeStyles.fontColorMain.color
-                        },
-                        headerTitle: 'Edit Auctions',
-                        headerBackTitle: ' ',
-                        headerRight: () => <></>
-                    }
-                }
-                name="AuctionTabNavigator"
-                component={AuctionsTabNavigator}
-            />
-            <HomeStack.Screen
-                options={
-                    {
-                        headerTitleStyle: {
-                            alignSelf: 'center',
-                            color: themeStyles.fontColorMain.color
-                        },
-                        headerTitle: 'Mint NFT',
-                        headerBackTitle: ' ',
-                        headerRight: () => <></>
-                    }
-                }
-                name="MintPost"
-                component={MintPostScreen}
-            />
-            <HomeStack.Screen
-                options={
-                    {
-                        headerTitleStyle: {
-                            alignSelf: 'center',
-                            color: themeStyles.fontColorMain.color
-                        },
-                        headerTitle: 'Sell NFT',
-                        headerBackTitle: ' ',
-                        headerRight: () => <></>
-                    }
-                }
-                name="SellNft"
-                component={SellNftScreen}
-            />
+
+            {
+                SharedStackScreens.map((item: any, index: number) => <HomeStack.Screen
+                    key={`${item.name as string}_${index}`}
+                    options={item.options}
+                    name={item.name}
+                    component={item.component}
+                />
+                )
+            }
+
         </HomeStack.Navigator>
     );
 }
 
 const styles = StyleSheet.create(
     {
-        postButton: {
-            marginRight: 10,
-        },
-        identityHeader: {
-            backgroundColor: '#121212',
-            shadowRadius: 0,
-            shadowOffset: { height: 0, width: 0 }
-        },
         messagesBadge: {
             width: 14,
             height: 14,
