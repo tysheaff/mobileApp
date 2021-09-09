@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { EmitterSubscription, Image, Keyboard, Platform, StyleSheet, View } from 'react-native';
+import { EmitterSubscription, Image, Keyboard, Platform, StyleSheet, View, SafeAreaView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -156,43 +156,45 @@ const TabBar = ({ state }: any) => {
         return null;
     }
     return (
-        <View style={[styles.tabsContainer, themeStyles.containerColorMain, { borderColor: settingsGlobals.darkMode ? '#141414' : '#f2f2f2' }]}>
-            {
-                routes.slice(0, 2).map((p_route: any) => (
-                    <TabElement
-                        tab={p_route}
-                        onPress={() => navigate(p_route.name)}
-                        selectedTab={selectedTab}
-                        key={p_route.key}>
-                    </TabElement>
-                ))
-            }
-            <View>
-                <TouchableOpacity onPress={() => navigation.push('TabNavigator', {
-                    screen: 'HomeStack',
-                    params: {
-                        screen: 'CreatePost',
+        <SafeAreaView style={themeStyles.containerColorMain}>
+            <View style={[styles.tabsContainer, themeStyles.containerColorMain, { borderColor: settingsGlobals.darkMode ? '#141414' : '#f2f2f2' }]}>
+                {
+                    routes.slice(0, 2).map((p_route: any) => (
+                        <TabElement
+                            tab={p_route}
+                            onPress={() => navigate(p_route.name)}
+                            selectedTab={selectedTab}
+                            key={p_route.key}>
+                        </TabElement>
+                    ))
+                }
+                <View>
+                    <TouchableOpacity onPress={() => navigation.push('TabNavigator', {
+                        screen: 'HomeStack',
                         params: {
-                            newPost: true,
-                            key: 'NewPost'
+                            screen: 'CreatePost',
+                            params: {
+                                newPost: true,
+                                key: 'NewPost'
+                            }
                         }
-                    }
-                })}>
-                    <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />
-                </TouchableOpacity>
+                    })}>
+                        <Ionicons name="add-circle-sharp" size={50} color={themeStyles.fontColorMain.color} />
+                    </TouchableOpacity>
+                </View>
+                {
+                    routes.slice(2).map((p_route: any) => (
+                        <TabElement
+                            tab={p_route}
+                            onPress={() => navigate(p_route.name)}
+                            selectedTab={selectedTab}
+                            key={p_route.key}
+                            navigation={navigation}>
+                        </TabElement>
+                    ))
+                }
             </View>
-            {
-                routes.slice(2).map((p_route: any) => (
-                    <TabElement
-                        tab={p_route}
-                        onPress={() => navigate(p_route.name)}
-                        selectedTab={selectedTab}
-                        key={p_route.key}
-                        navigation={navigation}>
-                    </TabElement>
-                ))
-            }
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -212,12 +214,10 @@ export function TabNavigator() {
 const styles = StyleSheet.create(
     {
         tabsContainer: {
-            height: Platform.OS === 'ios' ? 80 : 60,
+            height: 50,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-around',
-            paddingHorizontal: 16,
-            paddingBottom: Platform.OS === 'ios' ? 20 : 0,
             borderTopWidth: 1
         },
         profileImage: {
