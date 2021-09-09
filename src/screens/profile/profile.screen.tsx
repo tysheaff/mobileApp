@@ -366,6 +366,9 @@ export function ProfileScreen({ route }: Route): JSX.Element {
             response => {
                 const holders = response.Hodlers as CreatorCoinHODLer[] ?? [];
                 profile.UsersThatHODL = holders;
+                if (profile.UsersThatHODL.length < 25) {
+                    setNoMoreHolders(true);
+                }
             }
         ).catch(error => globals.defaultHandleError(error));
     }
