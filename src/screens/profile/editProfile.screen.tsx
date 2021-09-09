@@ -12,6 +12,7 @@ import { signing } from '@services/authorization/signing';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import CloutFeedButton from '@components/cloutfeedButton.component';
 import { ParamListBase } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system';
 
 interface Props {
     navigation: NavigationProp<ParamListBase>
@@ -22,10 +23,11 @@ interface State {
     username: string,
     description: string,
     founderReward: string,
-    loading: boolean
+    isLoading: boolean
 }
 
 export class EditProfileScreen extends Component<Props, State> {
+
     private _isMounted = false;
 
     constructor(props: Props) {
@@ -35,7 +37,7 @@ export class EditProfileScreen extends Component<Props, State> {
             username: '',
             description: '',
             founderReward: '',
-            loading: true,
+            isLoading: true,
         };
 
         this.pickImage = this.pickImage.bind(this);
@@ -44,17 +46,17 @@ export class EditProfileScreen extends Component<Props, State> {
         this.handleFounderRewardsChange = this.handleFounderRewardsChange.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this.updateNavigation();
         this.loadSingleProfile();
         this._isMounted = true;
     }
 
-    componentWillUnmout() {
+    componentWillUnmout(): void {
         this._isMounted = false;
     }
 
-    updateNavigation = () => {
+    private updateNavigation(): void {
         this.props.navigation.setOptions({
             headerRight: () => <CloutFeedButton
                 title={'Save'}
@@ -69,8 +71,8 @@ export class EditProfileScreen extends Component<Props, State> {
         });
     }
 
-    updateProfile = (): void => {
-        if (this.state.loading) {
+    private async updateProfile(): Promise<void> {
+        if (this.state.isLoading) {
             return;
         }
 
@@ -86,16 +88,29 @@ export class EditProfileScreen extends Component<Props, State> {
             return;
         }
 
-        if (!this.state.founderReward.trim()) {
+        const founderRewardText: string = this.state.founderReward.trim();
+        if (!founderRewardText) {
             Alert.alert('Error', 'Please enter a founder reward.');
             return;
         }
 
-        const profilePic = this.state.profilePic === api.getSingleProfileImage(globals.user.publicKey) ? '' : this.state.profilePic;
+        if (this._isMounted) {
+            this.setState({ isLoading: true });
+        }
 
-        this.setState({ loading: true });
+        const oldProfileImage = api.getSingleProfileImage(globals.user.publicKey);
+        let profilePic = this.state.profilePic;
 
-        const founderRewardText = this.state.founderReward.split(',').join('.');
+        if (profilePic.replace(/\?.*/, '') === oldProfileImage) {
+            try {
+                const { uri } = await FileSystem.downloadAsync(
+                    this.state.profilePic,
+                    FileSystem.documentDirectory + 'bufferimg.png'
+                );
+                profilePic = await FileSystem.readAsStringAsync(uri, { encoding: 'base64', });
+            } catch { }
+        }
+
         const founderReward = Number(founderRewardText) * 100;
 
         api.updateProfile(
@@ -115,7 +130,7 @@ export class EditProfileScreen extends Component<Props, State> {
                     },
                     p_error => {
                         if (this._isMounted) {
-                            this.setState({ loading: false });
+                            this.setState({ isLoading: false });
                             globals.defaultHandleError(p_error);
                         }
                     }
@@ -124,7 +139,7 @@ export class EditProfileScreen extends Component<Props, State> {
         ).catch(
             p_error => {
                 if (this._isMounted) {
-                    this.setState({ loading: false });
+                    this.setState({ isLoading: false });
 
                     const usernameExists = !!p_error?.error && p_error.error.indexOf('Username') !== -1 && p_error.error.indexOF('already exists') !== -1;
 
@@ -138,7 +153,7 @@ export class EditProfileScreen extends Component<Props, State> {
         );
     }
 
-    pickImage = async () => {
+    private async pickImage(): Promise<void> {
         if (Platform.OS !== 'web') {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
@@ -163,9 +178,9 @@ export class EditProfileScreen extends Component<Props, State> {
                 this.setState({ profilePic: `data:image/jpg;base64,${base64Image}` });
             }
         }
-    };
+    }
 
-    loadSingleProfile = async () => {
+    private async loadSingleProfile(): Promise<void> {
         try {
             const response = await api.getSingleProfile(globals.user.username);
             const newProfile = response.Profile as Profile;
@@ -177,7 +192,7 @@ export class EditProfileScreen extends Component<Props, State> {
                         username: newProfile.Username,
                         description: newProfile.Description,
                         founderReward: String(newProfile.CoinEntry.CreatorBasisPoints / 100),
-                        loading: false
+                        isLoading: false
                     }
                 );
             }
@@ -186,21 +201,23 @@ export class EditProfileScreen extends Component<Props, State> {
         }
     }
 
-    handleDescriptionChange = (p_text: string) => {
-        this.setState({ description: p_text });
+    private handleDescriptionChange = (p_text: string): void => {
+        if (this._isMounted) {
+            this.setState({ description: p_text });
+        }
     }
 
-    handleFounderRewardsChange = (p_text: string) => {
+    private handleFounderRewardsChange = (p_text: string): void => {
         const numberText = p_text.split(',').join('.');
         const founderRewardNumber = Number(numberText);
 
-        if (founderRewardNumber >= 0 && founderRewardNumber <= 100) {
+        if (founderRewardNumber >= 0 && founderRewardNumber <= 100 && this._isMounted) {
             this.setState({ founderReward: p_text });
         }
     }
 
-    render() {
-        if (this.state.loading) {
+    render(): JSX.Element {
+        if (this.state.isLoading) {
             return (
                 <CloutFeedLoader />
             );
