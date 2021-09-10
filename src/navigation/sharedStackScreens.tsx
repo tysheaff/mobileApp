@@ -88,10 +88,6 @@ export const SharedStackScreens = [
     {
         options: ({ route }: any) => (
             {
-                headerTitleStyle: {
-                    alignSelf: 'center',
-                    color: themeStyles.fontColorMain.color
-                },
                 headerTitle: route.params.newPost ? 'New Post' : route.params.comment ? 'New Comment' :
                     route.params.editPost ? 'Edit Post' : 'Reclout Post',
                 headerBackTitle: 'Cancel',
@@ -183,10 +179,6 @@ export const SharedStackScreens = [
         options:
             ({ route }: any) => (
                 {
-                    headerTitleStyle: {
-                        alignSelf: 'center',
-                        color: themeStyles.fontColorMain.color
-                    },
                     headerTitle: route.params?.username ? route.params?.username : 'NFT',
                     headerBackTitle: ' ',
                     headerRight: () => <></>
@@ -198,10 +190,6 @@ export const SharedStackScreens = [
     {
         options:
         {
-            headerTitleStyle: {
-                alignSelf: 'center',
-                color: themeStyles.fontColorMain.color
-            },
             headerTitle: 'Bid Editions',
             headerBackTitle: ' ',
             headerRight: () => <></>
@@ -212,10 +200,6 @@ export const SharedStackScreens = [
     {
         options:
         {
-            headerTitleStyle: {
-                alignSelf: 'center',
-                color: themeStyles.fontColorMain.color
-            },
             headerTitle: 'Edit Auctions',
             headerBackTitle: ' ',
             headerRight: () => <></>
@@ -226,10 +210,6 @@ export const SharedStackScreens = [
     {
         options:
         {
-            headerTitleStyle: {
-                alignSelf: 'center',
-                color: themeStyles.fontColorMain.color
-            },
             headerTitle: 'Mint NFT',
             headerBackTitle: ' ',
             headerRight: () => <></>
@@ -240,10 +220,6 @@ export const SharedStackScreens = [
     {
         options:
         {
-            headerTitleStyle: {
-                alignSelf: 'center',
-                color: themeStyles.fontColorMain.color
-            },
             headerTitle: 'Sell NFT',
             headerBackTitle: ' ',
             headerRight: () => <></>

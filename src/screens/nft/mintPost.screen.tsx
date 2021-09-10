@@ -81,11 +81,11 @@ export default class MintPostScreen extends React.Component<Props, State> {
     }
 
     private handleNftCount(count: string): void {
-        const pasrsedCount = Number(count);
-        if (pasrsedCount > 1000) {
+        const parsedCount = Number(count);
+        if (parsedCount > 1000) {
             return;
         }
-        const networkFee = Number((pasrsedCount * 0.00001).toFixed(5));
+        const networkFee = Number((parsedCount * 0.00001).toFixed(5));
 
         if (this._isMounted) {
             if (!isNaN(Number(count))) {
@@ -266,7 +266,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
         >
             <View style={[styles.subContainer, themeStyles.containerColorMain]}>
                 <Text style={[styles.title, themeStyles.fontColorSub]}>Type of NFT</Text>
-                <View style={[{ backgroundColor: themeStyles.fontColorSub.color }, styles.titleBorder]} />
+                <View style={[{ backgroundColor: themeStyles.recloutBorderColor.borderColor }, styles.titleBorder]} />
                 <View style={styles.choices}>
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -329,7 +329,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
                 </View>
                 <Text style={[themeStyles.fontColorSub, styles.hint]}>An NFT can have multiple editions, each with its own unique serial number</Text>
                 <Text style={[styles.title, themeStyles.fontColorSub]}>Sale Status and Price</Text>
-                <View style={[{ backgroundColor: themeStyles.fontColorSub.color }, styles.titleBorder]} />
+                <View style={[{ backgroundColor: themeStyles.recloutBorderColor.borderColor }, styles.titleBorder]} />
 
                 <View style={styles.row}>
                     <Text style={[styles.label, themeStyles.fontColorMain]}>Put on Sale</Text>
@@ -370,7 +370,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
                 </View>
 
                 <Text style={[styles.title, themeStyles.fontColorSub]}>Royalties</Text>
-                <View style={[{ backgroundColor: themeStyles.fontColorSub.color }, styles.titleBorder]} />
+                <View style={[{ backgroundColor: themeStyles.recloutBorderColor.borderColor }, styles.titleBorder]} />
 
                 <View style={styles.row}>
                     <Text style={[styles.label, themeStyles.fontColorMain]}>% Creator Royalty</Text>
@@ -398,7 +398,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
 
                 <Text style={[styles.hint, themeStyles.fontColorSub]}>On every sale, including resale, a customizable percentage goes to you, the creator, and to your coin-holders.</Text>
                 <Text style={[styles.title, themeStyles.fontColorSub]}>Unlockable Content</Text>
-                <View style={[{ backgroundColor: themeStyles.fontColorSub.color }, styles.titleBorder]} />
+                <View style={[{ backgroundColor: themeStyles.recloutBorderColor.borderColor }, styles.titleBorder]} />
 
                 <View style={styles.row}>
                     <Text style={[styles.label, themeStyles.fontColorMain]}>Enable Unlockable Content</Text>

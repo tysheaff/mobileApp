@@ -223,7 +223,7 @@ export default class MinBidAmountFormComponent extends React.Component<Props, St
                         backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
                         isLoading={this.state.isButtonLoading}
                         styles={styles.putOnSaleButtonContainer}
-                        title={'Put on sale'}
+                        title={'Put on Sale'}
                         onPress={this.handleOpenOwnAuctionAlert}
                     />
                 </TouchableOpacity>

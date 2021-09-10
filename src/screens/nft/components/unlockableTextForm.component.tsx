@@ -10,7 +10,6 @@ import { signing } from '@services/authorization/signing';
 import { nftApi } from '@services';
 
 interface Props {
-    isVisible: boolean;
     toggleModal: (isVisible: boolean) => void;
     selectedNftForSale: Post;
     postHashHex: string;
@@ -33,7 +32,7 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
         this.state = {
             unlockableText: '',
             isButtonLoading: false,
-            isVisible: this.props.isVisible
+            isVisible: true
         };
 
         this.close = this.close.bind(this);
@@ -56,11 +55,13 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
         }
     }
 
-    private close(): void {
-        if (this._isMounted) {
+    private close(p_animated = true): void {
+        if (this._isMounted && p_animated) {
             this.setState({ isVisible: false });
         }
-        setTimeout(() => this.props.toggleModal(false), 1000);
+
+        const timeout = p_animated ? 1000 : 0;
+        setTimeout(() => this.props.toggleModal(false), timeout);
     }
 
     private async handleSellSingleNftBid(): Promise<void> {
@@ -93,7 +94,7 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
                         text: 'Ok',
                         onPress: () => {
                             Keyboard.dismiss();
-                            this.close();
+                            this.close(false);
                             this.props.refresh(true);
                         }
                     },
@@ -137,9 +138,9 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
             swipeDirection='down'
             animationInTiming={400}
             animationOutTiming={400}
-            onSwipeComplete={this.close}
-            onBackdropPress={this.close}
-            onBackButtonPress={this.close}
+            onSwipeComplete={() => this.close()}
+            onBackdropPress={() => this.close()}
+            onBackButtonPress={() => this.close()}
             isVisible={this.state.isVisible}
             style={styles.modal}>
             <KeyboardAvoidingView
@@ -153,7 +154,7 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
                             <Text style={[styles.headerTitle, themeStyles.fontColorMain]}>Unlockable Content</Text>
                             <View style={[styles.titleBorder, themeStyles.borderColor]} />
                         </View>
-                        <TouchableOpacity onPress={this.close}>
+                        <TouchableOpacity onPress={() => this.close()}>
                             <AntDesign name="close" size={21} color={themeStyles.fontColorMain.color} />
                         </TouchableOpacity>
                     </View>
@@ -172,8 +173,8 @@ export default class UnlockableTextFormComponent extends React.Component<Props, 
                         {
                             [
                                 styles.input,
+                                themeStyles.fontColorMain,
                                 { borderColor: themeStyles.fontColorSub.color },
-                                { color: themeStyles.fontColorSub.color },
                                 Platform.OS === 'ios' && { paddingBottom: 40 }
                             ]
                         }

@@ -43,6 +43,7 @@ interface State {
     isUserBidder: boolean;
     hasUnlockableContent: boolean;
     selectedNftsForSale: Post[];
+    ownNFTs: Post[];
     encryptedUnlockableTexts: UnlockableText[];
     isUnlockableTextModalVisible: boolean;
     isUserOwner: boolean;
@@ -83,7 +84,8 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             sendUnlockableTextFormVisible: false,
             isSellButtonLoading: false,
             ownUserBidders: [],
-            newMinBidAmountFormVisible: false
+            newMinBidAmountFormVisible: false,
+            ownNFTs: []
         };
 
         this.init = this.init.bind(this);
@@ -247,9 +249,9 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
 
             const transactionResponse = await nftApi.updateNftBid(
                 false,
-                this.state.selectedNftsForSale[0].MinBidAmountNanos,
+                this.state.ownNFTs[0].MinBidAmountNanos,
                 this.props.route.params.post?.PostHashHex,
-                this.state.selectedNftsForSale[0].SerialNumber,
+                this.state.ownNFTs[0].SerialNumber,
                 globals.user.publicKey
             );
             const transactionHex: string = transactionResponse.TransactionHex;
@@ -259,6 +261,9 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
             setTimeout(() => { this.init(true); }, 750);
         } catch (error) {
             globals.defaultHandleError(error);
+            if (this._isMounted) {
+                this.setState({ isButtonLoading: false });
+            }
         }
     }
 
@@ -287,7 +292,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
 
     private handleOwnBidInfo(selectedNftsForSale: Post): void {
         if (this._isMounted) {
-            this.setState({ selectedNftsForSale: [selectedNftsForSale] });
+            this.setState({ ownNFTs: [selectedNftsForSale] });
         }
     }
 
@@ -470,7 +475,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 isLoading={this.state.isButtonLoading}
                 backgroundColor={themeStyles.verificationBadgeBackgroundColor.backgroundColor}
                 styles={styles.editAuctionsButtonContainer}
-                title={'Put on sale'}
+                title={'Put on Sale'}
                 onPress={() => this.toggleNewMinBidAmount(true)}
             />;
         }
@@ -563,7 +568,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
         const keyExtractor = (item: UnlockableText, index: number): string => `${item.EncryptedText}_${index.toString()}`;
         const renderHeader = <>
             <Text style={[themeStyles.fontColorMain, styles.unlockableTitle]}>Unlockable Content</Text>
-            <View style={[styles.titleBorder, themeStyles.borderColor]} />
+            <View style={[styles.titleBorder, themeStyles.recloutBorderColor]} />
         </>;
         const renderItem = (item: UnlockableText) => <View>
             <View style={styles.row}>
@@ -702,7 +707,6 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                     refresh={this.init}
                     selectedNftForSale={this.state.selectedNftsForSale[0]}
                     toggleModal={this.toggleSendUnlockableText}
-                    isVisible={this.state.sendUnlockableTextFormVisible}
                     postHashHex={this.props.route.params.post.PostHashHex}
                 />
             }
@@ -711,7 +715,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                 <MinBidAmountFormComponent
                     refresh={this.init as any}
                     isSingleNFT={true}
-                    auctions={this.state.selectedNftsForSale}
+                    auctions={this.state.ownNFTs}
                     toggleModal={this.toggleNewMinBidAmount}
                     isVisible={this.state.newMinBidAmountFormVisible}
                     postHashHex={this.props.route.params.post.PostHashHex}
@@ -803,7 +807,8 @@ const styles = StyleSheet.create(
         unlockableTitle: {
             fontSize: 17,
             textAlign: 'center',
-            marginBottom: 6
+            marginBottom: 6,
+            fontWeight: '700'
         },
         titleBorder: {
             width: '100%',
