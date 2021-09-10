@@ -65,7 +65,7 @@ export class PostComponent extends React.Component<Props, State> {
             const imageUrls: string[] = [];
 
             for (const imageUrl of this.props.post.ImageURLs) {
-                if (imageUrl.startsWith('https://images.bitclout.com/') || imageUrl.startsWith('https://arweave.net/')) {
+                if (imageUrl.startsWith('https://images.bitclout.com/') || imageUrl.startsWith('https://arweave.net/') || /https:\/\/\w+\.arweave\.net\//.test(imageUrl)) {
                     imageUrls.push(imageUrl);
                 } else if (imageUrl.startsWith('https://i.imgur.com')) {
                     const mappedImage = imageUrl.replace('https://i.imgur.com', 'https://images.bitclout.com/i.imgur.com');

@@ -60,6 +60,7 @@ function checkBasicTransfer(p_notification: Notification, p_diamond: boolean): b
 
 export function filterNotifications(p_notificaitons: Notification[], p_filter: NotificationsFilter, p_posts: any) {
     const filteredNotifications: Notification[] = [];
+
     for (const notification of p_notificaitons) {
         let add = false;
 
@@ -84,10 +85,9 @@ export function filterNotifications(p_notificaitons: Notification[], p_filter: N
         }
 
         if (!add && p_filter.purchase) {
-            add = checkBasicTransfer(notification, false) ||
+            add = (notification.Metadata.TxnType === NotificationType.BasicTransfer && checkBasicTransfer(notification, false)) ||
                 notification.Metadata.TxnType === NotificationType.CreatorCoin ||
                 notification.Metadata.TxnType === NotificationType.NftBid;
-
         }
 
         if (!add && p_filter.diamond) {

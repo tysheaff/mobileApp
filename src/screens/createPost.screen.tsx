@@ -32,7 +32,7 @@ export function CreatePostScreen({ navigation, route }: any) {
 
         let images = imagesBase64 ?? [];
 
-        if (postText || ((reclout || !!editedPost?.RecloutedPostEntryResponse) && images.length === 0 && !videoLink)) {
+        if (postText || images.length > 0 || ((reclout || !!editedPost?.RecloutedPostEntryResponse) && images.length === 0 && !videoLink)) {
             if (isMounted) {
                 setLoading(true);
             }

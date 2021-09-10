@@ -35,7 +35,7 @@ export class NftBidNotificationComponent extends React.Component<Props> {
         let usdAmount = '';
 
         if (output) {
-            bitCloutAmount = (output / 1000000000).toFixed(2);
+            bitCloutAmount = (output / 1000000000).toFixed(3);
             usdAmount = calculateAndFormatBitCloutInUsd(output);
         }
 
@@ -63,10 +63,10 @@ export class NftBidNotificationComponent extends React.Component<Props> {
                         !isBidCancelled &&
                         <>
                             <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT</Text>
-                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) </Text>
+                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) for</Text>
                         </>
                     }
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>for serial number</Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> serial number</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {
                         this.props.notification.Metadata.NFTBidTxindexMetadata?.SerialNumber
                     }

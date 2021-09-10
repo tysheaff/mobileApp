@@ -35,7 +35,7 @@ export class AcceptNftBidNotificationComponent extends React.Component<Props> {
         let usdAmount = '';
 
         if (output) {
-            bitCloutAmount = (output / 1000000000).toFixed(2);
+            bitCloutAmount = (output / 1000000000).toFixed(3);
             usdAmount = calculateAndFormatBitCloutInUsd(output);
         }
 
