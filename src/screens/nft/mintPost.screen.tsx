@@ -140,7 +140,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
         const parsedUsd = Number(usd.split(',').join('.'));
         const clout = ((parsedUsd * 100) / globals.exchangeRate.USDCentsPerBitCloutExchangeRate).toFixed(4);
         if (this._isMounted && !isNaN(parsedUsd)) {
-            this.setState({ usd, clout: clout });
+            this.setState({ usd, clout });
         }
     }
 
@@ -183,7 +183,8 @@ export default class MintPostScreen extends React.Component<Props, State> {
         if (!this.isFormValid()) {
             return;
         }
-        const bidAmountNanos = Number(this.state.clout) * 1000000000;
+
+        const bidAmountNanos = Number(this.state.clout.split(',').join('.')) * 1000000000;
         try {
             if (this._isMounted) {
                 this.setState({ isMintButtonEnabled: true });
