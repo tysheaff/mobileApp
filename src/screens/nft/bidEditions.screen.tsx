@@ -129,7 +129,7 @@ export default class BidEditionsScreen extends React.Component<Props, State> {
                 <Text style={[themeStyles.fontColorMain, styles.record]}>#{item.SerialNumber}</Text>
             </View>
             <View style={styles.titleRow}>
-                <Text style={[themeStyles.fontColorSub, styles.tableTitle]}>Heighest Bid</Text>
+                <Text style={[themeStyles.fontColorSub, styles.tableTitle]}>Highest Bid</Text>
                 <Text style={[themeStyles.fontColorMain, styles.record]}>
                     {formatNumber(item.HighestBidAmountNanos / 1000000000, true, 3)}
                     {' '}CLOUT <Text style={themeStyles.fontColorSub}>(~${formatNumber(calculateBitCloutInUSD(item.HighestBidAmountNanos))})</Text>
