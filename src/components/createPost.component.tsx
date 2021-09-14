@@ -83,7 +83,7 @@ export function CreatePostComponent(
         () => {
 
             if (newPost) {
-                onMentionChange('\n\nPosted by @[cloutfeed](undefined)');
+                onMentionChange('\n\nPosted via @[cloutfeed](undefined)');
             }
             return () => {
                 isMounted.current = false;

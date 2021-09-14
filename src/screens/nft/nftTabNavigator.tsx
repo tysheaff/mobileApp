@@ -588,7 +588,7 @@ export default class NFTTabNavigator extends React.Component<Props, State> {
                         <Text style={styles.auctionCount}>{this.state.availableBids} </Text>
                         of
                         <Text style={styles.auctionCount}> {this.props.route.params.post.NumNFTCopies} </Text>
-                        availabe
+                        available
                     </Text>
                     {
                         this.state.hasUnlockableContent &&
