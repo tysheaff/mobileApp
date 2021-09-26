@@ -1,7 +1,7 @@
 import { themeStyles } from '@styles/globalColors';
 import React from 'react';
 import { StyleSheet, View, Text, RefreshControl, TouchableOpacity } from 'react-native';
-import { FontAwesome, SimpleLineIcons, Octicons, Entypo  } from '@expo/vector-icons';
+import { FontAwesome, SimpleLineIcons, Octicons, Entypo, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { api, cache, cloutFeedApi, getAnonymousProfile } from '@services';
 import { CloutTag, DiscoveryType, Profile } from '@types';
@@ -115,13 +115,14 @@ export default class DiscoveryListComponent extends React.Component<Props, State
         }
     }
 
-    private renderListItem(icon: any, text: string, discoveryType: DiscoveryType) {
+    private renderListItem(icon: any, text: string, discoveryType: DiscoveryType, screen = 'DiscoveryTypeCreator', newElement = false) {
         return <TouchableOpacity
-            onPress={() => this.props.navigation.push('DiscoveryTypeCreator', { discoveryType })}
+            onPress={() => this.props.navigation.push(screen, { discoveryType })}
             activeOpacity={0.7}>
             <View style={[styles.listItemContainer, themeStyles.lightBorderColor]}>
                 {icon}
                 <Text style={[styles.listItemText, themeStyles.fontColorMain]}>{text}</Text>
+                {newElement && <MaterialIcons name="new-releases" size={18} color={'#FFA500'} />}
             </View>
         </TouchableOpacity>;
     }
@@ -142,6 +143,8 @@ export default class DiscoveryListComponent extends React.Component<Props, State
                     titleColor={themeStyles.fontColorMain.color}
                 />
             }>
+
+            {this.renderListItem(<AntDesign name="picture" size={24} color={themeStyles.fontColorMain.color} />, 'NFT Gallery', DiscoveryType.FeaturedNFT, 'DiscoveryTypePost', true)}
             {this.renderListItem(<Octicons name="project" size={24} color={themeStyles.fontColorMain.color} />, 'Community Projects', DiscoveryType.CommunityProject)}
             {this.renderListItem(<FontAwesome name="line-chart" size={21} color={themeStyles.fontColorMain.color} />, 'Value Creators', DiscoveryType.ValueCreator)}
             {this.renderListItem(<SimpleLineIcons name="user-female" size={24} color={themeStyles.fontColorMain.color} />, 'Goddesses', DiscoveryType.Goddess)}
@@ -192,7 +195,8 @@ const styles = StyleSheet.create(
         listItemText: {
             fontWeight: '600',
             marginLeft: 10,
-            fontSize: 15
+            fontSize: 15,
+            marginRight: 8
         },
         featuredCreatorsText: {
             marginTop: 12,

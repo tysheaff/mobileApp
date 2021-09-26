@@ -10,6 +10,7 @@ import SearchScreen from '@screens/search/search.screen';
 import { DiscoveryTypeCreatorScreen } from '@screens/search/discoverTypeCreatorScreen';
 import { DiscoveryType } from '@types';
 import { SharedStackScreens } from './sharedStackScreens';
+import { DiscoveryTypePostScreen } from '../screens/search/discoveryTypePostScreen';
 
 const SearchStack = createStackNavigator();
 
@@ -23,6 +24,8 @@ function getDiscoveryTypeCreatorTitle(discoveryType: DiscoveryType) {
             return 'Goddesses';
         case DiscoveryType.Developer:
             return 'Developers';
+        case DiscoveryType.FeaturedNFT:
+            return 'NFT Gallery';
     }
 }
 
@@ -72,6 +75,19 @@ export default function SearchStackScreen() {
                 }
                 name="DiscoveryTypeCreator"
                 component={DiscoveryTypeCreatorScreen}
+            />
+
+            <SearchStack.Screen
+                options={
+                    ({ route }) => (
+                        {
+                            headerTitle: getDiscoveryTypeCreatorTitle((route.params as any)?.discoveryType),
+                            headerBackTitle: ' '
+                        }
+                    )
+                }
+                name="DiscoveryTypePost"
+                component={DiscoveryTypePostScreen}
             />
 
             {
