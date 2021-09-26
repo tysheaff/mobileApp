@@ -124,7 +124,7 @@ export function LoginScreen({ navigation }: any) {
         <View style={styles.container}>
             <Image style={[styles.logo, { height: isLogoVisible ? 120 : 0 }]} source={require('../../../assets/icon-black.png')}></Image>
             <Text style={styles.title}>CloutFeed</Text>
-            <Text style={styles.subtitle}>Powered by BitClout</Text>
+            <Text style={styles.subtitle}>Powered by DeSo</Text>
             {
                 loginWithUsername ?
                     <View style={styles.loginOptionsContainer}>

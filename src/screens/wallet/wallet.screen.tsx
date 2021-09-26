@@ -257,7 +257,7 @@ export class WalletScreen extends React.Component<Props, State> {
     render() {
         const renderItem = () => <>
             <View style={[styles.bitCloutPriceContainer]}>
-                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>$BitClout Price</Text>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>$DESO Price</Text>
                 <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.bitCloutPriceUsd}</Text>
             </View>
 

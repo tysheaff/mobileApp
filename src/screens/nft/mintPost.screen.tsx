@@ -255,7 +255,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
 
     render(): JSX.Element {
 
-        const currency = this.state.isUsd ? 'USD' : 'CLOUT';
+        const currency = this.state.isUsd ? 'USD' : 'DESO';
         const radioButtonSingleName = this.state.selectedNftType === NftType.Single ? 'radio-button-on' : 'radio-button-off';
         const radioButtonMultipleName = this.state.selectedNftType === NftType.Multiple ? 'radio-button-on' : 'radio-button-off';
         const areMultipleCopiesEnabled = this.state.selectedNftType === NftType.Multiple;
@@ -416,7 +416,7 @@ export default class MintPostScreen extends React.Component<Props, State> {
 
                 <View style={styles.row}>
                     <Text style={[styles.label, themeStyles.fontColorMain]}>Network Fee</Text>
-                    <Text style={themeStyles.fontColorSub}>{this.state.networkFee} CLOUT (~${calculateAndFormatBitCloutInUsd(this.state.networkFee)})</Text>
+                    <Text style={themeStyles.fontColorSub}>{this.state.networkFee} DESO (~${calculateAndFormatBitCloutInUsd(this.state.networkFee)})</Text>
                 </View>
 
                 <TouchableOpacity

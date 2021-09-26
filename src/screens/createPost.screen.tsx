@@ -179,7 +179,7 @@ export function CreatePostScreen({ navigation, route }: any) {
 
             if (globals.readonly) {
                 navigation.goBack();
-                Alert.alert('Info', 'You are using CloutFeed in the read-only mode. If you wish to post, please logout and login again using BitClout Identity.');
+                Alert.alert('Info', 'You are using CloutFeed in the read-only mode. If you wish to post, please logout and login again using CloutFeed Identity.');
                 return;
             }
 

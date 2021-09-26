@@ -152,7 +152,7 @@ export default class MinBidAmountFormComponent extends React.Component<Props, St
 
     render() {
 
-        const currencyLabel = this.state.isUsd ? 'USD' : 'CLOUT';
+        const currencyLabel = this.state.isUsd ? 'USD' : 'DESO';
         const keyboardVerticalOffset = Platform.OS === 'ios' ? 10 : 0;
         const behavior = Platform.OS === 'ios' ? 'padding' : undefined;
 

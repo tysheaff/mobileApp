@@ -244,7 +244,7 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
 
         const keyboardVerticalOffset = Platform.OS === 'ios' ? 10 : 0;
         const behavior = Platform.OS === 'ios' ? 'padding' : undefined;
-        const currency = this.state.isUsd ? 'USD' : 'CLOUT';
+        const currency = this.state.isUsd ? 'USD' : 'DESO';
 
         return <Modal
             animationIn={'slideInUp'}

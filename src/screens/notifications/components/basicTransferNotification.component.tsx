@@ -98,7 +98,7 @@ export class BasicTransferNotificationComponent extends React.Component<Props> {
                     />
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> sent you</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} </Text>
-                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>BitClout!</Text>
+                    <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>DESO!</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount})</Text>
                 </View>
             </TouchableOpacity>

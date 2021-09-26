@@ -71,7 +71,7 @@ export function SettingsScreen({ navigation }: Props) {
             action: () => globals.onLogout()
         },
         {
-            title: 'CloutFeed v 1.5.0',
+            title: 'CloutFeed v 1.5.1',
             icon: <AntDesign name="copyright" style={styles.iconMargin} size={24} color={themeStyles.fontColorMain.color} />,
             action: () => { return; }
         }

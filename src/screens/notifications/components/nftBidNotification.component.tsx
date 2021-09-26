@@ -62,7 +62,7 @@ export class NftBidNotificationComponent extends React.Component<Props> {
                     {
                         !isBidCancelled &&
                         <>
-                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT</Text>
+                            <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} DESO</Text>
                             <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) for</Text>
                         </>
                     }

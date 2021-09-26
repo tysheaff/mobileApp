@@ -237,28 +237,28 @@ export default class SellNftScreen extends React.Component<Props, State> {
                     <Text style={themeStyles.fontColorSub}>Selling Price</Text>
                     <Text style={themeStyles.fontColorSub}>
                         {this.calculateBidderBalance(this.state.sellingPriceCloutNanos)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.sellingPriceCloutNanos)})
+                        {' '}DESO(~${calculateAndFormatBitCloutInUsd(this.state.sellingPriceCloutNanos)})
                     </Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Earnings</Text>
                     <Text style={themeStyles.fontColorSub}>
                         {this.calculateBidderBalance(this.state.earningsCloutNanos)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.earningsCloutNanos)})
+                        {' '}DESO(~${calculateAndFormatBitCloutInUsd(this.state.earningsCloutNanos)})
                     </Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Creator royalty</Text>
                     <Text style={themeStyles.fontColorSub}>
                         {this.calculateBidderBalance(this.state.creatorRoyaltyCloutNanos)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.creatorRoyaltyCloutNanos)})
+                        {' '}DESO(~${calculateAndFormatBitCloutInUsd(this.state.creatorRoyaltyCloutNanos)})
                     </Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={themeStyles.fontColorSub}>Coin-holder royalty</Text>
                     <Text style={themeStyles.fontColorSub}>
                         {this.calculateBidderBalance(this.state.coinHolderRoyaltyCloutNanos)}
-                        {' '}CLOUT(~${calculateAndFormatBitCloutInUsd(this.state.coinHolderRoyaltyCloutNanos)})
+                        {' '}DESO(~${calculateAndFormatBitCloutInUsd(this.state.coinHolderRoyaltyCloutNanos)})
                     </Text>
                 </View>
             </View>

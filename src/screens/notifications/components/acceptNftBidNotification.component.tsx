@@ -58,7 +58,7 @@ export class AcceptNftBidNotificationComponent extends React.Component<Props> {
                         profile={this.props.profile}
                     />
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}> accepted your bid of</Text>
-                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} CLOUT</Text>
+                    <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> {bitCloutAmount} DESO</Text>
                     <Text style={[notificationsStyles.usernameText, themeStyles.fontColorMain]}> (~${usdAmount}) </Text>
 
                     <Text style={[globalStyles.fontWeight500, themeStyles.fontColorMain]}>for serial number </Text>
