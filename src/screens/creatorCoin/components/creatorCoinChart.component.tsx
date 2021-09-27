@@ -6,6 +6,7 @@ import { themeStyles } from '@styles/globalColors';
 import { formatAsFullCurrency, formatNumber } from '@services/helpers';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
 import { DateTime } from 'luxon';
+import { mean, isFinite } from 'lodash';
 
 interface Props {
     publicKey: string;
@@ -77,29 +78,18 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
             const price = (() => {
                 // For today, take the current price rather than the average price
                 if (isToday) return this.props.currentCoinPrice;
+                const meanPrice = mean(prices);
+                if (isFinite(meanPrice)) {
+                    lastAveragePrice = meanPrice;
+                    return meanPrice;
+                }
                 // for days with no txns, take the previous average
-                if (prices.length === 0) return lastAveragePrice;
-                lastAveragePrice = this.getAverage(prices);
                 return lastAveragePrice;
             })();
             everyDayToAveragePrice.push({ startOfDay, price });
         }
 
         return everyDayToAveragePrice;
-    }
-
-    getAverage(p_numbers: number[]) {
-        if (p_numbers.length === 0) {
-            return 0;
-        }
-
-        let sum = 0;
-
-        for (const number of p_numbers) {
-            sum += number;
-        }
-
-        return sum / p_numbers.length;
     }
 
     render() {
