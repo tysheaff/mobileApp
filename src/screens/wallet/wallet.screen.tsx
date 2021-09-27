@@ -6,7 +6,7 @@ import { calculateAndFormatBitCloutInUsd, calculateBitCloutInUSD } from '@servic
 import { CoinEntry, CreatorCoinHODLer, User } from '@types';
 import { TabConfig, TabsComponent } from '@components/tabs.component';
 import { CreatorCoinHODLerComponent } from '@components/creatorCoinHODLer.component';
-import { formatNumber } from '@services/helpers';
+import { formatAsFullCurrency } from '@services/helpers';
 import { navigatorGlobals } from '@globals/navigatorGlobals';
 import CloutFeedLoader from '@components/loader/cloutFeedLoader.component';
 import { api, cache } from '@services';
@@ -30,6 +30,7 @@ interface State {
     balanceBitClout: string;
     balanceUsd: string;
     creatorCoinsTotalValueUsd: string;
+    netWorthUsd: string;
     selectedTab: WalletTab;
     usersYouHODL: CreatorCoinHODLer[];
     sections: Section[];
@@ -70,6 +71,7 @@ export class WalletScreen extends React.Component<Props, State> {
             bitCloutPriceUsd: '',
             balanceBitClout: '',
             balanceUsd: '',
+            netWorthUsd: '',
             creatorCoinsTotalValueUsd: '',
             selectedTab: WalletTab.Purchased,
             usersYouHODL: [],
@@ -127,10 +129,11 @@ export class WalletScreen extends React.Component<Props, State> {
                 const bitCloutNanos = 1000000000.0;
                 const balanceBitClout = (user.BalanceNanos / bitCloutNanos).toFixed(9);
                 const bitCloutPriceUsd = calculateAndFormatBitCloutInUsd(bitCloutNanos);
-                const balanceUsd = calculateAndFormatBitCloutInUsd(user.BalanceNanos);
+                const balanceUsd = calculateAndFormatBitCloutInUsd(user.BalanceNanos, false);
 
                 const usersYouHODL = user.UsersYouHODL;
 
+                let creatorCoinsTotalBitCloutNanos = 0;
                 let creatorCoinsTotalValueUsd = 0;
 
                 if (usersYouHODL?.length > 0) {
@@ -138,15 +141,16 @@ export class WalletScreen extends React.Component<Props, State> {
                     for (let i = 0; i < usersYouHODL.length; i++) {
                         if (usersYouHODL[i].ProfileEntryResponse) {
                             const userYouHODL = usersYouHODL[i];
-                            const amountYouGetIfYouSold = this.bitCloutNanosYouWouldGetIfYouSold(
+                            const amountNanos = this.bitCloutNanosYouWouldGetIfYouSold(
                                 userYouHODL.BalanceNanos,
                                 userYouHODL.ProfileEntryResponse.CoinEntry
                             );
-                            const amountUsd = calculateBitCloutInUSD(amountYouGetIfYouSold);
+                            const amountUsd = calculateBitCloutInUSD(amountNanos);
 
                             const coinsAmount = userYouHODL.BalanceNanos / 1000000000;
                             userYouHODL.ProfileEntryResponse.CoinPriceUSD = amountUsd / coinsAmount;
 
+                            creatorCoinsTotalBitCloutNanos += amountNanos;
                             creatorCoinsTotalValueUsd += amountUsd;
                             amountUsdMap[userYouHODL.CreatorPublicKeyBase58Check] = amountUsd;
                         }
@@ -157,6 +161,9 @@ export class WalletScreen extends React.Component<Props, State> {
                     );
                 }
 
+                const netWorthBitCloutNanos = creatorCoinsTotalBitCloutNanos + user.BalanceNanos;
+                const netWorthUsd = calculateBitCloutInUSD(netWorthBitCloutNanos);
+
                 if (this._isMounted) {
                     this.setState(
                         {
@@ -164,7 +171,8 @@ export class WalletScreen extends React.Component<Props, State> {
                             bitCloutPriceUsd,
                             balanceBitClout,
                             balanceUsd,
-                            creatorCoinsTotalValueUsd: formatNumber(creatorCoinsTotalValueUsd),
+                            creatorCoinsTotalValueUsd: formatAsFullCurrency(creatorCoinsTotalValueUsd),
+                            netWorthUsd: formatAsFullCurrency(netWorthUsd),
                             usersYouHODL: usersYouHODL,
                             refreshing: false,
                             sections: this.getSections(usersYouHODL, this.state.selectedTab === WalletTab.Purchased)
@@ -271,6 +279,11 @@ export class WalletScreen extends React.Component<Props, State> {
                 <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>Creator Coins</Text>
                 <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.creatorCoinsTotalValueUsd}</Text>
             </View>
+
+            <View style={[styles.netWorthContainer]}>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>Net Worth</Text>
+                <Text style={[styles.bitCloutPriceText, themeStyles.fontColorMain]}>~${this.state.netWorthUsd}</Text>
+            </View>
         </>;
 
         const renderRefresh = <RefreshControl
@@ -344,6 +357,14 @@ const styles = StyleSheet.create(
         },
         creatorCoinsContainer: {
             marginTop: 4,
+            padding: 10,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+        },
+        netWorthContainer: {
+            marginTop: 0,
+            marginBottom: 8,
             padding: 10,
             flexDirection: 'row',
             justifyContent: 'space-between',
