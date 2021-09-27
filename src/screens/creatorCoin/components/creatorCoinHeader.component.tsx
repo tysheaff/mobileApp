@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
 import { CreatorCoinTransaction } from '@types';
 import { themeStyles } from '@styles/globalColors';
-import { formatNumber } from '@services/helpers';
+import { formatNumber, formatAsFullCurrency } from '@services/helpers';
 
 interface Props {
     username: string;
@@ -27,7 +27,7 @@ export class CreatorCoinHeaderComponent extends React.Component<Props, State> {
         const { absolutePriceChange, percentagePriceChange } = this.calculateChangeLast24Hours();
 
         this.state = {
-            formattedCurrentPrice: formatNumber(this.props.currentCoinPrice),
+            formattedCurrentPrice: formatAsFullCurrency(this.props.currentCoinPrice),
             absoluteChangeLast24Hours: formatNumber(absolutePriceChange),
             percentageChangeLast24Hour: percentagePriceChange.toFixed(2),
             changeDirection: percentagePriceChange > 0 ? 1 : -1
@@ -69,7 +69,7 @@ export class CreatorCoinHeaderComponent extends React.Component<Props, State> {
                 <Text>
                     <Text style={[styles.coinPriceChange, { color: this.state.changeDirection === 1 ? '#30c296' : '#e24c4f' }]}
                     >{this.state.changeDirection === 1 ? '+' : ''}
-                        {this.state.absoluteChangeLast24Hours} ({this.state.percentageChangeLast24Hour}%) </Text>
+                        {`$${this.state.absoluteChangeLast24Hours}`} ({this.state.percentageChangeLast24Hour}%) </Text>
                     <Text style={[styles.last24Hours, themeStyles.fontColorSub]}>LAST 24 HOURS</Text>
                 </Text>
             </View>

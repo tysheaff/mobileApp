@@ -131,15 +131,15 @@ export default class BidEditionsScreen extends React.Component<Props, State> {
             <View style={styles.titleRow}>
                 <Text style={[themeStyles.fontColorSub, styles.tableTitle]}>Highest Bid</Text>
                 <Text style={[themeStyles.fontColorMain, styles.record]}>
-                    {formatNumber(item.HighestBidAmountNanos / 1000000000, true, 3)}
-                    {' '}DESO <Text style={themeStyles.fontColorSub}>(~${formatNumber(calculateBitCloutInUSD(item.HighestBidAmountNanos))})</Text>
+                    {formatNumber(item.HighestBidAmountNanos / 1000000000, 3)}
+                    {' '}DESO <Text style={themeStyles.fontColorSub}>(~${formatNumber(calculateBitCloutInUSD(item.HighestBidAmountNanos), 2)})</Text>
                 </Text>
             </View>
             <View style={styles.titleRow}>
                 <Text style={[themeStyles.fontColorSub, styles.tableTitle]}>Min Bid Amount</Text>
                 <Text style={[themeStyles.fontColorMain, styles.record]}>
-                    {formatNumber(item.MinBidAmountNanos / 1000000000, true, 3)}
-                    {' '}DESO <Text style={themeStyles.fontColorSub}>(~${formatNumber(calculateBitCloutInUSD(item.MinBidAmountNanos), true)})</Text>
+                    {formatNumber(item.MinBidAmountNanos / 1000000000, 3)}
+                    {' '}DESO <Text style={themeStyles.fontColorSub}>(~${formatNumber(calculateBitCloutInUSD(item.MinBidAmountNanos), 2)})</Text>
                 </Text>
             </View>
         </TouchableOpacity>;

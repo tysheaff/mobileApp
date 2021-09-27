@@ -357,8 +357,8 @@ export default class AuctionStatusScreen extends React.Component<Props, State> {
                     <Text style={[themeStyles.fontColorMain, styles.serialNumber]}>#{item.SerialNumber}</Text>
                 </View>
                 <Text style={themeStyles.fontColorMain}>
-                    {formatNumber(item.MinBidAmountNanos / 1000000000, true, 3)} DESO
-                    <Text style={themeStyles.fontColorSub}> (~${formatNumber(calculateBitCloutInUSD(item.MinBidAmountNanos), true)})</Text>
+                    {formatNumber(item.MinBidAmountNanos / 1000000000, 3)} DESO
+                    <Text style={themeStyles.fontColorSub}> (~${formatNumber(calculateBitCloutInUSD(item.MinBidAmountNanos), 2)})</Text>
                 </Text>
             </TouchableOpacity>
         </>;

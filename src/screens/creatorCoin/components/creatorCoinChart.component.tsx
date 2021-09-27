@@ -3,8 +3,9 @@ import { View, StyleSheet } from 'react-native';
 import { CreatorCoinTransaction } from '@types';
 import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip } from 'victory-native';
 import { themeStyles } from '@styles/globalColors';
-import { formatNumber } from '@services/helpers';
+import { formatAsFullCurrency, formatNumber } from '@services/helpers';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
+import { DateTime } from 'luxon';
 
 interface Props {
     publicKey: string;
@@ -13,7 +14,12 @@ interface Props {
 }
 
 interface State {
-    aggregatedDate: { x: number, y: number }[];
+    aggregatedData: { x: Date, y: number }[];
+}
+
+interface DayToAveragePrice {
+    startOfDay: Date,
+    price: number,
 }
 
 export class CreatorCoinChartComponent extends React.Component<Props, State> {
@@ -21,54 +27,72 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        const aggregateData = this.aggregateData();
-        const data: { x: number, y: number }[] = [];
-        for (let i = 0; i < aggregateData.length; i++) {
-            data.push({ x: i, y: aggregateData[i] });
-        }
+        const pricesByDay = this.getPricePerDay();
+        const aggregatedData: { x: Date, y: number }[] = [];
+        pricesByDay.forEach((value: DayToAveragePrice) => {
+            aggregatedData.push({ x: value.startOfDay, y: value.price });
+        });
 
-        if (this.props.currentCoinPrice != null) {
-            data.push({ x: data.length, y: this.props.currentCoinPrice });
-        }
-
-        this.state = {
-            aggregatedDate: data
-        };
+        this.state = { aggregatedData };
     }
 
     shouldComponentUpdate(p_nextProps: Props) {
         return p_nextProps.creatorCoinTransactions.length !== this.props.creatorCoinTransactions.length;
     }
 
-    aggregateData() {
-        const coinPricePerDayMap: { [key: string]: number[] } = {};
+    startOfDay(coinTxn: CreatorCoinTransaction): DateTime {
+        const timestamp = DateTime.fromSeconds(coinTxn.timeStamp);
+        return timestamp.startOf('day');
+    }
 
-        for (const coinPrice of this.props.creatorCoinTransactions) {
-            const timeStampInMilliseconds = coinPrice.timeStamp * 1000;
-            const date = new Date(timeStampInMilliseconds);
+    getPricePerDay(): DayToAveragePrice[] {
+        const firstTxn = this.props.creatorCoinTransactions[0];
+        const firstDay = this.startOfDay(firstTxn);
+        const startOfToday = DateTime.now().startOf('day');
+        const durationActive = startOfToday.diff(firstDay, 'days');
 
-            const key = '_' + date.getFullYear() + date.getMonth() + date.getDate() + Math.floor(date.getHours() / 8);
+        // this will be the x axis on our chart, representing the start of each day in the user's local timezone
+        // we iterate through each day, so that there aren't gaps in the chart on days when no transactions occurred
+        const startOfEveryDay = [...[...Array(durationActive.days).keys()].map((dayOffset) => {
+            return firstDay.plus({ days: dayOffset }).toJSDate();
+        }), startOfToday.toJSDate()];
 
-            if (coinPricePerDayMap[key]) {
-                coinPricePerDayMap[key].push(coinPrice.coinPrice);
-            } else {
-                coinPricePerDayMap[key] = [coinPrice.coinPrice];
-            }
+        const everyDayToPrices: { [key: string]: number[] } = {};
+        startOfEveryDay.forEach((startOfDay) => {
+            everyDayToPrices[startOfDay.toISOString()] = [];
+        });
+
+        this.props.creatorCoinTransactions.forEach((coinTxn) => {
+            const startOfDay = this.startOfDay(coinTxn).toJSDate();
+            const pricesThisDay = everyDayToPrices[startOfDay.toISOString()] ?? [];
+            pricesThisDay.push(coinTxn.coinPrice);
+            everyDayToPrices[startOfDay.toISOString()] = pricesThisDay;
+        });
+
+        const everyDayToAveragePrice: DayToAveragePrice[] = [];
+        let lastAveragePrice = 0;
+        for (const [startOfDayISO, prices] of Object.entries(everyDayToPrices)) {
+            const startOfDay = new Date(startOfDayISO);
+            const isToday = startOfDay.getTime() === startOfToday.toJSDate().getTime();
+            const price = (() => {
+                // For today, take the current price rather than the average price
+                if (isToday) return this.props.currentCoinPrice;
+                // for days with no txns, take the previous average
+                if (prices.length === 0) return lastAveragePrice;
+                lastAveragePrice = this.getAverage(prices);
+                return lastAveragePrice;
+            })();
+            everyDayToAveragePrice.push({ startOfDay, price });
         }
 
-        const keys = Object.keys(coinPricePerDayMap);
-
-        const result = [];
-
-        for (const key of keys) {
-            const average = this.getAverage(coinPricePerDayMap[key]);
-            result.push(average);
-        }
-
-        return result;
+        return everyDayToAveragePrice;
     }
 
     getAverage(p_numbers: number[]) {
+        if (p_numbers.length === 0) {
+            return 0;
+        }
+
         let sum = 0;
 
         for (const number of p_numbers) {
@@ -81,10 +105,11 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
     render() {
         return <View style={[styles.container, themeStyles.containerColorMain]}>
             <Svg>
-                < VictoryChart
+                <VictoryChart
                     standalone={false}
-                    padding={{ left: 0, top: 10, bottom: 0, right: 32 }}
+                    padding={{ left: 20, top: 10, bottom: 0, right: 40 }}
                     domainPadding={{ x: [0, 5], y: [0, 40] }}
+                    scale={{ x: 'time' }}
                     theme={
                         {
                             axis: {
@@ -105,7 +130,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                             y2="100%"
                         >
                             <Stop offset="0%" stopColor="#1E93FA" stopOpacity="1" />
-                            <Stop offset="75%" stopColor="#1E93FA" stopOpacity="0" />
+                            <Stop offset="75%" stopColor="#FFFFFF" stopOpacity="0" />
                         </LinearGradient>
                     </Defs>
                     <VictoryAxis
@@ -124,7 +149,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         }}
                         domainPadding={1000}
                         orientation={'right'}
-                        tickFormat={p_value => formatNumber(p_value, false)}
+                        tickFormat={p_value => `$${formatNumber(p_value, 0, true, 0)}`}
                     />
                     <VictoryArea
                         animate={{
@@ -133,24 +158,31 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         }}
                         style={{ data: { stroke: '#0061a8', strokeWidth: 1.3, fillOpacity: 0.1, fill: 'url(#gradientStroke)' } }}
                         padding={0}
-                        data={this.state.aggregatedDate}
+                        data={this.state.aggregatedData}
                     />
                     <VictoryScatter
                         size={15}
-                        labels={({ datum }) => datum.y.toFixed(2)}
+                        labels={({ datum }) => {
+                            const formattedDate: string = DateTime.fromJSDate(datum.x).toLocaleString(DateTime.DATE_MED);
+                            return `${formattedDate}\n$${formatAsFullCurrency(datum.y)}`;
+                        }}
                         labelComponent={
                             <VictoryTooltip
-                                dy={-12}
-                                flyoutPadding={6}
-                                flyoutStyle={{ stroke: 'none', backgroundColor: 'black', fill: themeStyles.containerColorSub.backgroundColor }}
-                                renderInPortal={false} />
+                                dy={0}
+                                flyoutPadding={12}
+                                flyoutStyle={{
+                                    stroke: themeStyles.borderColor.borderColor,
+                                    fill: themeStyles.containerColorSub.backgroundColor,
+                                }}
+                                renderInPortal={false}
+                            />
                         }
                         style={{
                             data: { stroke: 'none', strokeWidth: 2, fillOpacity: 0.1, fill: 'none' },
                             labels: { fill: themeStyles.fontColorMain.color, fontFamily: 'Arial' }
                         }}
                         padding={0}
-                        data={this.state.aggregatedDate}
+                        data={this.state.aggregatedData}
                     />
                 </VictoryChart>
             </Svg>

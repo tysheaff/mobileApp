@@ -165,8 +165,8 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
 
     private isBidFormValid(bidAmountNanos: number): boolean {
 
-        const minBidAmountInUsd = formatNumber(calculateBitCloutInUSD(this.props.bidEdition.MinBidAmountNanos), true);
-        const minBidAmountInClout = formatNumber(this.props.bidEdition.MinBidAmountNanos / 1000000000, true, 4);
+        const minBidAmountInUsd = formatNumber(calculateBitCloutInUSD(this.props.bidEdition.MinBidAmountNanos), 2);
+        const minBidAmountInClout = formatNumber(this.props.bidEdition.MinBidAmountNanos / 1000000000, 4);
 
         if (this.state.clout.length === 0 || this.state.usd.length === 0) {
             Alert.alert('Error', 'Bid amount is empty');
@@ -236,11 +236,11 @@ export default class PlaceBidFormComponent extends React.Component<Props, State>
 
         const highestBid = this.state.isUsd ?
             <>~${calculateAndFormatBitCloutInUsd(this.state.highestBid)} </> :
-            formatNumber(this.state.highestBid / 1000000000, true, 3);
+            formatNumber(this.state.highestBid / 1000000000, 3);
 
         const lowestBid = this.state.isUsd ?
             <>~${calculateAndFormatBitCloutInUsd(this.state.lowestBid)} </> :
-            formatNumber(this.state.lowestBid / 1000000000, true, 3);
+            formatNumber(this.state.lowestBid / 1000000000, 3);
 
         const keyboardVerticalOffset = Platform.OS === 'ios' ? 10 : 0;
         const behavior = Platform.OS === 'ios' ? 'padding' : undefined;

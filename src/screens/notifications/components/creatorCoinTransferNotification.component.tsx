@@ -31,7 +31,7 @@ export class CreatorCoinTransferNotificationComponent extends React.Component<Pr
 
     render() {
         const creatorCoinAmount = this.props.notification.Metadata.CreatorCoinTransferTxindexMetadata?.CreatorCoinToTransferNanos as number;
-        const formattedCreatorCoinAmount = formatNumber(creatorCoinAmount / 1000000000, true, 6);
+        const formattedCreatorCoinAmount = formatNumber(creatorCoinAmount / 1000000000, 6);
         const creatorCoinUsername = this.props.notification.Metadata.CreatorCoinTransferTxindexMetadata?.CreatorUsername as string;
         const diamondLevel = this.props.notification.Metadata.CreatorCoinTransferTxindexMetadata?.DiamondLevel as number;
         const postHashHex = this.props.notification.Metadata.CreatorCoinTransferTxindexMetadata?.PostHashHex as string;

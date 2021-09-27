@@ -227,14 +227,14 @@ export function ProfileStats(
 
     function formatData(p_stats: Stats) {
         if (mount) {
-            setLikesCount(formatNumber(p_stats.likesCount, false));
-            setAvgLikesCount(formatNumber(p_stats.avgLikesCount, false));
-            setCommentsCount(formatNumber(p_stats.commentsCount, false));
-            setAvgCommentsCount(formatNumber(p_stats.avgCommentsCount, false));
-            setRecloutsCount(formatNumber(p_stats.recloutsCount, false));
-            setAvgRecloutsCount(formatNumber(p_stats.avgRecloutsCount, false));
-            setAvgCoinPricePerFollower(formatNumber(p_stats.avgCoinPricePerFollower, true));
-            setAvgCoinPricePerHODLer(formatNumber(p_stats.avgCoinPricePerHODLer, true));
+            setLikesCount(formatNumber(p_stats.likesCount, 0));
+            setAvgLikesCount(formatNumber(p_stats.avgLikesCount, 0));
+            setCommentsCount(formatNumber(p_stats.commentsCount, 0));
+            setAvgCommentsCount(formatNumber(p_stats.avgCommentsCount, 0));
+            setRecloutsCount(formatNumber(p_stats.recloutsCount, 0));
+            setAvgRecloutsCount(formatNumber(p_stats.avgRecloutsCount, 0));
+            setAvgCoinPricePerFollower(formatNumber(p_stats.avgCoinPricePerFollower, 2));
+            setAvgCoinPricePerHODLer(formatNumber(p_stats.avgCoinPricePerHODLer, 2));
             setCloutRate(p_stats.cloutRate);
         }
     }

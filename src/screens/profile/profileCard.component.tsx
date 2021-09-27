@@ -253,7 +253,7 @@ export class ProfileCard extends React.Component<Props, State> {
                         <Text style={[styles.infoTextLabel, themeStyles.fontColorSub]}>Followers</Text>
                         {
                             this.state.followersNumber != null ?
-                                < Text style={[styles.infoTextNumber, themeStyles.fontColorMain]}>{formatNumber(this.state.followersNumber, false)}</Text>
+                                < Text style={[styles.infoTextNumber, themeStyles.fontColorMain]}>{formatNumber(this.state.followersNumber, 0)}</Text>
                                 :
                                 <ActivityIndicator color={themeStyles.fontColorMain.color} style={styles.activityIndicator} />
                         }
@@ -270,7 +270,7 @@ export class ProfileCard extends React.Component<Props, State> {
                         <Text style={[styles.infoTextLabel, themeStyles.fontColorSub]}>Following</Text>
                         {
                             this.state.followingNumber != null ?
-                                <Text style={[styles.infoTextNumber, themeStyles.fontColorMain]}>{formatNumber(this.state.followingNumber, false)}</Text>
+                                <Text style={[styles.infoTextNumber, themeStyles.fontColorMain]}>{formatNumber(this.state.followingNumber, 0)}</Text>
                                 : <ActivityIndicator color={themeStyles.fontColorMain.color} style={styles.activityIndicator} />
                         }
                     </TouchableOpacity>
