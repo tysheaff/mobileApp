@@ -13,6 +13,7 @@ export function calculateBitCloutInUSD(p_nanos: number) {
     return 0;
 }
 
-export function calculateAndFormatBitCloutInUsd(p_nanos: number) {
-    return formatNumber(calculateBitCloutInUSD(p_nanos));
+// If usingSuffix is true, it'll be like `1.2k`, otherwise it'll be full precision like `1,234.56`
+export function calculateAndFormatBitCloutInUsd(p_nanos: number, usingSuffix = true): string {
+    return formatNumber(calculateBitCloutInUSD(p_nanos), true, 2, usingSuffix);
 }

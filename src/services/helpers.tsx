@@ -38,25 +38,40 @@ export function checkProfilePicture(p_profile: Profile) {
     }
 }
 
-const SYMBOLs = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
+const SYMBOLS = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
 
-export function formatNumber(p_number: number, p_includeDecimalPlaces = true, p_decimalPlaces = 2) {
-
+// If > 1000 and usingSuffix is true: 8234.79 => 8.2k and 12345678.91 => 12.3M
+// If < 1000 or usingSuffix is false: 82.7934 => 82.79 and 8234.7934 => 8,234.79
+export function formatNumber(p_number: number, p_includeDecimalPlaces = true, p_decimalPlaces = 2, usingSuffix = true): string {
     const tier = Math.log10(Math.abs(p_number)) / 3 | 0;
 
-    if (tier <= 0) {
-        return p_includeDecimalPlaces ? p_number.toFixed(p_decimalPlaces) : p_number.toString();
+    if (tier <= 0 || !usingSuffix) {
+        if (!p_includeDecimalPlaces) {
+            return p_number.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
+
+        const numberRoundedWithDecimals = Math.floor(p_number * Math.pow(10, p_decimalPlaces)) / Math.pow(10, p_decimalPlaces);
+        return numberRoundedWithDecimals.toLocaleString(undefined, {
+            minimumFractionDigits: p_decimalPlaces,
+            maximumFractionDigits: p_decimalPlaces
+        });
     }
 
-    const suffix = SYMBOLs[tier];
+    const suffix = SYMBOLS[tier];
     const scale = Math.pow(10, tier * 3);
-
     const scaled = p_number / scale;
-
     return scaled.toFixed(1) + suffix;
 }
 
-export function isNumber(p_value: any) {
+// No suffix, always 2 decimal places, for when full precision is desired
+export function formatAsFullCurrency(p_number: number): string {
+    return formatNumber(p_number, true, 2, false);
+}
+
+export function isNumber(p_value: any): boolean {
     return !isNaN(p_value) &&
         !isNaN(parseFloat(p_value));
 }
