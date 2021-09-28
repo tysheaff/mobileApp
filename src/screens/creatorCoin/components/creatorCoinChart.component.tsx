@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
 import { CreatorCoinTransaction } from '@types';
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip } from 'victory-native';
+import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip, VictoryTheme } from 'victory-native';
 import { themeStyles } from '@styles/globalColors';
 import { formatAsFullCurrency, formatNumber } from '@services/helpers';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
@@ -41,6 +41,7 @@ interface ChartIntervalConfig {
     chunkDuration: Duration, // e.g. 5 minutes for the `24_hours` interval, or 1 day for the `1_year` interval
     displayName: string,
     dateRenderer: (date: Date) => string
+    dateAxisRenderer: (date: Date) => string
 }
 
 export class CreatorCoinChartComponent extends React.Component<Props, State> {
@@ -55,6 +56,10 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
 
     // Intervals and Chunks
 
+    hoursDateRenderer(date: Date): string {
+        return DateTime.fromJSDate(date).toLocaleString(DateTime.TIME_SIMPLE);
+    }
+
     minutesDateRenderer(date: Date): string {
         return DateTime.fromJSDate(date).toLocaleString(DateTime.DATETIME_MED);
     }
@@ -64,6 +69,26 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
         return DateTime.fromJSDate(date).minus(Duration.fromMillis(1)).toLocaleString(DateTime.DATE_MED);
     }
 
+    daysShortDateRenderer(date: Date): string {
+        // the end of a day chunk is at 12:00am on the *next* day, so we subtract 1ms from it so that it renders properly
+        return DateTime.fromJSDate(date).minus(Duration.fromMillis(1)).toLocaleString({ month: 'short', day: 'numeric' });
+    }
+
+    monthRenderer(date: Date): string {
+        return DateTime.fromJSDate(date).toLocaleString({ month: 'short' });
+    }
+
+    dateAxisRenderer(date: Date): string {
+        const intervalDuration = this.state.now.diff(this.getStartOfInterval());
+        if (intervalDuration < Duration.fromObject({ hours: 36 })) {
+            return this.hoursDateRenderer(date);
+        }
+        if (intervalDuration < Duration.fromObject({ days: 60 })) {
+            return this.daysShortDateRenderer(date);
+        }
+        return this.monthRenderer(date);
+    }
+
     intervalConfigs: ChartIntervalConfig[] = CHART_INTERVALS.map((interval) => {
         switch (interval) {
             case '24_hours': return {
@@ -71,42 +96,48 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                 intervalDuration: Duration.fromObject({ hours: 24}),
                 chunkDuration: Duration.fromObject({ minutes: 5 }),
                 displayName: '24H',
-                dateRenderer: this.minutesDateRenderer,
+                dateRenderer: this.minutesDateRenderer.bind(this),
+                dateAxisRenderer: this.dateAxisRenderer.bind(this),
             };
             case '7_days': return {
                 interval,
                 intervalDuration: Duration.fromObject({ days: 7}),
                 chunkDuration: Duration.fromObject({ minutes: 30 }),
                 displayName: '7D',
-                dateRenderer: this.minutesDateRenderer,
+                dateRenderer: this.minutesDateRenderer.bind(this),
+                dateAxisRenderer: this.dateAxisRenderer.bind(this),
             };
             case '1_month': return {
                 interval,
                 intervalDuration: Duration.fromObject({ months: 1 }),
                 chunkDuration: Duration.fromObject({ days: 1 }),
                 displayName: '1M',
-                dateRenderer: this.daysDateRenderer,
+                dateRenderer: this.daysDateRenderer.bind(this),
+                dateAxisRenderer: this.dateAxisRenderer.bind(this),
             };
             case '6_months': return {
                 interval,
                 intervalDuration: Duration.fromObject({ months: 6 }),
                 chunkDuration: Duration.fromObject({ days: 1 }),
                 displayName: '6M',
-                dateRenderer: this.daysDateRenderer,
+                dateRenderer: this.daysDateRenderer.bind(this),
+                dateAxisRenderer: this.dateAxisRenderer.bind(this),
             };
             case '1_year': return {
                 interval,
                 intervalDuration: Duration.fromObject({ years: 1 }),
                 chunkDuration: Duration.fromObject({ days: 1 }),
                 displayName: '1Y',
-                dateRenderer: this.daysDateRenderer,
+                dateRenderer: this.daysDateRenderer.bind(this),
+                dateAxisRenderer: this.dateAxisRenderer.bind(this),
             };
             case 'max': return {
                 interval,
                 intervalDuration: undefined,
                 chunkDuration: Duration.fromObject({ days: 1 }),
                 displayName: 'MAX',
-                dateRenderer: this.daysDateRenderer,
+                dateRenderer: this.daysDateRenderer.bind(this),
+                dateAxisRenderer: this.dateAxisRenderer.bind(this),
             };
         }
     })
@@ -127,10 +158,15 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
         return this.getSurroundingChunk(fromDate, intervalConfig, true);
     }
 
-    getSurroundingChunk(fromDate: DateTime, intervalConfig: ChartIntervalConfig, isNext: boolean): DateTime {
-        const { chunkDuration, intervalDuration } = intervalConfig;
+    getStartOfInterval(intervalConfig: ChartIntervalConfig = this.getCurrentIntervalConfig()): DateTime {
+        const { intervalDuration } = intervalConfig;
         const firstTxnDate = this.getDateTime(this.props.creatorCoinTransactions[0]);
-        const startOfInterval = (intervalDuration && max([this.state.now.minus(intervalDuration), firstTxnDate])) ?? firstTxnDate;
+        return (intervalDuration && max([this.state.now.minus(intervalDuration), firstTxnDate])) ?? firstTxnDate;
+    }
+
+    getSurroundingChunk(fromDate: DateTime, intervalConfig: ChartIntervalConfig, isNext: boolean): DateTime {
+        const { chunkDuration } = intervalConfig;
+        const startOfInterval = this.getStartOfInterval(intervalConfig);
         const chunkMillis = chunkDuration.shiftTo('milliseconds').milliseconds;
         const startToDateMillis = fromDate.diff(startOfInterval).shiftTo('milliseconds').milliseconds;
         const chunkIndex = Math.max(Math.floor(startToDateMillis / chunkMillis), 0) + (isNext ? 1 : 0);
@@ -224,6 +260,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         onPress={() => {
                             this.setState({ interval });
                         }}
+                        // style={{ position: 'absolute' }}
                         title={displayName}
                         color={isSelected ? '#4eaf00': '#000000'}
                         accessibilityLabel="Learn more about this purple button"
@@ -234,8 +271,8 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
             <Svg>
                 <VictoryChart
                     standalone={false}
-                    padding={{ left: 20, top: 10, bottom: 0, right: 40 }}
-                    domainPadding={{ x: [0, 5], y: [0, 40] }}
+                    // padding={{ left: 20, top: 10, bottom: 10, right: 40 }}
+                    // domainPadding={{ x: [0, 80], y: [0, 80] }}
                     scale={{ x: 'time' }}
                     theme={
                         {
@@ -261,22 +298,31 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         </LinearGradient>
                     </Defs>
                     <VictoryAxis
+                        // theme={VictoryTheme.material}
                         style={{
-                            grid: { strokeWidth: 0 },
-                            axis: { stroke: 'transparent' },
+                            grid: { strokeWidth: 0.5 },
+                            // axis: { stroke: 'transparent' },
                             ticks: { stroke: 'transparent' },
-                            tickLabels: { fill: 'transparent' }
+                            // tickLabels: { fill: 'transparent' }
                         }}
-                        tickFormat={date => this.getCurrentIntervalConfig().dateRenderer(date)}
+                        domain={[
+                            this.getStartOfInterval().toJSDate(),
+                            this.state.now.toJSDate(),
+                        ]}
+                        domainPadding={0}
+                        standalone={false}
+                        orientation={'bottom'}
+                        tickFormat={date => this.getCurrentIntervalConfig().dateAxisRenderer(date)}
                     />
                     <VictoryAxis
                         dependentAxis
                         style={{
-                            grid: { strokeWidth: 0 },
+                            grid: { strokeWidth: 0.5 },
                             axis: { stroke: 'transparent' },
+                            ticks: { stroke: 'transparent' },
                             tickLabels: { fontFamily: 'Arial', fontSize: 12 }
                         }}
-                        domainPadding={1000}
+                        // domainPadding={10}
                         orientation={'right'}
                         tickFormat={price => `$${formatNumber(price, 0, true, 0)}`}
                     />
@@ -294,7 +340,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         labelComponent={
                             <VictoryTooltip
                                 dy={0}
-                                flyoutPadding={12}
+                                // flyoutPadding={12}
                                 flyoutStyle={{
                                     stroke: themeStyles.borderColor.borderColor,
                                     fill: themeStyles.containerColorSub.backgroundColor,
@@ -320,8 +366,8 @@ const styles = StyleSheet.create(
         container: {
             alignItems: 'center',
             justifyContent: 'center',
-            height: 300,
-            paddingBottom: 10
+            height: 400,
+            paddingBottom: 0
         }
     }
 );
