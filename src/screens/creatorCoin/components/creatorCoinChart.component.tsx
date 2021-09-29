@@ -383,6 +383,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         labelComponent={
                             <VictoryTooltip
                                 dy={0}
+                                flyoutPadding={12}
                                 flyoutStyle={{
                                     stroke: themeStyles.borderColor.borderColor,
                                     fill: themeStyles.containerColorSub.backgroundColor,
