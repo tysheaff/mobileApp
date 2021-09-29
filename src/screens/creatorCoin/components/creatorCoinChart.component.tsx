@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
 import { CreatorCoinTransaction } from '@types';
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip, VictoryTheme } from 'victory-native';
+import { VictoryArea, VictoryAxis, VictoryChart, VictoryScatter, VictoryTooltip, VictoryLabel } from 'victory-native';
 import { themeStyles } from '@styles/globalColors';
 import { formatAsFullCurrency, formatNumber } from '@services/helpers';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
 import { DateTime, Duration } from 'luxon';
-import { find, max, forEach } from 'lodash';
+import { max, maxBy, minBy, find, forEach } from 'lodash';
 import { Union } from '@types';
 
 interface Props {
@@ -50,14 +50,14 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
 
         this.state = {
             now: DateTime.now(),
-            interval: '24_hours',
+            interval: 'max',
         };
     }
 
     // Intervals and Chunks
 
     hoursDateRenderer(date: Date): string {
-        return DateTime.fromJSDate(date).toLocaleString(DateTime.TIME_SIMPLE);
+        return DateTime.fromJSDate(date).toLocaleString({ hour: 'numeric' });
     }
 
     minutesDateRenderer(date: Date): string {
@@ -80,6 +80,7 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
 
     dateAxisRenderer(date: Date): string {
         const intervalDuration = this.state.now.diff(this.getStartOfInterval());
+
         if (intervalDuration < Duration.fromObject({ hours: 36 })) {
             return this.hoursDateRenderer(date);
         }
@@ -250,29 +251,62 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
 
     render() {
         const chartData = this.getChartData();
+        const dataDomain: { x: [Date, Date], y: [number, number] } = {
+            x: [
+                this.getStartOfInterval().toJSDate(),
+                this.state.now.toJSDate(),
+            ],
+            y: [
+                minBy(chartData, 'y')?.y ?? 0,
+                maxBy(chartData, 'y')?.y ?? 0,
+            ]
+        };
+        const yRange = dataDomain.y[1] - dataDomain.y[0];
 
         return <View style={[styles.container, themeStyles.containerColorMain]}>
-            {
-                this.intervalConfigs.map((intervalConfig, index) => {
-                    const { interval, displayName } = intervalConfig;
-                    const isSelected = interval === this.state.interval;
-                    return <Button
-                        onPress={() => {
-                            this.setState({ interval });
-                        }}
-                        // style={{ position: 'absolute' }}
-                        title={displayName}
-                        color={isSelected ? '#4eaf00': '#000000'}
-                        accessibilityLabel="Learn more about this purple button"
-                        key={`interval-button-${index}`}
-                    />;
-                })
-            }
+            <View style={{ display: 'flex', flexDirection:'row', flexWrap:'nowrap', marginTop: 40 }}>
+                {
+                    this.intervalConfigs.map((intervalConfig, index) => {
+                        const { interval, displayName } = intervalConfig;
+                        const isSelected = interval === this.state.interval;
+                        const buttonTheme = isSelected ? themeStyles.selectedButton : themeStyles.unselectedButton;
+                        return <Pressable
+                            onPress={() => {
+                                this.setState({ interval });
+                            }}
+                            key={`interval-button-${index}`}
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                paddingVertical: 4,
+                                paddingHorizontal: 12,
+                                borderRadius: 4,
+                                borderWidth: 2,
+                                marginRight: 8,
+                                backgroundColor: buttonTheme.backgroundColor,
+                                borderColor: buttonTheme.borderColor,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: 16,
+                                    lineHeight: 21,
+                                    fontWeight: 'bold',
+                                    letterSpacing: 0.25,
+                                    color: buttonTheme.color,
+                                }}
+                            >
+                                {displayName}
+                            </Text>
+                        </Pressable>;
+                    })
+                }
+            </View>
             <Svg>
                 <VictoryChart
                     standalone={false}
-                    // padding={{ left: 20, top: 10, bottom: 10, right: 40 }}
-                    // domainPadding={{ x: [0, 80], y: [0, 80] }}
+                    domainPadding={{ x: [0, 20], y: [20, 20]}}
+                    domain={dataDomain}
                     scale={{ x: 'time' }}
                     theme={
                         {
@@ -298,33 +332,42 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         </LinearGradient>
                     </Defs>
                     <VictoryAxis
-                        // theme={VictoryTheme.material}
                         style={{
-                            grid: { strokeWidth: 0.5 },
-                            // axis: { stroke: 'transparent' },
+                            grid: { stroke: themeStyles.recloutBorderColor.borderColor, strokeDasharray: '1,4' },
+                            axis: { stroke: 'transparent' },
                             ticks: { stroke: 'transparent' },
-                            // tickLabels: { fill: 'transparent' }
+                            tickLabels: { fontFamily: 'Arial', fontSize: 12 }
                         }}
-                        domain={[
-                            this.getStartOfInterval().toJSDate(),
-                            this.state.now.toJSDate(),
-                        ]}
-                        domainPadding={0}
-                        standalone={false}
                         orientation={'bottom'}
                         tickFormat={date => this.getCurrentIntervalConfig().dateAxisRenderer(date)}
                     />
                     <VictoryAxis
                         dependentAxis
                         style={{
-                            grid: { strokeWidth: 0.5 },
+                            grid: { stroke: themeStyles.recloutBorderColor.borderColor, strokeDasharray: '1,4' },
                             axis: { stroke: 'transparent' },
                             ticks: { stroke: 'transparent' },
                             tickLabels: { fontFamily: 'Arial', fontSize: 12 }
                         }}
-                        // domainPadding={10}
-                        orientation={'right'}
-                        tickFormat={price => `$${formatNumber(price, 0, true, 0)}`}
+                        orientation="left"
+                        standalone={false}
+                        tickLabelComponent={<VictoryLabel dx={-10}/>}
+                        tickFormat={price => {
+                            const formattedPrice = (() => {
+                                const yRangeLog = Math.log10(yRange);
+                                if (yRangeLog > 3.5) {
+                                    return formatNumber(price, 0, true, 0);
+                                }
+                                if (yRangeLog > 2.5) {
+                                    return formatNumber(price, 0, true, 1);
+                                }
+                                if (yRangeLog > 2.5) {
+                                    return formatNumber(price, 0, true, 2);
+                                }
+                                return formatNumber(price, 0, false);
+                            })();
+                            return `$${formattedPrice}`;
+                        }}
                     />
                     <VictoryArea
                         style={{ data: { stroke: '#0061a8', strokeWidth: 1.3, fillOpacity: 0.1, fill: 'url(#gradientStroke)' } }}
@@ -340,7 +383,6 @@ export class CreatorCoinChartComponent extends React.Component<Props, State> {
                         labelComponent={
                             <VictoryTooltip
                                 dy={0}
-                                // flyoutPadding={12}
                                 flyoutStyle={{
                                     stroke: themeStyles.borderColor.borderColor,
                                     fill: themeStyles.containerColorSub.backgroundColor,
@@ -366,7 +408,7 @@ const styles = StyleSheet.create(
         container: {
             alignItems: 'center',
             justifyContent: 'center',
-            height: 400,
+            height: 324,
             paddingBottom: 0
         }
     }
